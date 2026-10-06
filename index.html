@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- ============================================================
+     OSIRIS — diffusion privée. Accès réservé aux Mécènes.
+     ============================================================ -->
+<title>Osiris RP</title>
+<meta name="description" content="Osiris produit l'émission que personne n'est censé voir. Serveur GTA RP en saisons · Programme 01 : L'Hiver de Ludendorff, à partir du 3 avril 2027.">
+<meta name="theme-color" content="#0A0B0D">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Osiris RP">
+<meta property="og:title" content="Osiris RP">
+<meta property="og:description" content="L'émission que personne n'est censé voir. Programme 01 · L'Hiver de Ludendorff · 3 avril 2027.">
+<meta property="og:image" content="https://osiris-self-omega.vercel.app/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&display=swap">
+<link rel="preload" as="image" href="/img/oeil.webp" type="image/webp">
+<script>
+/* Rideau noir jusqu'au début de l'animation d'ouverture. */
+(function(){try{var r=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;if(!r&&!location.hash&&(window.scrollY||0)<40){document.documentElement.classList.add("intro");setTimeout(function(){document.documentElement.classList.remove("intro")},4000)}}catch(e){}})();
+</script>
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#0A0B0D;
+  --panel:#111317;
+  --panel-2:#16191E;
+  --line:#23262C;
+  --bone:#E6E0D3;
+  --dim:#8B877D;
+  --faint:#55534D;
+  --brass:#C4A265;
+  --brass-soft:#8E7747;
+  --gold:#E9CF78;
+  --alarm:#B5564A;
+  --display:"Marcellus", "Trajan Pro", Georgia, serif;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --max:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+html,body{background:var(--ground)}
+body{margin:0;color:var(--bone);font-family:var(--serif);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);z-index:5}
+[hidden]{display:none!important}
+a{color:inherit}
+img{max-width:100%}
+.in-wrap{max-width:var(--max);margin:0 auto;padding-inline:20px}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+.muted{color:var(--dim)}
+.gold-text{background:linear-gradient(180deg,#fbf0b8 0%,#e9cf78 45%,#a9853f 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- Boutons ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--brass);color:#16130C;border:0;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;padding:13px 22px;cursor:pointer;text-decoration:none;transition:filter .2s,background .2s,color .2s}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--brass);border:1px solid var(--brass-soft)}
+.btn.ghost:hover{background:rgba(196,162,101,.08);filter:none}
+.btn:focus-visible,a:focus-visible,button:focus-visible{outline:1px solid var(--bone);outline-offset:3px}
+.link{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);text-decoration:none;display:inline-flex;gap:8px;align-items:center}
+.link:hover{color:var(--gold)}
+.link .ar{transition:transform .25s}
+.link:hover .ar{transform:translateX(4px)}
+
+/* ---------- En-tête ---------- */
+.top{position:fixed;inset:0 0 auto;z-index:7;background:rgba(10,11,13,.9);transition:background .4s,border-color .4s,backdrop-filter .4s;border-bottom:1px solid transparent}
+.top.scrolled{background:rgba(10,11,13,.92);border-bottom-color:var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.top .in-wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
+.mark{display:flex;align-items:center;gap:12px;font-family:var(--display);font-size:17px;letter-spacing:.32em;color:var(--bone);text-decoration:none;white-space:nowrap}
+.mark img{width:36px;height:36px;mix-blend-mode:screen}
+.nav{display:flex;align-items:center;gap:26px}
+.nav a{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-decoration:none;position:relative;padding-block:6px;transition:color .2s}
+.nav a:hover,.nav a.on{color:var(--bone)}
+.nav a.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--brass)}
+.nav .btn{padding:10px 16px;color:#16130C}
+.burger{display:none;background:none;border:1px solid var(--line);width:42px;height:42px;cursor:pointer;position:relative}
+.burger i{position:absolute;left:11px;right:11px;height:1px;background:var(--bone);transition:transform .3s,opacity .3s}
+.burger i:nth-child(1){top:15px}.burger i:nth-child(2){top:20px}.burger i:nth-child(3){top:25px}
+.menu-open .burger i:nth-child(1){transform:translateY(5px) rotate(45deg)}
+.menu-open .burger i:nth-child(2){opacity:0}
+.menu-open .burger i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+@media (max-width:960px){
+  .burger{display:block}
+  .nav{position:fixed;inset:72px 0 auto;flex-direction:column;align-items:stretch;gap:0;background:rgba(10,11,13,.97);border-bottom:1px solid var(--line);padding:8px 20px 22px;transform:translateY(-8px);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+  .menu-open .nav{opacity:1;transform:none;pointer-events:auto}
+  .menu-open .top{background:rgba(10,11,13,.97)}
+  .nav a{padding:14px 0;border-bottom:1px solid var(--line);font-size:12px}
+  .nav a.on::after{display:none}
+  .nav .btn{margin-top:16px;justify-content:center;border-bottom:0}
+}
+
+/* ---------- Œil (dessin de l'artiste, jamais retouché) ---------- */
+.eye{position:relative;z-index:1;aspect-ratio:1051/877;transform-origin:50% 50%;will-change:transform;mix-blend-mode:screen;transition:translate .9s cubic-bezier(.2,.7,.2,1)}
+.eye img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
+.eye .glint{position:absolute;left:40.53%;top:33.41%;width:110%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(circle closest-side,rgba(255,248,220,.95) 0,rgba(240,210,120,.4) 7%,rgba(240,210,120,0) 26%),radial-gradient(ellipse 50% 1.5% at 50% 50%,rgba(255,240,200,.95) 0,rgba(233,190,100,.35) 35%,rgba(233,190,100,0) 100%)}
+.veil{position:fixed;inset:0;background:var(--ground);z-index:8;opacity:0;pointer-events:none;transition:opacity 1.3s ease}
+.veil.on{opacity:1}
+html.intro body::after{content:"";position:fixed;inset:0;background:var(--ground);z-index:8}
+html.intro .hero .eye{opacity:0}
+.intro-mark{position:fixed;left:0;right:0;z-index:10;display:flex;flex-direction:column;align-items:center;gap:16px;pointer-events:none;transition:opacity .8s ease}
+.intro-mark .w{font-family:var(--display);font-size:clamp(30px,5.6vw,62px);line-height:1;letter-spacing:.3em;white-space:nowrap;margin-right:-.3em}
+.intro-mark .w span{display:inline-block;background:linear-gradient(180deg,#fbf0b8 0%,#e9cf78 45%,#a9853f 100%);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:0;transform:translateY(10px);filter:blur(8px) drop-shadow(0 0 0 rgba(233,207,120,0));transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1),filter .9s ease}
+.intro-mark .w .gap{width:.55em}
+.intro-mark.on .w span{opacity:1;transform:none;filter:blur(0) drop-shadow(0 0 14px rgba(233,207,120,.3))}
+.intro-mark .rule{position:relative;height:1px;width:0;background:linear-gradient(90deg,rgba(233,207,120,0),rgba(233,207,120,.9),rgba(233,207,120,0));transition:width 1s cubic-bezier(.6,0,.2,1) .6s}
+.intro-mark .rule::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;background:#e9cf78;transform:translate(-50%,-50%) rotate(45deg) scale(0);transition:transform .6s ease 1.1s}
+.intro-mark.on .rule{width:min(600px,72vw)}
+.intro-mark.on .rule::after{transform:translate(-50%,-50%) rotate(45deg) scale(1)}
+.intro-skip{position:fixed;right:20px;bottom:20px;z-index:10;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);transition:opacity .6s}
+
+/* ---------- Accueil ---------- */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:92px 20px 64px;gap:18px}
+.hero canvas.dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.hero .eye{width:min(430px,80vw,calc(38svh * 1.2))}
+.hero .lockup{display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:1}
+.hero .word{font-family:var(--display);font-size:clamp(30px,4.4vw,54px);line-height:1;letter-spacing:.3em;margin-right:-.3em;white-space:nowrap}
+.hero .rule{width:min(520px,70vw);height:1px;background:linear-gradient(90deg,rgba(233,207,120,0),rgba(233,207,120,.85),rgba(233,207,120,0));position:relative}
+.hero .rule::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;background:var(--gold);transform:translate(-50%,-50%) rotate(45deg)}
+.hero h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(19px,2.2vw,24px);line-height:1.45;margin:6px 0 0;color:var(--bone);max-width:30em;position:relative;z-index:1}
+.hero .lead{color:var(--dim);margin:0;max-width:36em;position:relative;z-index:1}
+.hero .cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px;position:relative;z-index:1}
+.nextstep{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:10px;position:relative;z-index:1}
+.nextstep b{font-weight:500;color:var(--bone);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.live{display:inline-flex;align-items:center;gap:8px}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--alarm);box-shadow:0 0 8px var(--alarm);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.scroll-cue{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:1px;height:46px;background:linear-gradient(var(--brass),transparent);opacity:.6;animation:cue 2.6s ease-in-out infinite;z-index:1}
+@keyframes cue{0%{transform:translateX(-50%) scaleY(0);transform-origin:top}45%{transform:translateX(-50%) scaleY(1);transform-origin:top}55%{transform:translateX(-50%) scaleY(1);transform-origin:bottom}100%{transform:translateX(-50%) scaleY(0);transform-origin:bottom}}
+
+/* ---------- Accès rapides ---------- */
+.quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.quick a{background:var(--ground);padding:26px 22px 24px;text-decoration:none;display:flex;flex-direction:column;gap:12px;position:relative;transition:background .3s}
+.quick a:hover{background:var(--panel)}
+.quick svg{width:30px;height:30px;stroke:var(--brass);fill:none;stroke-width:1.2}
+.quick b{font-family:var(--display);font-weight:400;font-size:21px;letter-spacing:.04em;color:var(--bone)}
+.quick span{color:var(--dim);font-size:15px;line-height:1.5}
+.quick .ar{position:absolute;right:20px;top:24px;font-family:var(--mono);color:var(--faint);transition:transform .25s,color .25s}
+.quick a:hover .ar{transform:translateX(4px);color:var(--brass)}
+@media (max-width:860px){.quick{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.quick{grid-template-columns:1fr}}
+
+/* ---------- Sections ---------- */
+main section.block{padding-block:120px 20px}
+.head{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 56px;align-items:end;margin-bottom:46px}
+.head .num{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--faint);display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.head .num::after{content:"";height:1px;width:56px;background:var(--brass-soft)}
+.head h2{font-family:var(--display);font-weight:400;font-size:clamp(32px,4.4vw,52px);line-height:1.08;letter-spacing:.03em;margin:0;text-wrap:balance}
+.head p{margin:0;color:var(--dim);font-size:18px;max-width:40em}
+@media (max-width:860px){.head{grid-template-columns:1fr;align-items:start}}
+
+/* L'émission : dossiers */
+.files{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.file{position:relative;background:var(--panel);border:1px solid var(--line);padding:28px 26px 26px;overflow:hidden;transition:border-color .3s,transform .3s}
+.file::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,var(--brass),transparent 70%);opacity:.5}
+.file:hover{border-color:var(--brass-soft);transform:translateY(-2px)}
+.file .tag{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:18px}
+.file .tag em{font-style:normal;color:var(--alarm);border:1px solid rgba(181,86,74,.45);padding:1px 7px}
+.file h3{font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:.03em;margin:0 0 10px}
+.file p{margin:0;color:#CFC9BB}
+.file .seal{position:absolute;right:-30px;bottom:-34px;width:150px;opacity:.08;mix-blend-mode:screen;pointer-events:none}
+.secret{margin-top:18px;border:1px dashed var(--line);padding:22px 26px;display:flex;gap:22px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.secret p{margin:0;max-width:52ch;font-style:italic;color:var(--dim)}
+.redacted{font-family:var(--mono);font-size:13px;color:var(--faint);letter-spacing:.06em}
+.redacted s{text-decoration:none;background:var(--dim);color:transparent;opacity:.6;user-select:none;margin-inline:2px}
+@media (max-width:720px){.files{grid-template-columns:1fr}}
+
+/* Programmes */
+.progs{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:18px}
+.prog{position:relative;border:1px solid var(--line);background:var(--panel);overflow:hidden;min-height:520px;display:flex;flex-direction:column;justify-content:flex-end;padding:34px 32px 30px}
+.prog canvas.snow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.prog .year{position:absolute;right:-6px;top:-24px;font-family:var(--display);font-size:clamp(120px,16vw,220px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(196,162,101,.18);pointer-events:none;letter-spacing:.02em}
+.prog .fog{position:absolute;inset:0;background:radial-gradient(120% 70% at 20% 110%,rgba(230,224,211,.08),transparent 60%),linear-gradient(180deg,rgba(10,11,13,0) 30%,rgba(10,11,13,.85) 85%);pointer-events:none}
+.prog .body{position:relative;display:flex;flex-direction:column;gap:14px}
+.prog h3{font-family:var(--display);font-weight:400;font-size:clamp(32px,4vw,46px);line-height:1.05;letter-spacing:.03em;margin:0}
+.prog .where{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.prog p{margin:0;max-width:58ch;color:#CFC9BB}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:6px}
+.facts div{background:rgba(10,11,13,.82);padding:14px 12px;display:flex;flex-direction:column;gap:2px}
+.facts b{font-family:var(--display);font-weight:400;font-size:26px;color:var(--bone);line-height:1.1}
+.facts span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.chip{align-self:flex-start;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid var(--brass-soft);padding:6px 10px;background:rgba(10,11,13,.6)}
+.prog .acts{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.sealed{justify-content:center;align-items:center;text-align:center;gap:16px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.015) 0 2px,transparent 2px 9px),var(--panel)}
+.sealed .stamp{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--alarm);border:1px solid rgba(181,86,74,.6);padding:8px 14px;transform:rotate(-6deg)}
+.sealed h3{font-size:30px}
+.sealed .bars{display:flex;flex-direction:column;gap:9px;align-items:center;width:100%}
+.sealed .bars i{display:block;height:12px;background:var(--line)}
+.sealed p{color:var(--dim);font-style:italic;max-width:26ch}
+.sealed:hover .bars i{animation:glitchbar .35s steps(2) 2}
+@keyframes glitchbar{50%{transform:translateX(6px);background:var(--brass-soft)}}
+@media (max-width:860px){.progs{grid-template-columns:1fr}.prog{min-height:0;padding-top:140px}.sealed{padding-top:60px;padding-bottom:60px}.facts{grid-template-columns:1fr 1fr}}
+
+/* Mécènes */
+.does{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.do{border-top:1px solid var(--brass-soft);padding-top:18px}
+.do b{display:block;font-family:var(--display);font-weight:400;font-size:22px;margin-bottom:6px}
+.do span{color:var(--dim);font-size:16px}
+.do .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--brass);display:block;margin-bottom:10px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:56px}
+.card{background:var(--panel);border:1px solid var(--line);padding:28px 26px}
+.card h3{font-family:var(--display);font-weight:400;font-size:24px;margin:8px 0 6px;letter-spacing:.03em}
+.card > p{margin:0 0 18px;color:var(--dim)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:38px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line);color:#CFC9BB}
+.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:12px;color:var(--brass);padding-top:3px}
+.ranks{display:flex;flex-direction:column;gap:0;margin:0;padding:0;list-style:none}
+.ranks li{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.ranks .medal{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:13px;color:var(--ground)}
+.ranks b{font-family:var(--display);font-weight:400;font-size:19px;display:block;line-height:1.2}
+.ranks span{font-size:14px;color:var(--dim)}
+.perks{margin:18px 0 0;padding:16px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;font-size:15px;color:#CFC9BB}
+.perks div{display:flex;gap:10px}
+.perks div::before{content:"◆";color:var(--brass);font-size:9px;padding-top:6px}
+.rules{margin-top:18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.rules div{background:var(--ground);padding:18px 20px;font-size:15px;color:var(--dim)}
+.rules b{display:block;color:var(--bone);font-weight:400;font-family:var(--display);font-size:18px;margin-bottom:4px}
+@media (max-width:960px){.does{grid-template-columns:1fr 1fr}.split{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
+@media (max-width:480px){.does{grid-template-columns:1fr}}
+
+/* Salle de projection */
+.reels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.reel{display:flex;flex-direction:column;gap:14px}
+.screen{position:relative;aspect-ratio:16/9;background:#050506;border:1px solid var(--line);overflow:hidden}
+.screen video,.screen iframe,.screen img{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover;display:block}
+.screen .lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;background:radial-gradient(70% 70% at 50% 50%,rgba(196,162,101,.07),transparent 70%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px)}
+.screen .lock img{position:static;width:64px;height:auto;opacity:.5;mix-blend-mode:screen}
+.screen .lock span{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.screen .lock b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--bone)}
+.screen .rec{position:absolute;left:14px;top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--faint);display:flex;gap:8px;align-items:center}
+.screen .rec i{width:6px;height:6px;border-radius:50%;background:var(--alarm)}
+.screen .play{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.25);border:0;cursor:pointer;transition:background .3s}
+.screen .play:hover{background:rgba(0,0,0,.1)}
+.screen .play svg{width:64px;height:64px}
+.reel .meta{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.reel h3{font-family:var(--display);font-weight:400;font-size:22px;margin:0;letter-spacing:.03em}
+.reel .when{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+.reel p{margin:0;color:var(--dim);font-size:16px}
+@media (max-width:720px){.reels{grid-template-columns:1fr}}
+
+/* Calendrier */
+.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;position:relative}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:9px;height:1px;background:var(--line)}
+.timeline li{position:relative;padding:34px 18px 0 0}
+.timeline li::before{content:"";position:absolute;left:0;top:4px;width:11px;height:11px;border:1px solid var(--brass-soft);background:var(--ground);transform:rotate(45deg)}
+.timeline li.done::before{background:var(--brass-soft)}
+.timeline li.soon::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(233,207,120,.6)}
+.timeline .d{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass)}
+.timeline b{display:block;font-family:var(--display);font-weight:400;font-size:19px;line-height:1.25;margin:6px 0 4px}
+.timeline span{font-size:14px;color:var(--dim)}
+.timeline li.done b,.timeline li.done span{opacity:.55}
+.nights{margin-top:56px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 56px;align-items:start}
+.nights h3{font-family:var(--display);font-weight:400;font-size:26px;margin:0 0 8px}
+.nights p{margin:0;color:var(--dim)}
+.sched{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.sched div{background:var(--ground);padding:16px 14px}
+.sched b{display:block;font-family:var(--mono);font-weight:500;font-size:22px;color:var(--bone)}
+.sched span{font-size:14px;color:var(--dim)}
+@media (max-width:960px){
+  .timeline{grid-template-columns:1fr;padding-left:30px}
+  .timeline::before{left:5px;right:auto;top:0;bottom:0;width:1px;height:auto}
+  .timeline li{padding:0 0 26px}
+  .timeline li::before{left:-30px;top:5px}
+  .nights{grid-template-columns:1fr}
+  .sched{grid-template-columns:1fr 1fr}
+}
+
+/* Rejoindre */
+.paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.path{background:var(--panel);border:1px solid var(--line);padding:30px 26px 26px;display:flex;flex-direction:column;gap:12px;transition:border-color .3s}
+.path:hover{border-color:var(--brass-soft)}
+.path .who{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.path h3{font-family:var(--display);font-weight:400;font-size:28px;margin:0;letter-spacing:.03em}
+.path p{margin:0;color:var(--dim);flex:1}
+.path .btn{align-self:flex-start;margin-top:8px}
+.about{margin-top:56px;border-top:1px solid var(--line);padding-top:40px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 56px}
+.about h3{font-family:var(--display);font-weight:400;font-size:26px;margin:0}
+.about p{margin:0 0 12px;color:#CFC9BB}
+.about p:last-child{margin-bottom:0;color:var(--dim)}
+@media (max-width:860px){.paths{grid-template-columns:1fr}.about{grid-template-columns:1fr}}
+
+/* Pied de page */
+footer{margin-top:120px;border-top:1px solid var(--line);padding-block:44px 34px}
+footer .in-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:start}
+footer .links{display:flex;gap:22px;flex-wrap:wrap;justify-content:flex-end}
+footer .links a{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none}
+footer .links a:hover{color:var(--bone)}
+footer .legal{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);border-top:1px solid var(--line);padding-top:20px}
+footer .legal .clock{font-variant-numeric:tabular-nums}
+footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
+@media (max-width:720px){footer .in-wrap{grid-template-columns:1fr}footer .links{justify-content:flex-start}}
+
+/* Apparition au défilement */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .live i,.scroll-cue{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="in-wrap">
+    <a class="mark" href="#accueil"><img src="/img/apple-touch-icon.png" alt="" width="36" height="36">OSIRIS RP</a>
+    <nav class="nav" id="nav" aria-label="Navigation principale">
+      <a href="#emission">L'émission</a>
+      <a href="#programmes">Programmes</a>
+      <a href="#mecenes">Mécènes</a>
+      <a href="#projection">Projection</a>
+      <a href="#calendrier">Calendrier</a>
+      <a href="#rejoindre">Rejoindre</a>
+      <a class="btn" href="/casting">Casting</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav"><i></i><i></i><i></i></button>
+  </div>
+</header>
+
+<main>
+  <!-- ========== Accueil ========== -->
+  <section class="hero" id="accueil" aria-labelledby="h1">
+    <canvas class="dust" id="dust" aria-hidden="true"></canvas>
+    <div class="eye" id="eye" role="img" aria-label="L'Œil d'Osiris">
+      <picture><source srcset="/img/oeil.webp" type="image/webp"><img src="/img/oeil.png" alt="" width="1051" height="877" draggable="false" fetchpriority="high"></picture>
+      <span class="glint" aria-hidden="true"></span>
+    </div>
+    <div class="lockup">
+      <div class="word gold-text" aria-hidden="true">OSIRIS RP</div>
+      <div class="rule" aria-hidden="true"></div>
+    </div>
+    <h1 id="h1">Osiris produit l'émission que personne n'est censé voir.</h1>
+    <p class="lead">Chaque saison, des candidats se réveillent dans un monde qu'ils croient réel. Les Mécènes, eux, savent qu'il s'agit d'un spectacle.</p>
+    <div class="cta">
+      <a class="btn" href="#emission">Entrer dans Osiris</a>
+      <a class="btn ghost" href="#projection">Salle de projection</a>
+    </div>
+    <div class="nextstep" aria-live="off">
+      <span class="live"><i></i>Diffusion privée</span>
+      <span id="next-label">Ouverture du Programme 01 dans</span>
+      <b id="next-count">— j —</b>
+    </div>
+    <span class="scroll-cue" aria-hidden="true"></span>
+  </section>
+
+  <!-- ========== Accès rapides ========== -->
+  <div class="in-wrap rv">
+    <nav class="quick" aria-label="Accès rapides">
+      <a href="#emission">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 16c4-6 9-9 13-9s9 3 13 9c-4 6-9 9-13 9S7 22 3 16Z"/><circle cx="16" cy="16" r="4.5"/></svg>
+        <b>L'émission</b><span>Une compagnie, une île, un spectacle.</span><span class="ar">→</span>
+      </a>
+      <a href="#programmes">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 26h26M6 26l7-12 4 6 3-4 6 10"/><circle cx="23" cy="8" r="2.5"/></svg>
+        <b>Les Programmes</b><span>Chaque saison, un monde reconstruit.</span><span class="ar">→</span>
+      </a>
+      <a href="#mecenes">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11"/><circle cx="16" cy="16" r="7"/><path d="M12 16h8M16 12v8"/></svg>
+        <b>Les Mécènes</b><span>Ceux qui regardent. Et qui décident.</span><span class="ar">→</span>
+      </a>
+      <a href="#projection">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="18"/><path d="M14 12.5v7l6-3.5-6-3.5Z"/><path d="M4 11h3M4 21h3M25 11h3M25 21h3"/></svg>
+        <b>Projection</b><span>Les cinématiques d'Osiris.</span><span class="ar">→</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- ========== L'émission ========== -->
+  <section class="block" id="emission" aria-labelledby="t-emission">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">01 · L'émission</span><h2 id="t-emission">Une compagnie qui n'existe pas</h2></div>
+        <p>Osiris n'a ni siège, ni logo public, ni site officiel. Elle n'existe que pour ceux qu'elle invite à regarder. Elle filme, elle écrit, elle décide. Ce qui arrive aux candidats n'est jamais un accident : c'est un scénario.</p>
+      </div>
+      <div class="files">
+        <article class="file rv">
+          <div class="tag"><span>Dossier 01</span><em>Confidentiel</em></div>
+          <h3>Cassius Vale</h3>
+          <p>Le fondateur d'Osiris. Personne n'a jamais vu son visage, seulement entendu sa voix. C'est lui qui ouvre et ferme chaque Programme, lui qui s'adresse aux Mécènes, lui qui annonce les Offrandes retenues. Quand Cassius Vale parle, le Programme écoute.</p>
+        </article>
+        <article class="file rv">
+          <div class="tag"><span>Dossier 02</span><em>Confidentiel</em></div>
+          <h3>L'Œil d'Osiris</h3>
+          <p>L'emblème de la compagnie. Il apparaît sur ses messages, ses écrans, et parfois là où il ne devrait pas être. Pour un Mécène, c'est un signe de ralliement. Pour un candidat qui le croise dans le décor, c'est un détail inexplicable.</p>
+          <img class="seal" src="/img/apple-touch-icon.png" alt="">
+        </article>
+        <article class="file rv">
+          <div class="tag"><span>Dossier 03</span><em>Confidentiel</em></div>
+          <h3>L'île</h3>
+          <p>Les Programmes sont tournés sur une île qui ne figure sur aucune carte. Osiris y reconstruit un monde complet pour chaque saison : une ville, une époque, une histoire. À la fin du Programme, le décor est démonté et l'île attend le suivant.</p>
+        </article>
+        <article class="file rv">
+          <div class="tag"><span>Dossier 04</span><em>Confidentiel</em></div>
+          <h3>Les candidats</h3>
+          <p>Ils ne savent pas qu'ils sont filmés. Personne ne le leur a dit, et personne ne le leur dira. Ce qu'ils vivent leur paraît réel. La peur, les alliances et les trahisons le sont.</p>
+        </article>
+      </div>
+      <div class="secret rv">
+        <p>Osiris ne répond jamais aux questions. Les Mécènes les plus attentifs trouveront peut-être quand même des réponses.</p>
+        <span class="redacted" aria-hidden="true">Fichier 0333 · <s>████████</s> <s>█████</s> <s>███████████</s></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Programmes ========== -->
+  <section class="block" id="programmes" aria-labelledby="t-prog">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">02 · Les Programmes</span><h2 id="t-prog">Une saison, un monde</h2></div>
+        <p>Une saison d'Osiris s'appelle un Programme. Chacun a son propre monde, son propre genre et sa propre histoire, écrits par Osiris. Six semaines, trois soirées par semaine, et un décor démonté à la fin.</p>
+      </div>
+      <div class="progs">
+        <article class="prog rv" aria-labelledby="t-p01">
+          <canvas class="snow" id="snow" aria-hidden="true"></canvas>
+          <span class="year" aria-hidden="true">1987</span>
+          <div class="fog" aria-hidden="true"></div>
+          <div class="body">
+            <span class="label">Programme 01 · Saison 1</span>
+            <h3 id="t-p01">L'Hiver de Ludendorff</h3>
+            <span class="where">North Yankton · Hiver 1987</span>
+            <p>Une petite ville minière sous la neige. Un an plus tôt, la mine s'est effondrée : onze mineurs sont morts. Ludendorff vit entre trois familles fondatrices, un shérif fatigué et des souvenirs que personne ne veut remuer. Les candidats croient y vivre. Les Mécènes savent qu'Osiris a tout construit.</p>
+            <div class="facts">
+              <div><b>35</b><span>Candidats</span></div>
+              <div><b>18</b><span>Soirées</span></div>
+              <div><b>6</b><span>Semaines</span></div>
+              <div><b>3 avr.</b><span>Ouverture 2027</span></div>
+            </div>
+            <span class="chip" id="p01-chip">Casting du 27 février au 14 mars 2027</span>
+            <div class="acts">
+              <a class="btn" href="/casting">Le casting</a>
+              <a class="link" href="#calendrier">Le calendrier <span class="ar">→</span></a>
+            </div>
+          </div>
+        </article>
+        <article class="prog sealed rv" aria-labelledby="t-p02">
+          <span class="label">Programme 02</span>
+          <div class="bars" aria-hidden="true"><i style="width:78%"></i><i style="width:56%"></i><i style="width:66%"></i></div>
+          <h3 id="t-p02">Accès refusé</h3>
+          <span class="stamp">Scellé</span>
+          <p>Osiris prépare déjà le suivant. Les Mécènes seront les premiers informés.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Mécènes ========== -->
+  <section class="block" id="mecenes" aria-labelledby="t-mec">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">03 · Les Mécènes</span><h2 id="t-mec">Ils ne jouent pas. Ils font tourner le Programme.</h2></div>
+        <p>Dans la lore, ce sont les riches spectateurs d'Osiris, invités à suivre l'émission en secret et à la financer. En vrai, c'est toi : les membres du Discord, les viewers des streams, et les joueurs non retenus au casting. Ne pas être pris comme candidat, c'est passer de l'autre côté de l'écran.</p>
+      </div>
+      <div class="does">
+        <div class="do rv"><span class="n">I</span><b>Il vote</b><span>Pendant chaque soirée, Osiris propose des Offrandes sur le Discord. La plus votée se produit en jeu, le soir même.</span></div>
+        <div class="do rv"><span class="n">II</span><b>Il regarde</b><span>Il suit les candidats sur leurs streams, choisit ses favoris, repère ceux qui mentent.</span></div>
+        <div class="do rv"><span class="n">III</span><b>Il enquête</b><span>Il cherche ce qu'Osiris cache, dans ses messages, sur ce site et ailleurs.</span></div>
+        <div class="do rv"><span class="n">IV</span><b>Il débat</b><span>Théories, paris et soutiens se partagent dans les salons réservés aux Mécènes.</span></div>
+      </div>
+      <div class="split">
+        <div class="card rv">
+          <span class="label">Les Offrandes</span>
+          <h3>Changer les règles du jeu</h3>
+          <p>Une Offrande est une intervention des Mécènes dans le Programme : un événement, un objet, une menace, un secret révélé. Elle ne tue jamais un candidat directement.</p>
+          <ol class="steps">
+            <li>Osiris ouvre le vote sur le Discord, avec deux ou trois Offrandes au choix.</li>
+            <li>Les Mécènes votent pendant la durée indiquée.</li>
+            <li>Cassius Vale annonce l'Offrande retenue.</li>
+            <li>Elle se produit en jeu, sans que les candidats sachent d'où elle vient.</li>
+          </ol>
+        </div>
+        <div class="card rv">
+          <span class="label">Les rangs</span>
+          <h3>La fidélité est récompensée</h3>
+          <p>Plus tu suis le Programme, plus Osiris te fait confiance.</p>
+          <ul class="ranks">
+            <li><span class="medal" style="background:#8B877D">I</span><div><b>Mécène</b><span>L'accès aux votes et aux salons des Mécènes.</span></div></li>
+            <li><span class="medal" style="background:#C9CED6">II</span><div><b>Mécène d'argent</b><span>Un spectateur assidu.</span></div></li>
+            <li><span class="medal" style="background:#E9CF78">III</span><div><b>Mécène d'or</b><span>Un pilier du Programme.</span></div></li>
+            <li><span class="medal" style="background:radial-gradient(circle at 35% 30%,#fbf0b8,#c99a3c)">IV</span><div><b>Grand Mécène</b><span>Le cercle le plus proche d'Osiris.</span></div></li>
+          </ul>
+          <div class="perks">
+            <div>Chaque semaine, le Mécène le plus fidèle choisit une Offrande du menu.</div>
+            <div>Une priorité au casting du Programme suivant.</div>
+          </div>
+        </div>
+      </div>
+      <div class="rules rv">
+        <div><b>Ne jamais aider un candidat</b>Aucun spoil, aucun indice en message privé ou dans le chat d'un stream.</div>
+        <div><b>Garder le secret des votes</b>L'Offrande doit surprendre les candidats.</div>
+        <div><b>Respecter les joueurs</b>On peut détester un personnage, jamais le joueur.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Salle de projection ========== -->
+  <section class="block" id="projection" aria-labelledby="t-proj">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">04 · Salle de projection</span><h2 id="t-proj">Les cinématiques</h2></div>
+        <p>Trois films pour ouvrir le Programme 01, diffusés sur la chaîne Twitch LilianoBarhaw. Chacun se débloque ici le jour de sa diffusion.</p>
+      </div>
+      <div class="reels" id="reels"></div>
+    </div>
+  </section>
+
+  <!-- ========== Calendrier ========== -->
+  <section class="block" id="calendrier" aria-labelledby="t-cal">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">05 · Calendrier</span><h2 id="t-cal">Programme 01</h2></div>
+        <p>Du casting à la dernière soirée. Les dates sont données à l'heure de Paris.</p>
+      </div>
+      <ol class="timeline rv" id="timeline">
+        <li data-from="2027-02-27T00:00:00+01:00"><span class="d">27 février</span><b>Ouverture du casting</b><span>Première cinématique, « Ils s'ennuient ».</span></li>
+        <li data-from="2027-03-14T23:59:00+01:00"><span class="d">14 mars · 23h59</span><b>Fin du casting</b><span>Les dossiers sont étudiés par Osiris.</span></li>
+        <li data-from="2027-03-20T00:00:00+01:00"><span class="d">20 mars</span><b>Les 35 candidats</b><span>Deuxième cinématique, « Trente-cinq ».</span></li>
+        <li data-from="2027-04-02T20:30:00+02:00"><span class="d">2 – 3 avril</span><b>Vote d'ouverture</b><span>Les Mécènes décident comment l'hiver commence.</span></li>
+        <li data-from="2027-04-03T20:30:00+02:00"><span class="d">3 avril · 20h30</span><b>Ouverture du Programme</b><span>Troisième cinématique, « Moteur ».</span></li>
+        <li data-from="2027-05-15T20:30:00+02:00"><span class="d">15 mai</span><b>Dernière soirée</b><span>Tout le monde ne sortira pas de l'hiver.</span></li>
+      </ol>
+      <div class="nights">
+        <div class="rv"><h3>Pendant chaque soirée</h3><p>Mercredi, vendredi et samedi, de 20h30 à 1h. Les votes se font sur le Discord, l'émission se suit en direct.</p></div>
+        <div class="sched rv">
+          <div><b>20h30</b><span>Ouverture de la session</span></div>
+          <div><b>22h</b><span>Vote de milieu de soirée</span></div>
+          <div><b>0h30</b><span>Vote de fin de soirée</span></div>
+          <div><b>1h</b><span>Fermeture du serveur</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Rejoindre ========== -->
+  <section class="block" id="rejoindre" aria-labelledby="t-join">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">06 · Rejoindre</span><h2 id="t-join">De quel côté de l'écran ?</h2></div>
+        <p>Il y a trois façons d'entrer dans Osiris. Toutes passent par le Discord.</p>
+      </div>
+      <div class="paths">
+        <article class="path rv">
+          <span class="who">Jouer</span>
+          <h3>Candidat</h3>
+          <p>Vivre le Programme de l'intérieur. 35 places, sur dossier, en whitelist. Il faut être présent aux soirées choisies.</p>
+          <a class="btn" href="/casting">Le casting</a>
+        </article>
+        <article class="path rv">
+          <span class="who">Décider</span>
+          <h3>Mécène</h3>
+          <p>Rejoindre le Discord, prendre le rôle Mécène, voter les Offrandes et chercher ce qu'Osiris cache.</p>
+          <a class="btn ghost" data-link="discord" href="#">Rejoindre le Discord</a>
+        </article>
+        <article class="path rv">
+          <span class="who">Regarder</span>
+          <h3>Spectateur</h3>
+          <p>L'émission est diffusée sur la chaîne Twitch LilianoBarhaw, et chaque candidat peut streamer son point de vue.</p>
+          <a class="btn ghost" data-link="twitch" href="#">Regarder sur Twitch</a>
+        </article>
+      </div>
+      <div class="about rv">
+        <h3>Osiris RP, c'est quoi ?</h3>
+        <div>
+          <p>Un serveur GTA RP en saisons, sur FiveM. Chaque Programme réunit des candidats en whitelist dans un monde construit pour l'occasion, avec sa ville, son époque et ses secrets.</p>
+          <p>Le public ne fait pas que regarder : par leurs votes, les Mécènes changent ce qui arrive aux candidats, soir après soir.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="in-wrap">
+    <div>
+      <a class="mark" href="#accueil"><img src="/img/apple-touch-icon.png" alt="" width="36" height="36">OSIRIS RP</a>
+      <p class="tag">Les candidats vivent le Programme. Les Mécènes l'écrivent.</p>
+    </div>
+    <nav class="links" aria-label="Liens">
+      <a href="/casting">Casting</a>
+      <a data-link="discord" href="#">Discord</a>
+      <a data-link="twitch" href="#">Twitch</a>
+      <a data-link="tiktok" href="#">TikTok</a>
+      <a href="/casting#terminal">Accès candidat</a>
+    </nav>
+    <div class="legal">
+      <span>© Osiris RP · Tous les regards sont enregistrés</span>
+      <span class="clock" id="clock" title="Dernier signal reçu : 03:33">--:--:--</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ====================== À REMPLIR ======================
+  // Liens du serveur (laisser "" pour cacher un bouton)
+  var LIENS = {
+    discord: "",
+    twitch: "https://www.twitch.tv/lilianobarhaw",
+    tiktok: ""
+  };
+  // Cinématiques : coller l'identifiant YouTube quand la vidéo est en ligne
+  // (pour https://www.youtube.com/watch?v=AbCdEf12345, l'identifiant est AbCdEf12345)
+  var FILMS = [
+    { titre: "Générique", quand: "Disponible", texte: "L'Œil s'ouvre. Le générique d'Osiris.", video: "/video/osiris-rp.mp4", affiche: "/img/generique.jpg" },
+    { titre: "« Ils s'ennuient »", quand: "27 février 2027", date: "2027-02-27T00:00:00+01:00", texte: "Cassius Vale a un problème : ses spectateurs s'ennuient.", youtube: "" },
+    { titre: "« Trente-cinq »", quand: "20 mars 2027", date: "2027-03-20T00:00:00+01:00", texte: "Des centaines de dossiers. Trente-cinq élus.", youtube: "" },
+    { titre: "« Moteur »", quand: "3 avril 2027", date: "2027-04-03T20:30:00+02:00", texte: "Le décor est prêt. Le Programme peut commencer.", youtube: "" }
+  ];
+  // =======================================================
+
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function $(s,r){return (r||document).querySelector(s)}
+  function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+
+  // ---------- Liens ----------
+  $$("[data-link]").forEach(function(a){
+    var url = LIENS[a.getAttribute("data-link")];
+    if(url){ a.href = url; a.target = "_blank"; a.rel = "noopener"; }
+    else if(a.classList.contains("btn")){ a.removeAttribute("href"); a.setAttribute("aria-disabled","true"); a.style.opacity=".45"; a.style.pointerEvents="none"; a.textContent += " (bientôt)"; }
+    else a.hidden = true;
+  });
+
+  // ---------- En-tête et menu ----------
+  var top = $("#top"), burger = $("#burger");
+  function onScroll(){ top.classList.toggle("scrolled", window.scrollY > 30) }
+  onScroll(); window.addEventListener("scroll", onScroll, {passive:true});
+  burger.addEventListener("click", function(){
+    var open = document.body.classList.toggle("menu-open");
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  $$("#nav a").forEach(function(a){ a.addEventListener("click", function(){ document.body.classList.remove("menu-open"); burger.setAttribute("aria-expanded","false") }) });
+  if("IntersectionObserver" in window){
+    var links = {}; $$("#nav a[href^='#']").forEach(function(a){ links[a.getAttribute("href").slice(1)] = a });
+    var spy = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ $$("#nav a").forEach(function(a){a.classList.remove("on")}); if(links[e.target.id]) links[e.target.id].classList.add("on") } });
+    }, {rootMargin:"-45% 0px -50% 0px"});
+    $$("main section[id]").forEach(function(s){ spy.observe(s) });
+  }
+
+  // ---------- Apparition au défilement ----------
+  if("IntersectionObserver" in window && !reduce){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target) } }) }, {rootMargin:"0px 0px -8% 0px"});
+    $$(".rv").forEach(function(el){ io.observe(el) });
+  } else $$(".rv").forEach(function(el){ el.classList.add("in") });
+
+  // ---------- Prochaine étape + calendrier ----------
+  var STEPS = [
+    { t: "2027-02-27T00:00:00+01:00", label: "Ouverture du casting dans" },
+    { t: "2027-03-14T23:59:00+01:00", label: "Fin du casting dans" },
+    { t: "2027-03-20T00:00:00+01:00", label: "Annonce des 35 candidats dans" },
+    { t: "2027-04-03T20:30:00+02:00", label: "Ouverture du Programme 01 dans" }
+  ];
+  var END = new Date("2027-05-16T01:00:00+02:00").getTime();
+  function pad(n){return (n<10?"0":"")+n}
+  function tick(){
+    var now = Date.now(), lbl = $("#next-label"), cnt = $("#next-count");
+    var step = STEPS.filter(function(s){ return new Date(s.t).getTime() > now })[0];
+    if(step){
+      var d = Math.floor((new Date(step.t).getTime() - now)/1000);
+      lbl.textContent = step.label;
+      cnt.textContent = Math.floor(d/86400)+" j "+pad(Math.floor(d%86400/3600))+" h "+pad(Math.floor(d%3600/60))+" min "+pad(d%60)+" s";
+    } else if(now < END){ lbl.textContent = "Programme 01 en cours ·"; cnt.textContent = "mer. · ven. · sam. 20h30"; }
+    else { lbl.textContent = "Programme 01 terminé ·"; cnt.textContent = "Osiris prépare le suivant"; }
+    try{ $("#clock").textContent = new Date().toLocaleTimeString("fr-FR",{timeZone:"Europe/Paris"}) }catch(e){}
+  }
+  tick(); setInterval(tick, 1000);
+  (function(){
+    var now = Date.now(), items = $$("#timeline li"), nextSet = false;
+    items.forEach(function(li){
+      var t = new Date(li.getAttribute("data-from")).getTime();
+      if(t <= now) li.classList.add("done");
+      else if(!nextSet){ li.classList.add("soon"); nextSet = true; }
+    });
+    var chip = $("#p01-chip");
+    if(now >= new Date("2027-02-27T00:00:00+01:00").getTime() && now < new Date("2027-03-15T00:00:00+01:00").getTime()) chip.textContent = "Casting ouvert jusqu'au 14 mars, 23h59";
+    else if(now >= new Date("2027-03-15T00:00:00+01:00").getTime() && now < new Date("2027-04-03T20:30:00+02:00").getTime()) chip.textContent = "Casting fermé · ouverture le 3 avril à 20h30";
+    else if(now >= new Date("2027-04-03T20:30:00+02:00").getTime() && now < END) chip.textContent = "En cours · mer., ven. et sam. de 20h30 à 1h";
+    else if(now >= END) chip.textContent = "Programme terminé";
+  })();
+
+  // ---------- Salle de projection ----------
+  var EYE = '<img src="/img/apple-touch-icon.png" alt="">';
+  var PLAY = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="rgba(10,11,13,.55)" stroke="#E9CF78" stroke-width="1.2"/><path d="M26 21v22l18-11-18-11Z" fill="#E9CF78"/></svg>';
+  var reels = $("#reels");
+  FILMS.forEach(function(f, i){
+    var el = document.createElement("article"); el.className = "reel rv";
+    var open = !f.date || Date.now() >= new Date(f.date).getTime();
+    var screen = '<div class="screen">';
+    if(f.video){
+      screen += '<video src="'+f.video+'" poster="'+f.affiche+'" preload="none" controls playsinline></video>';
+    } else if(f.youtube && open){
+      screen += '<img src="https://i.ytimg.com/vi/'+f.youtube+'/hqdefault.jpg" alt="" loading="lazy"><button class="play" data-yt="'+f.youtube+'" aria-label="Lire '+f.titre.replace(/"/g,"")+'">'+PLAY+'</button>';
+    } else {
+      screen += '<div class="lock">'+EYE+'<span>'+(open?"Bientôt en ligne":"Diffusion le")+'</span><b>'+f.quand+'</b></div><span class="rec"><i></i>CAM 0'+i+'</span>';
+    }
+    screen += '</div>';
+    el.innerHTML = screen + '<div class="meta"><h3>'+(i ? "Cinématique "+i+" · " : "")+f.titre+'</h3><span class="when">'+f.quand+'</span></div><p>'+f.texte+'</p>';
+    reels.appendChild(el);
+  });
+  reels.addEventListener("click", function(e){
+    var b = e.target.closest(".play"); if(!b) return;
+    var sc = b.parentNode;
+    sc.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/'+b.getAttribute("data-yt")+'?autoplay=1&rel=0" title="Cinématique Osiris" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+  });
+  if("IntersectionObserver" in window && !reduce){
+    var io2 = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io2.unobserve(e.target) } }) });
+    $$("#reels .rv").forEach(function(el){ io2.observe(el) });
+  } else $$("#reels .rv").forEach(function(el){ el.classList.add("in") });
+
+  // ---------- Poussière d'or (accueil) et neige (Programme 01) ----------
+  function field(canvas, opts){
+    if(!canvas || reduce) return;
+    var ctx = canvas.getContext("2d"), parts = [], w = 0, h = 0, dpr = Math.min(2, window.devicePixelRatio || 1), visible = false, raf = 0;
+    function size(){
+      var r = canvas.getBoundingClientRect(); w = r.width; h = r.height;
+      canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr); ctx.setTransform(dpr,0,0,dpr,0,0);
+      var n = Math.round(w*h/opts.density); parts = [];
+      for(var i=0;i<n;i++) parts.push({x:Math.random()*w, y:Math.random()*h, v:opts.speed[0]+Math.random()*(opts.speed[1]-opts.speed[0]), s:opts.size[0]+Math.random()*(opts.size[1]-opts.size[0]), a:.15+Math.random()*.55, p:Math.random()*6.28, sw:4+Math.random()*16});
+    }
+    function frame(t){
+      raf = 0; if(!visible) return;
+      ctx.clearRect(0,0,w,h);
+      var k = t/1000;
+      for(var i=0;i<parts.length;i++){
+        var q = parts[i];
+        var y = (q.y + opts.dir*q.v*k) % h; if(y<0) y += h;
+        var x = q.x + Math.sin(k*.5+q.p)*q.sw;
+        var a = q.a*(.6+.4*Math.sin(k*1.3+q.p));
+        ctx.beginPath(); ctx.fillStyle = opts.color.replace("A", a.toFixed(3)); ctx.arc(x, y, q.s, 0, 6.283); ctx.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    size(); window.addEventListener("resize", function(){ size() });
+    if("IntersectionObserver" in window){
+      new IntersectionObserver(function(es){ visible = es[0].isIntersecting; if(visible && !raf) raf = requestAnimationFrame(frame) }).observe(canvas);
+    } else { visible = true; raf = requestAnimationFrame(frame); }
+  }
+  field($("#dust"), {density:9000, speed:[4,16], size:[.5,1.6], dir:-1, color:"rgba(250,226,150,A)"});
+  field($("#snow"), {density:2600, speed:[14,40], size:[.6,2.2], dir:1, color:"rgba(235,232,224,A)"});
+
+  // ---------- L'œil : intro, éclat, regard ----------
+  var eye = $("#eye"), eyeImg = $("img", eye), glint = $(".glint", eye);
+  var PX = 40.53, PY = 33.41;
+  var tracking = true;
+  function mask(r){
+    var v = r === null ? "" : "radial-gradient(circle at "+PX+"% "+PY+"%, #000 "+Math.max(0,r-16).toFixed(2)+"%, transparent "+r.toFixed(2)+"%)";
+    eyeImg.style.webkitMaskImage = v; eyeImg.style.maskImage = v;
+  }
+  function flash(strength, ms){ if(glint.animate) glint.animate([{opacity:0},{opacity:strength,offset:.28},{opacity:0}],{duration:ms,easing:"ease-out"}) }
+  if(!reduce){
+    window.addEventListener("pointermove", function(e){
+      if(!tracking) return;
+      var r = eye.getBoundingClientRect();
+      if(r.bottom < 0) return;
+      var dx = e.clientX-(r.left+r.width/2), dy = e.clientY-(r.top+r.height/2), len = Math.hypot(dx,dy)||1;
+      var k = Math.min(1, len/500);
+      eye.style.translate = (dx/len*10*k).toFixed(1)+"px "+(dy/len*7*k).toFixed(1)+"px";
+    });
+    setInterval(function(){ if(tracking && !document.hidden) flash(.5,1500) }, 9000);
+
+    (function intro(){
+      var root = document.documentElement;
+      try{
+        if(!root.classList.contains("intro")) return;
+        var r = eye.getBoundingClientRect(); if(!r.width){ root.classList.remove("intro"); return }
+        var vw = window.innerWidth, vh = window.innerHeight;
+        var s = Math.max(1, Math.min(vw*0.84/r.width, vh*0.5/r.height));
+        var cy = vh*0.4;
+        var tx = vw/2-(r.left+r.width/2), ty = cy-(r.top+r.height/2);
+        var veil = document.createElement("div"); veil.className = "veil on"; document.body.appendChild(veil);
+        var mark = document.createElement("div"); mark.className = "intro-mark"; mark.setAttribute("aria-hidden","true");
+        var letters = "OSIRIS RP".split(""), mid = (letters.length-1)/2, html = "";
+        letters.forEach(function(ch,i){ var d = Math.abs(i-mid)/mid; html += ch === " " ? '<span class="gap"></span>' : '<span style="transition-delay:'+(d*0.5).toFixed(2)+'s">'+ch+'</span>' });
+        mark.innerHTML = '<div class="w">'+html+'</div><div class="rule"></div>';
+        mark.style.top = (cy + r.height*s/2 + Math.max(22, vh*0.045))+"px";
+        document.body.appendChild(mark);
+        var skip = document.createElement("div"); skip.className = "intro-skip";
+        skip.textContent = (window.matchMedia && matchMedia("(pointer: coarse)").matches) ? "Toucher pour passer" : "Cliquer pour passer";
+        document.body.appendChild(skip);
+        tracking = false;
+        eye.style.zIndex = "9";
+        eye.style.transition = "none";
+        eye.style.transform = "translate("+tx+"px,"+ty+"px) scale("+s+")";
+        mask(0);
+        root.classList.remove("intro");
+        var t0 = performance.now(), done = false, timers = [];
+        function frame(now){
+          if(done) return;
+          var k = Math.min(1, Math.max(0, (now-t0-250)/1700));
+          var e = k < .5 ? 4*k*k*k : 1-Math.pow(-2*k+2,3)/2;
+          mask(e*116);
+          if(k < 1) requestAnimationFrame(frame); else mask(null);
+        }
+        requestAnimationFrame(frame);
+        timers.push(setTimeout(function(){ flash(1,1300) }, 1650));
+        timers.push(setTimeout(function(){ mark.classList.add("on") }, 2000));
+        timers.push(setTimeout(finish, 4600));
+        function finish(){
+          if(done) return; done = true;
+          timers.forEach(clearTimeout); mask(null);
+          mark.style.opacity = "0"; skip.style.opacity = "0";
+          eye.style.transition = "transform 1.4s cubic-bezier(.7,0,.2,1), translate .9s cubic-bezier(.2,.7,.2,1)";
+          eye.style.transform = "";
+          veil.classList.remove("on");
+          ["pointerdown","keydown","wheel","touchstart"].forEach(function(ev){ window.removeEventListener(ev, finish) });
+          setTimeout(function(){
+            tracking = true; eye.style.transition = ""; eye.style.zIndex = "";
+            [veil,mark,skip].forEach(function(n){ if(n.parentNode) n.parentNode.removeChild(n) });
+          }, 1500);
+        }
+        ["pointerdown","keydown","wheel","touchstart"].forEach(function(ev){ window.addEventListener(ev, finish, {passive:true}) });
+      }catch(err){ tracking = true; root.classList.remove("intro"); mask(null) }
+    })();
+  }
+})();
+</script>
+</body>
+</html>
