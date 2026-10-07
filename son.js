@@ -35,6 +35,19 @@
 
   var ctx = null, gain = null, src = null, chargement = null, joue = false, arret = 0;
 
+  // iPhone : le mode silencieux coupe le son « Web Audio ». On demande le mode lecture (iOS 17 et plus),
+  // et, pour les iPhone plus anciens, on joue en parallèle un son muet qui fait passer le téléphone en mode lecture.
+  var muet = null;
+  function modeLecture() {
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+    if (!muet) {
+      muet = document.createElement("audio");
+      muet.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAABTQALCwsLDc3Nzc3QUFBQUtLS0tLVVVVVV9fX19faWlpaXNzc3NzfX19fYeHh4eHkZGRkZubm5ubpaWlpaWvr6+vubm5ubnDw8PDzc3Nzc3X19fX4eHh4eHr6+vr9fX19fX/////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQELwAAAAAAAAU0bbRwgwAAAAAAAAAAAAAAAAD/8yDEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MixCcAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDETwAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxHYAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIMSdAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVX/8yLExAAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIsTXAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVV//MixNcAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMuMTAwVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/8yLE1wAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zIMTYAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/8yDE2AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//MgxNgAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zIsTXAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
+      muet.loop = true; muet.setAttribute("playsinline", ""); muet.setAttribute("x-webkit-airplay", "deny"); muet.preload = "auto";
+    }
+    try { var p = muet.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+  }
+
   function afficher() {
     btn.classList.toggle("on", joue);
     btn.setAttribute("aria-pressed", joue ? "true" : "false");
@@ -55,10 +68,11 @@
     return chargement;
   }
   function lancer(premiere) {
+    modeLecture();
     if (!ctx) { ctx = new AC(); gain = ctx.createGain(); gain.gain.value = 0; gain.connect(ctx.destination); }
     clearTimeout(arret);
     joue = true; afficher();
-    if (ctx.state === "suspended") ctx.resume();
+    if (ctx.state !== "running") { var r = ctx.resume(); if (r && r.catch) r.catch(function () {}); }
     if (src) { fondu(VOLUME, 2.5); return; }
     charger().then(function (buf) {
       if (src) return;
@@ -76,7 +90,7 @@
     joue = false; afficher();
     if (!ctx) return;
     fondu(0, 1);
-    arret = setTimeout(function () { if (!joue) ctx.suspend(); }, 1100);
+    arret = setTimeout(function () { if (!joue) { ctx.suspend(); if (muet) muet.pause(); } }, 1100);
   }
 
   btn.addEventListener("click", function () {
@@ -84,18 +98,26 @@
   });
 
   // Premier clic, toucher ou touche du visiteur : l'ambiance démarre (sauf s'il l'a coupée avant).
-  var EV = ["pointerup", "touchend", "keydown"];
-  function premierGeste(e) {
+  // Sur téléphone, le navigateur n'accepte parfois le son qu'au geste suivant : on réessaie à chaque geste
+  // tant que le son n'est pas vraiment lancé.
+  var EV = ["pointerup", "touchend", "click", "keydown"], demarre = false;
+  function geste(e) {
     if (btn.contains(e.target)) return;
-    EV.forEach(function (n) { window.removeEventListener(n, premierGeste, true); });
-    if (pref() !== "off" && !joue) lancer(true);
+    if (!demarre) {
+      demarre = true;
+      if (pref() !== "off" && !joue) lancer(true);
+      return;
+    }
+    if (joue && ctx && ctx.state !== "running") lancer(false);
+    else if (joue && muet && muet.paused) modeLecture();
   }
-  EV.forEach(function (n) { window.addEventListener(n, premierGeste, true); });
+  EV.forEach(function (n) { window.addEventListener(n, geste, true); });
 
   // Onglet en arrière-plan : on met en pause, et on reprend au retour.
   document.addEventListener("visibilitychange", function () {
     if (!ctx || !joue) return;
-    if (document.hidden) ctx.suspend(); else ctx.resume();
+    if (document.hidden) { ctx.suspend(); if (muet) muet.pause(); }
+    else { var r = ctx.resume(); if (r && r.catch) r.catch(function () {}); modeLecture(); }
   });
 
   afficher();
