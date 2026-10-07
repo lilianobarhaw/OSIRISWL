@@ -19,9 +19,8 @@
 <meta property="og:description" content="L'émission que personne n'est censé voir. Programme 01 · L'Hiver de Ludendorff · 3 avril 2027.">
 <meta property="og:image" content="https://osiriswl.vercel.app/img/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&display=swap">
+<link rel="stylesheet" href="fonts/polices.css">
+<link rel="preload" as="font" type="font/woff" href="fonts/marcellus.woff" crossorigin>
 <link rel="preload" as="image" href="img/oeil.webp" type="image/webp">
 <script>
 /* Rideau noir jusqu'au début de l'animation d'ouverture. */
@@ -434,7 +433,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
               <div><b>6</b><span>Semaines</span></div>
               <div><b>3 avr.</b><span>Ouverture 2027</span></div>
             </div>
-            <span class="chip" id="p01-chip">Casting du 27 février au 14 mars 2027</span>
+            <span class="chip" id="p01-chip">Casting du 20 février au 14 mars 2027</span>
             <div class="acts">
               <a class="btn" href="/casting" data-casting>Le casting</a>
               <a class="link" href="#calendrier">Le calendrier <span class="ar">→</span></a>
@@ -520,7 +519,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
         <p>Du casting à la dernière soirée. Les dates sont données à l'heure de Paris.</p>
       </div>
       <ol class="timeline rv" id="timeline">
-        <li data-from="2027-02-27T00:00:00+01:00"><span class="d">27 février</span><b>Ouverture du casting</b><span>Première cinématique, « Ils s'ennuient ».</span></li>
+        <li data-from="2027-02-20T23:30:00+01:00"><span class="d">20 février · 23h30</span><b>Ouverture du casting</b><span>En direct de la finale du TOURNOI BARHAW, avec la première cinématique, « Ils s'ennuient ».</span></li>
         <li data-from="2027-03-14T23:59:00+01:00"><span class="d">14 mars · 23h59</span><b>Fin du casting</b><span>Les dossiers sont étudiés par Osiris.</span></li>
         <li data-from="2027-03-20T00:00:00+01:00"><span class="d">20 mars</span><b>Les 35 candidats</b><span>Deuxième cinématique, « Trente-cinq ».</span></li>
         <li data-from="2027-04-02T20:30:00+02:00"><span class="d">2 – 3 avril</span><b>Vote d'ouverture</b><span>Les Mécènes décident comment l'hiver commence.</span></li>
@@ -589,6 +588,8 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       <a data-link="twitch" href="#">Twitch</a>
       <a data-link="tiktok" href="#">TikTok</a>
       <a href="/casting#terminal">Accès candidat</a>
+      <a href="legal#mentions">Mentions légales</a>
+      <a href="legal#donnees">Confidentialité</a>
     </nav>
     <div class="legal">
       <span>© Osiris RP · Tous les regards sont enregistrés</span>
@@ -606,11 +607,12 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     twitch: "https://www.twitch.tv/lilianobarhaw",
     tiktok: ""
   };
-  // Cinématiques : coller l'identifiant YouTube quand la vidéo est en ligne
+  // Cinématiques : coller l'identifiant YouTube quand la vidéo est en ligne.
+  // Miniature : mettre une image dans img/ et son chemin dans « affiche » (rien n'est chargé depuis YouTube avant le clic)
   // (pour https://www.youtube.com/watch?v=AbCdEf12345, l'identifiant est AbCdEf12345)
   var FILMS = [
     { titre: "Générique", quand: "Disponible", texte: "L'Œil s'ouvre. Le générique d'Osiris.", video: "video/osiris-rp.mp4", affiche: "img/generique.jpg" },
-    { titre: "« Ils s'ennuient »", quand: "27 février 2027", date: "2027-02-27T00:00:00+01:00", texte: "Cassius Vale a un problème : ses spectateurs s'ennuient.", youtube: "" },
+    { titre: "« Ils s'ennuient »", quand: "20 février 2027", date: "2027-02-20T23:30:00+01:00", texte: "Cassius Vale a un problème : ses spectateurs s'ennuient.", youtube: "" },
     { titre: "« Trente-cinq »", quand: "20 mars 2027", date: "2027-03-20T00:00:00+01:00", texte: "Des centaines de dossiers. Trente-cinq élus.", youtube: "" },
     { titre: "« Moteur »", quand: "3 avril 2027", date: "2027-04-03T20:30:00+02:00", texte: "Le décor est prêt. Le Programme peut commencer.", youtube: "" }
   ];
@@ -653,7 +655,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
 
   // ---------- Prochaine étape + calendrier ----------
   var STEPS = [
-    { t: "2027-02-27T00:00:00+01:00", label: "Ouverture du casting dans" },
+    { t: "2027-02-20T23:30:00+01:00", label: "Ouverture du casting dans" },
     { t: "2027-03-14T23:59:00+01:00", label: "Fin du casting dans" },
     { t: "2027-03-20T00:00:00+01:00", label: "Annonce des 35 candidats dans" },
     { t: "2027-04-03T20:30:00+02:00", label: "Ouverture du Programme 01 dans" }
@@ -680,12 +682,12 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       else if(!nextSet){ li.classList.add("soon"); nextSet = true; }
     });
     var chip = $("#p01-chip");
-    if(now >= new Date("2027-02-27T00:00:00+01:00").getTime() && now < new Date("2027-03-15T00:00:00+01:00").getTime()) chip.textContent = "Casting ouvert jusqu'au 14 mars, 23h59";
+    if(now >= new Date("2027-02-20T23:30:00+01:00").getTime() && now < new Date("2027-03-15T00:00:00+01:00").getTime()) chip.textContent = "Casting ouvert jusqu'au 14 mars, 23h59";
     else if(now >= new Date("2027-03-15T00:00:00+01:00").getTime() && now < new Date("2027-04-03T20:30:00+02:00").getTime()) chip.textContent = "Casting fermé · ouverture le 3 avril à 20h30";
     else if(now >= new Date("2027-04-03T20:30:00+02:00").getTime() && now < END) chip.textContent = "En cours · mer., ven. et sam. de 20h30 à 1h";
     else if(now >= END) chip.textContent = "Programme terminé";
     // Boutons du casting : leur texte suit les dates (la page /casting reste verrouillée hors des dates)
-    var castLabel = now < new Date("2027-02-27T00:00:00+01:00").getTime() ? "Casting · 27 février"
+    var castLabel = now < new Date("2027-02-20T23:30:00+01:00").getTime() ? "Casting · 20 février"
       : now < new Date("2027-03-15T00:00:00+01:00").getTime() ? "Déposer ma candidature" : "Casting terminé";
     $$("[data-casting]").forEach(function(a){ a.textContent = castLabel });
   })();
@@ -701,7 +703,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     if(f.video){
       screen += '<video src="'+f.video+'" poster="'+f.affiche+'" preload="none" controls playsinline></video>';
     } else if(f.youtube && open){
-      screen += '<img src="https://i.ytimg.com/vi/'+f.youtube+'/hqdefault.jpg" alt="" loading="lazy"><button class="play" data-yt="'+f.youtube+'" aria-label="Lire '+f.titre.replace(/"/g,"")+'">'+PLAY+'</button>';
+      screen += '<img src="'+(f.affiche || "img/generique.jpg")+'" alt="" loading="lazy"><button class="play" data-yt="'+f.youtube+'" aria-label="Lire '+f.titre.replace(/"/g,"")+'">'+PLAY+'</button>';
     } else {
       screen += '<div class="lock">'+EYE+'<span>'+(open?"Bientôt en ligne":"Diffusion le")+'</span><b>'+f.quand+'</b></div><span class="rec"><i></i>CAM 0'+i+'</span>';
     }

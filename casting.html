@@ -21,9 +21,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" as="image" href="img/oeil.webp" type="image/webp">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&display=swap">
+<link rel="stylesheet" href="fonts/polices.css">
+<link rel="preload" as="font" type="font/woff" href="fonts/marcellus.woff" crossorigin>
 <style>
 :root{
   color-scheme: dark;
@@ -111,6 +110,10 @@ section .label{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-t
 .progress i.on{background:var(--brass)}
 footer{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line);padding-top:20px}
 footer .clock{font-variant-numeric:tabular-nums}
+footer a{color:inherit;text-decoration:none}
+footer a:hover{color:var(--bone)}
+.legalnote{grid-column:1/-1;margin:0;font-size:13px;line-height:1.5;color:var(--faint)}
+.legalnote a,.gate .more{color:var(--brass)}
 .glitch{animation:gl .5s steps(2) 3}
 @keyframes gl{0%{transform:translate(0)}25%{transform:translate(-3px,1px);filter:hue-rotate(20deg)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,2px)}100%{transform:translate(0)}}
 @media (max-width:620px){.recrute{grid-template-columns:1fr}.wrap{gap:64px}}
@@ -186,7 +189,7 @@ a.btn{text-decoration:none;display:inline-block}
       <div><b id="cd-m">00</b><span>Minutes</span></div>
       <div><b id="cd-s">00</b><span>Secondes</span></div>
     </div>
-    <span class="date" id="cd-date">Ouverture du casting · samedi 27 février 2027</span>
+    <span class="date" id="cd-date">Ouverture du casting · samedi 20 février 2027 · 23h30</span>
     <a class="btn" id="hero-cta" href="#candidature" style="text-decoration:none">Déposer ma candidature</a>
   </section>
 
@@ -230,7 +233,7 @@ a.btn{text-decoration:none;display:inline-block}
         <a class="btn ghost" href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Rejoindre le Discord</a>
       </div>
       <div class="gate" id="gate" hidden>
-        <p>Pour passer le casting, connecte-toi avec ton compte Discord. Tu rejoindras automatiquement le serveur Osiris, et ta candidature y ouvrira un ticket privé avec le staff.</p>
+        <p>Pour passer le casting, connecte-toi avec ton compte Discord. Tu rejoindras automatiquement le serveur Osiris, et ta candidature y ouvrira un ticket privé avec le staff. Le site n'utilise que ton identifiant et ton pseudo Discord. <a class="more" href="legal#donnees">En savoir plus</a></p>
         <a class="btn" href="/api/auth/login">Se connecter avec Discord</a>
         <span class="formerr" id="gate-err" role="alert"></span>
       </div>
@@ -260,6 +263,7 @@ a.btn{text-decoration:none;display:inline-block}
         </div>
         <div class="hp" aria-hidden="true"><label for="w-site">Site web</label><input id="w-site" name="site" tabindex="-1" autocomplete="off"></div>
         <div class="actions"><button class="btn" type="submit" id="w-send">Soumettre mon dossier</button><span class="formerr" id="w-err" role="alert"></span></div>
+        <p class="legalnote">En soumettant ton dossier, tu le transmets à l'équipe d'Osiris RP dans un ticket privé sur Discord. Il est supprimé au plus tard 3 mois après la fin du Programme. Ce qu'on en fait et tes droits : <a href="legal#donnees">données personnelles</a>.</p>
       </form>
       <div class="receipt" id="receipt" hidden>
         <span class="label" id="r-label">Candidature transmise</span>
@@ -294,6 +298,7 @@ Entrez votre code d'accès.</div>
 
   <footer>
     <span>© Osiris · Tous les regards sont enregistrés</span>
+    <span><a href="/">Accueil</a> · <a href="legal#mentions">Mentions légales</a> · <a href="legal#donnees">Confidentialité</a></span>
     <span class="clock" id="clock" title="Dernier signal reçu : 03:33">--:--:--</span>
   </footer>
 </div>
@@ -302,7 +307,7 @@ Entrez votre code d'accès.</div>
   var STEPS = [{"h": "e73a36f8264731f64049b86564604e671d4bb1cfc0f6ab26803a5ad18040fee2", "c": "c3x9fXVrenx+E/C6ZHJxf3l2HRNzcn1yfBN9fH4TcmZkfGF6Y/C6HTo5el9DE0FWV1JBV1VdRx0QZ1xGWlxGQUMdOXpcQBNHVRNXWkJcXUcQQkZWEEdGE1VAE0VfX1xdRFJaQVUdE31VE19WQxNQQV9aQBNAUkAdOjlwW1VBUFtVE1BWXEZaE0FGWhNeFFJGQlJaRxBZUl5RWkATVPCIE0JWXlxeR1ZBEFdWE1xSE15ZXVYdEHxdE15WE19FWhNSEF9SWkNA8JoQQkYURV0TQERSR0ZEE1ZHEEZdE15GXvCZQVwTChMCBB458LpTQVpAEFBWE0FGFFpcE/CaRFJaRxwTQEZZRVoTVFYTQF9dE11FXvCaQlwd"}, {"h": "b5d2d1709ca8838ba4e9c22996303eced8c7330f9494e2b4b90ea8c1d66afd9f", "c": "Bw4dFwABE3Rydg0FBwAIEGFlBhljEhoFHREVdAsXBgcIBQqHyHo7PQckPCogITN0YUUsJjwlJCkkdFJYLS87ZHNkICFSQi1vRBQ7KyI8UF4tYR42JiMzNVxaJmF0ZDwqJHRHXi8tK2Q6KzQnEVsiYSAhICMkejs9Ci09ZCYqNXRSViApje1pNy46EVksLG4gKCoydF1SNjM9ZDk2LiRDUjBhIys9N29eY1IvKD1kKiFhJUQQDDInNiA3YTBYQ2MlaSElKCR5XPTpLCtqaQckJkVWKi8rN2koJCBFRSYybiY7LS04VFk3YT4oPDdhJURSYy0rN2klNCBDUjBv"}, {"h": "cb52595ea9159e2a95e299f6f88daf1c1f9526c8cf51dfc5271c5a0ee5101ab8", "c": "GCBkJD1kOyApMzqW7WUiJW8kLyogMGQkOCUhJmYjOS1qT0QIOjYjKCg6NiMoam8AIzIlMCo2bicqcigpIXV+ZToxbz5hKTk3KCwrNi4haExGFishK2QrN2Y2LSY3JCkhb2hmEgQaEGh/c2ITdUwIOiorK2kjN2YnOXU3MS8iKXI1Mz51KCBuACYhJSk+MWQhaQs8OzQvP3tkDCI3byEnMz46KjFuNTo3ZjI5dSU2bjI6fExMrtXQZRpq"}];
   // La cible du compte à rebours est choisie par le script du casting (window.osirisCompte) :
   // ouverture du casting, puis fin du casting, puis ouverture du Programme 01.
-  var target = new Date("2027-02-27T00:00:00+01:00").getTime();
+  var target = new Date("2027-02-20T23:30:00+01:00").getTime();
   function pad(n,l){n=String(n);while(n.length<l)n="0"+n;return n}
   function tick(){
     var c=window.osirisCompte;
@@ -450,7 +455,7 @@ Entrez votre code d'accès.</div>
   if(q.get("login")==="serveur")gerr.textContent="Tu es connecté, mais tu n'as pas pu être ajouté au serveur Osiris. Rejoins-le avec l'invitation du Discord, puis reviens ici.";
   // ---------- Ouverture du casting ----------
   // Dates par défaut ; le serveur (/api/casting) donne les vraies dates et l'heure exacte.
-  var C={ouverture:Date.parse("2027-02-27T00:00:00+01:00"),fermeture:Date.parse("2027-03-14T23:59:59+01:00"),programme:Date.parse("2027-04-03T20:30:00+02:00"),testeur:false,decalage:0};
+  var C={ouverture:Date.parse("2027-02-20T23:30:00+01:00"),fermeture:Date.parse("2027-03-14T23:59:59+01:00"),programme:Date.parse("2027-04-03T20:30:00+02:00"),testeur:false,decalage:0};
   var lock=document.getElementById("lock"),heroCta=document.getElementById("hero-cta"),courant=null;
   function maintenant(){return Date.now()+C.decalage}
   function etat(){var n=maintenant();var e=n<C.ouverture?"bientot":n>C.fermeture?"ferme":"ouvert";return (e!=="ouvert"&&C.testeur)?"test":e}

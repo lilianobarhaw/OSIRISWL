@@ -10,6 +10,8 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `casting.html` : la page de candidature (compte à rebours, dossier, connexion Discord, terminal « Accès candidat »), à l'adresse `/casting`.
 - `vercel.json` : `cleanUrls` pour que `/casting` ouvre `casting.html`.
 - `video/osiris-rp.mp4` : le générique (animation de l'Œil), lu dans la salle de projection.
+- `legal.html` (adresse `/legal`) : mentions légales, mention de fiction, données personnelles (RGPD), cookies, conditions d'utilisation, crédits. Liée en bas de toutes les pages et sous le formulaire de candidature. Mettre à jour la date en haut de la page à chaque changement.
+- `fonts/` : les polices du site (Marcellus, IBM Plex Mono, Source Serif 4), hébergées sur le site pour ne rien envoyer à Google. Licences OFL dans le dossier.
 - `son.js` + `audio/ambiance.mp3` : l'ambiance sonore (composition originale, libre de droits, boucle de 96 s). Elle démarre au premier clic du visiteur (les navigateurs interdisent le son automatique), à volume bas, avec un bouton « Ambiance » en bas à gauche pour la couper ; le choix est retenu. Pour changer de musique : remplacer `audio/ambiance.mp3` et mettre sa durée dans `BOUCLE` (son.js). Volume : `VOLUME` dans son.js.
 - `img/` : le logo d'Osiris (dessin de l'artiste, non retouché) : `oeil.webp` / `oeil.png` pour la page, `favicon.png` et `apple-touch-icon.png` pour l'onglet et les téléphones, `og.png` pour l'aperçu des liens sur Discord et les réseaux. Si l'adresse du site change, modifier aussi la ligne `og:image` dans `index.html`.
 - `lib/discord.js` : sessions signées (cookie HttpOnly), cookies, appels à l'API Discord.
@@ -86,8 +88,8 @@ L'ancienne variable `DISCORD_WEBHOOK` n'est plus utilisée.
 
 Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du casting. Avant, la page affiche « Formulaire scellé » avec le compte à rebours ; après, « Casting terminé ». Le serveur refuse aussi tout dossier envoyé hors de ces dates (`api/candidature.js`), même si quelqu'un contourne la page.
 
-- Dates par défaut dans `lib/casting.js` : ouverture le 27 février 2027 à 0h, fermeture le 14 mars 2027 à 23h59 (heure de Paris).
-- Pour les changer sans toucher au code, variables Vercel `CASTING_OUVERTURE` et `CASTING_FERMETURE`, au format `2027-02-27T21:00:00+01:00`. Penser à changer aussi les dates affichées sur l'accueil (`index.html`).
+- Dates par défaut dans `lib/casting.js` : ouverture le samedi 20 février 2027 à 23h30 (finale du TOURNOI BARHAW), fermeture le 14 mars 2027 à 23h59 (heure de Paris).
+- Pour les changer sans toucher au code, variables Vercel `CASTING_OUVERTURE` et `CASTING_FERMETURE`, au format `2027-02-20T23:30:00+01:00`. Penser à changer aussi les dates affichées sur l'accueil (`index.html`).
 - `CASTING_TESTEURS` : identifiants Discord (séparés par des virgules) qui peuvent tester le formulaire même quand le casting est fermé. La page leur affiche « Mode test ».
 - État actuel : `https://<ton-domaine>/api/casting` (ou la ligne `casting` de `/api/candidature`).
 
