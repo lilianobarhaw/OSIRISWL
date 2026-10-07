@@ -6,7 +6,9 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 
 - `index.html` : la page d'accueil (HTML, CSS et JS dans un seul fichier). En haut du script, deux réglages à remplir :
   - `LIENS` : les liens Discord, Twitch et TikTok (un lien vide cache le bouton) ;
-  - `FILMS` : les cinématiques ; coller l'identifiant YouTube de chaque vidéo quand elle est en ligne. Une cinématique reste verrouillée jusqu'à sa date de diffusion.
+  - `FILMS` : les cinématiques ; coller l'identifiant YouTube de chaque vidéo quand elle est en ligne. Une cinématique reste verrouillée jusqu'à sa date de diffusion ;
+  - `ECRANS` : les chaînes Twitch des streamers (voir « Les écrans »).
+- `api/ecrans.js` : dit quelles chaînes sont en direct sur Twitch (voir « Les écrans »).
 - `casting.html` : la page de candidature (compte à rebours, dossier, connexion Discord, terminal « Accès candidat »), à l'adresse `/casting`.
 - `vercel.json` : `cleanUrls` pour que `/casting` ouvre `casting.html`.
 - `video/osiris-rp.mp4` : le générique (animation de l'Œil), lu dans la salle de projection.
@@ -186,3 +188,21 @@ Permissions du bot dans #offrandes : Voir le salon, Envoyer des messages, Intég
 | `DISCORD_GRAND_MECENE_ROLE_ID` | Rôle Grand Mécène |
 | `DISCORD_CANDIDAT_ROLE_ID` | Rôle Candidat (déjà utilisé par /casting) |
 | `CRON_SECRET` | Une suite de caractères au hasard (16 ou plus) : Vercel l'envoie au lancement de chaque nuit |
+
+## Les écrans (streams du Programme)
+
+Section « Les écrans » de l'accueil : un moniteur et une case par streamer. « Regarder ici » charge le direct Twitch dans le moniteur, sans quitter le site. Rien n'est chargé depuis Twitch avant ce clic (voir la page légale, partie Cookies).
+
+- **Liste des streamers** : `ECRANS`, en haut du script de `index.html`. Une ligne par chaîne : `twitch` = ce qui suit `twitch.tv/`. `role` remplace « Écran 0X » (ex. « La régie ») ; `texte` s'affiche quand la chaîne n'est pas en direct ; `nom` = nom affiché tant que Twitch ne l'a pas donné.
+- **En direct ou non** : `api/ecrans.js` demande à Twitch qui est en direct (titre, jeu, spectateurs). La réponse est gardée 60 secondes, et la page se met à jour toute seule chaque minute. Sans les deux variables ci-dessous, tout marche quand même, mais sans « En direct » ni « Hors ligne ».
+- **Créer les identifiants Twitch** (gratuit, 2 minutes) : https://dev.twitch.tv/console → se connecter → **Register Your Application** → Name : `Osiris RP` ; OAuth Redirect URLs : `http://localhost` ; Category : `Website Integration` ; Client Type : `Confidential` → Create → **Manage** → copier le **Client ID**, puis **New Secret** et copier le secret.
+- Le lecteur Twitch ne marche que sur le site en ligne (https), pas en ouvrant `index.html` depuis l'ordinateur : dans ce cas, « Regarder ici » ouvre Twitch dans un nouvel onglet.
+
+| Variable | Valeur |
+| --- | --- |
+| `TWITCH_CLIENT_ID` | Client ID de l'application Twitch |
+| `TWITCH_CLIENT_SECRET` | Secret de l'application Twitch (ne jamais le partager) |
+
+## Partenaires
+
+Section « Partenaires » en bas de l'accueil (FreakyVerse). Pour en ajouter un : copier le bloc `<article class="partner">` dans `index.html` et changer les textes et les liens.

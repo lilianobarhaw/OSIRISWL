@@ -245,6 +245,76 @@ main section.block{padding-block:120px 20px}
 .reel p{margin:0;color:var(--dim);font-size:16px}
 @media (max-width:720px){.reels{grid-template-columns:1fr}}
 
+/* Les écrans */
+.monitor{position:relative;aspect-ratio:16/9;background:#050506;border:1px solid var(--line);overflow:hidden}
+.monitor.on{border-color:var(--brass-soft)}
+.monitor canvas.noise{position:absolute;inset:0;width:100%;height:100%;opacity:.13;image-rendering:pixelated}
+.monitor .idle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px;background:radial-gradient(60% 60% at 50% 50%,rgba(196,162,101,.07),transparent 70%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px)}
+.monitor .idle img{width:64px;opacity:.5;mix-blend-mode:screen}
+.monitor .idle span{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.monitor .idle b{font-family:var(--display);font-weight:400;font-size:clamp(20px,2.4vw,28px);color:var(--bone)}
+.monitor iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.monitor .corner{position:absolute;width:18px;height:18px;border-color:var(--brass-soft);border-style:solid;pointer-events:none;opacity:.8}
+.monitor .corner.tl{left:12px;top:12px;border-width:1px 0 0 1px}.monitor .corner.tr{right:12px;top:12px;border-width:1px 1px 0 0}
+.monitor .corner.bl{left:12px;bottom:12px;border-width:0 0 1px 1px}.monitor .corner.br{right:12px;bottom:12px;border-width:0 1px 1px 0}
+.monitor-bar{display:flex;justify-content:space-between;align-items:center;gap:10px 20px;flex-wrap:wrap;padding-top:14px}
+.monitor-bar .now{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.monitor-bar .now b{font-weight:500;color:var(--bone)}
+.monitor-bar .right{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.monitor-bar button.link{background:none;border:0;padding:0;cursor:pointer}
+.consent{margin:8px 0 0;font-size:14px;line-height:1.5;color:var(--faint)}
+.screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:34px}
+.tile{background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;transition:border-color .3s}
+.tile.en-direct{border-color:var(--brass-soft)}
+.tile.on{border-color:var(--gold);box-shadow:0 0 0 1px rgba(233,207,120,.25)}
+.tile .tv{position:relative;aspect-ratio:16/9;overflow:hidden;border-bottom:1px solid var(--line);background:#07080A}
+.tile .tv::before{content:"";position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .85 0 0 0 0 .82 0 0 0 0 .76 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.1;animation:grain 1.2s steps(6) infinite}
+.tile.en-direct .tv{background:radial-gradient(80% 90% at 50% 60%,rgba(181,86,74,.16),transparent 70%),#0B0A0B}
+.tile.en-direct .tv::before{opacity:.05}
+.tile .tv::after{content:"";position:absolute;left:0;right:0;height:30%;top:-30%;background:linear-gradient(180deg,transparent,rgba(230,224,211,.05),transparent);animation:sweep 5s linear infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-8%,4%)}40%{transform:translate(6%,-6%)}60%{transform:translate(-4%,8%)}80%{transform:translate(8%,2%)}100%{transform:translate(0,0)}}
+@keyframes sweep{to{top:130%}}
+.tile .tv img{position:absolute;left:50%;top:50%;width:58px;transform:translate(-50%,-50%);opacity:.22;mix-blend-mode:screen}
+.tile.en-direct .tv img{opacity:.4}
+.tile .cam{position:absolute;left:12px;top:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.tile .sig{position:absolute;right:10px;top:9px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:2px 7px;border:1px solid var(--line);color:var(--faint);background:rgba(10,11,13,.6)}
+.tile .sig.live{background:var(--alarm);border-color:var(--alarm);color:#fff;display:inline-flex;align-items:center;gap:6px}
+.tile .sig.live i{width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 2.4s ease-in-out infinite}
+.tile .viewers{position:absolute;left:12px;bottom:9px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--bone)}
+.tile .info{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.tile h3{font-family:var(--display);font-weight:400;font-size:22px;margin:0;letter-spacing:.03em;overflow-wrap:anywhere}
+.tile .what{font-size:15px;line-height:1.45;color:var(--dim);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile .what em{font-style:normal;color:#CFC9BB}
+.tile .acts{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+.btn.sm{padding:10px 14px;font-size:11px}
+@media (max-width:960px){.screens{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){
+  .screens{grid-template-columns:1fr;gap:12px}
+  .tile{flex-direction:row}
+  .tile .tv{width:40%;flex:none;aspect-ratio:auto;min-height:118px;border-bottom:0;border-right:1px solid var(--line)}
+  .tile .tv img{width:42px}
+  .tile .sig{right:auto;left:10px;top:auto;bottom:9px}
+  .tile .viewers{bottom:auto;top:30px;left:10px;font-size:10.5px;letter-spacing:.02em;white-space:nowrap}
+  .tile .viewers .dur{display:none}
+  .tile .info{padding:12px 14px 14px;gap:4px}
+  .tile h3{font-size:19px}
+  .tile .what{font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){.tile .tv::before,.tile .tv::after,.tile .sig.live i{animation:none}}
+
+/* Partenaires */
+.partner{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);border:1px solid var(--line);background:var(--panel)}
+.partner .p-id{display:flex;flex-direction:column;justify-content:space-between;gap:34px;padding:30px 28px;border-right:1px solid var(--line);background:radial-gradient(90% 80% at 25% 105%,rgba(196,162,101,.1),transparent 70%),repeating-linear-gradient(135deg,rgba(255,255,255,.015) 0 2px,transparent 2px 9px)}
+.partner .p-x{display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-family:var(--display);font-size:clamp(26px,3.2vw,40px);letter-spacing:.16em;line-height:1.1}
+.partner .p-x i{font-style:normal;font-family:var(--mono);font-size:14px;letter-spacing:.2em;color:var(--brass)}
+.partner .p-body{padding:30px 30px 28px;display:flex;flex-direction:column;gap:12px}
+.partner h3{font-family:var(--display);font-weight:400;font-size:30px;margin:0;letter-spacing:.03em}
+.partner .where{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.partner p{margin:0;color:#CFC9BB;max-width:58ch}
+.partner blockquote{margin:2px 0 0;font-style:italic;color:var(--bone);border-left:1px solid var(--brass-soft);padding-left:14px}
+.partner .acts{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+@media (max-width:860px){.partner{grid-template-columns:1fr}.partner .p-id{border-right:0;border-bottom:1px solid var(--line)}}
+
 /* Calendrier */
 .timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;position:relative}
 .timeline::before{content:"";position:absolute;left:0;right:0;top:9px;height:1px;background:var(--line)}
@@ -323,6 +393,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       <a href="#programmes">Programmes</a>
       <a href="#mecenes">Mécènes</a>
       <a href="#projection">Projection</a>
+      <a href="#ecrans">Écrans</a>
       <a href="#calendrier">Calendrier</a>
       <a href="#rejoindre">Rejoindre</a>
       <a class="btn" href="/casting">Casting</a>
@@ -517,11 +588,30 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     </div>
   </section>
 
+  <!-- ========== Les écrans ========== -->
+  <section class="block" id="ecrans" aria-labelledby="t-ecr">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">05 · Les écrans</span><h2 id="t-ecr">Ce qu'Osiris regarde</h2></div>
+        <p>Chaque streamer du Programme filme l'hiver de Ludendorff de son point de vue. Choisis un écran : son direct s'affiche ici, sans quitter le site.</p>
+      </div>
+      <div class="rv">
+        <div class="monitor" id="monitor"></div>
+        <div class="monitor-bar">
+          <span class="now" id="monitor-now">Moniteur · <b>aucun écran</b></span>
+          <span class="right"><span class="now" id="monitor-count"></span><button class="link" id="monitor-stop" type="button" hidden>Couper l'écran</button></span>
+        </div>
+        <p class="consent">Le lecteur vient de Twitch : il ne se charge que lorsque tu choisis un écran, et Twitch peut alors utiliser ses propres cookies.</p>
+      </div>
+      <div class="screens" id="screens"></div>
+    </div>
+  </section>
+
   <!-- ========== Calendrier ========== -->
   <section class="block" id="calendrier" aria-labelledby="t-cal">
     <div class="in-wrap">
       <div class="head rv">
-        <div><span class="num">05 · Calendrier</span><h2 id="t-cal">Programme 01</h2></div>
+        <div><span class="num">06 · Calendrier</span><h2 id="t-cal">Programme 01</h2></div>
         <p>Du casting à la dernière soirée. Les dates sont données à l'heure de Paris.</p>
       </div>
       <ol class="timeline rv" id="timeline">
@@ -549,7 +639,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
   <section class="block" id="rejoindre" aria-labelledby="t-join">
     <div class="in-wrap">
       <div class="head rv">
-        <div><span class="num">06 · Rejoindre</span><h2 id="t-join">De quel côté de l'écran ?</h2></div>
+        <div><span class="num">07 · Rejoindre</span><h2 id="t-join">De quel côté de l'écran ?</h2></div>
         <p>Il y a trois façons d'entrer dans Osiris. Toutes passent par le Discord.</p>
       </div>
       <div class="paths">
@@ -568,8 +658,9 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
         <article class="path rv">
           <span class="who">Regarder</span>
           <h3>Spectateur</h3>
-          <p>L'émission est diffusée sur la chaîne Twitch LilianoBarhaw, et chaque candidat peut streamer son point de vue.</p>
-          <a class="btn ghost" data-link="twitch" href="#">Regarder sur Twitch</a>
+          <p>L'émission est diffusée sur la chaîne Twitch LilianoBarhaw, et les directs de chaque streamer sont réunis dans Les écrans.</p>
+          <a class="btn ghost" href="#ecrans">Les écrans</a>
+          <a class="link" data-link="twitch" href="#">La chaîne Twitch <span class="ar">→</span></a>
           <a class="link" data-link="tiktok" href="#">Les extraits sur TikTok <span class="ar">→</span></a>
         </article>
       </div>
@@ -580,6 +671,33 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
           <p>Le public ne fait pas que regarder : par leurs votes, les Mécènes changent ce qui arrive aux candidats, soir après soir.</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ========== Partenaires ========== -->
+  <!-- Pour un nouveau partenaire : copier le bloc <article class="partner"> et changer les textes et les liens. -->
+  <section class="block" id="partenaires" aria-labelledby="t-part">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">08 · Partenaires</span><h2 id="t-part">Les univers voisins</h2></div>
+        <p>Osiris n'est pas le seul monde à raconter des histoires. Ces projets sont nos alliés : nos communautés se croisent et se soutiennent.</p>
+      </div>
+      <article class="partner rv">
+        <div class="p-id">
+          <span class="label">Partenaire officiel</span>
+          <div class="p-x" aria-hidden="true"><span>OSIRIS</span><i>×</i><span class="gold-text">FREAKYVERSE</span></div>
+        </div>
+        <div class="p-body">
+          <h3>FreakyVerse</h3>
+          <span class="where">Roleplay Minecraft narratif · fondé par Shoku</span>
+          <p>Un multivers où chaque saison est écrite, jouée et mise en scène par sa communauté. Plusieurs univers y sont déjà sortis, et d'autres attendent leur tour.</p>
+          <blockquote>« Chaque histoire mérite son univers. »</blockquote>
+          <div class="acts">
+            <a class="btn" href="https://discord.gg/33kSyqC5AP" target="_blank" rel="noopener">Leur Discord</a>
+            <a class="btn ghost" href="https://freaky-verse.vercel.app" target="_blank" rel="noopener">Leur site</a>
+          </div>
+        </div>
+      </article>
     </div>
   </section>
 </main>
@@ -595,6 +713,8 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       <a data-link="discord" href="#">Discord</a>
       <a data-link="twitch" href="#">Twitch</a>
       <a data-link="tiktok" href="#">TikTok</a>
+      <a href="#ecrans">Écrans</a>
+      <a href="#partenaires">Partenaires</a>
       <a href="/casting#terminal">Accès candidat</a>
       <a href="legal#mentions">Mentions légales</a>
       <a href="legal#donnees">Confidentialité</a>
@@ -623,6 +743,16 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     { titre: "« Ils s'ennuient »", quand: "20 février 2027", date: "2027-02-20T23:30:00+01:00", texte: "Cassius Vale a un problème : ses spectateurs s'ennuient.", youtube: "" },
     { titre: "« Trente-cinq »", quand: "27 mars 2027", date: "2027-03-27T00:00:00+01:00", texte: "Des centaines de dossiers. Trente-cinq élus.", youtube: "" },
     { titre: "« Moteur »", quand: "3 avril 2027", date: "2027-04-03T20:30:00+02:00", texte: "Le décor est prêt. Le Programme peut commencer.", youtube: "" }
+  ];
+  // Les écrans : une ligne par streamer. « twitch » = le nom de la chaîne (ce qui suit twitch.tv/).
+  // « role » remplace « Écran 0X » ; « texte » s'affiche quand la chaîne n'est pas en direct.
+  var ECRANS = [
+    { twitch: "lilianobarhaw", nom: "LilianoBarhaw", role: "La régie", texte: "L'émission principale, présentée par la voix d'Osiris." },
+    { twitch: "veyzo_off" },
+    { twitch: "shoku_twitch" },
+    { twitch: "kikso06" },
+    { twitch: "ilhan_purpl" },
+    { twitch: "m_oo_de" }
   ];
   // =======================================================
 
@@ -728,6 +858,84 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     var io2 = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io2.unobserve(e.target) } }) });
     $$("#reels .rv").forEach(function(el){ io2.observe(el) });
   } else $$("#reels .rv").forEach(function(el){ el.classList.add("in") });
+
+  // ---------- Les écrans ----------
+  (function(){
+    var grid = $("#screens"), mon = $("#monitor"), now = $("#monitor-now"), count = $("#monitor-count"), stop = $("#monitor-stop");
+    if(!grid || !mon) return;
+    var etat = { ok:false, configure:false, live:{}, noms:{} }, charge = false, actuel = "", bruitId = 0;
+    var IDLE = '<canvas class="noise" aria-hidden="true"></canvas><div class="idle"><img src="img/apple-touch-icon.png" alt=""><span>Moniteur d\'Osiris</span><b>Choisis un écran</b></div><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>';
+    function esc(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c] }) }
+    function nom(e){ return (etat.noms && etat.noms[e.twitch]) || e.nom || e.twitch }
+    function numero(e){ var n = 0, k = 0; ECRANS.forEach(function(x){ if(!x.role){ n++; if(x === e) k = n } }); return k }
+    function camera(e){ return e.role || ("Écran " + pad(numero(e))) }
+    function duree(iso){ var m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime())/60000)); return m < 60 ? m+" min" : Math.floor(m/60)+" h "+pad(m%60) }
+    function connu(){ return charge && etat.ok && etat.configure }
+    // Neige d'écran sur le moniteur éteint
+    function bruit(){
+      var c = $("canvas.noise", mon); if(!c || reduce) return;
+      c.width = 160; c.height = 90;
+      var g = c.getContext("2d"), img = g.createImageData(160, 90), id = ++bruitId, last = 0, visible = true;
+      if("IntersectionObserver" in window) new IntersectionObserver(function(es){ visible = es[0].isIntersecting }).observe(c);
+      (function f(t){
+        if(id !== bruitId || !c.isConnected) return;
+        if(visible && t - last > 80){
+          last = t; var d = img.data;
+          for(var i=0;i<d.length;i+=4){ var v = Math.random()*255|0; d[i]=v; d[i+1]=v*.96|0; d[i+2]=v*.88|0; d[i+3]=255 }
+          g.putImageData(img, 0, 0);
+        }
+        requestAnimationFrame(f);
+      })(0);
+    }
+    function marquer(){ $$(".tile", grid).forEach(function(t){ t.classList.toggle("on", t.getAttribute("data-twitch") === actuel) }) }
+    function eteindre(){
+      actuel = ""; mon.classList.remove("on"); mon.innerHTML = IDLE; bruit();
+      now.innerHTML = "Moniteur · <b>aucun écran</b>"; stop.hidden = true; marquer();
+    }
+    function allumer(chaine){
+      var e = ECRANS.filter(function(x){ return x.twitch === chaine })[0]; if(!e) return;
+      // Le lecteur Twitch exige l'adresse du site : sur un fichier ouvert depuis l'ordinateur, on ouvre Twitch à la place
+      if(location.protocol === "file:" || !location.hostname){ window.open("https://www.twitch.tv/"+chaine, "_blank", "noopener"); return }
+      actuel = chaine; bruitId++;
+      mon.classList.add("on");
+      mon.innerHTML = '<iframe src="https://player.twitch.tv/?channel='+encodeURIComponent(chaine)+'&parent='+encodeURIComponent(location.hostname)+'&autoplay=true&muted=false" title="Direct Twitch de '+esc(nom(e))+'" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+      now.innerHTML = "Moniteur · <b>"+esc(camera(e))+" · "+esc(nom(e))+"</b>";
+      stop.hidden = false; marquer();
+      var r = mon.getBoundingClientRect();
+      if(r.top < 70 || r.bottom > window.innerHeight) mon.scrollIntoView({behavior: reduce ? "auto" : "smooth", block: "center"});
+    }
+    function dessiner(){
+      var html = "", nLive = 0;
+      ECRANS.forEach(function(e){
+        var L = etat.live && etat.live[e.twitch], off = connu() && !L;
+        if(L) nLive++;
+        var vus = L ? Number(L.spectateurs || 0) : 0;
+        html += '<article class="tile'+(L ? " en-direct" : "")+'" data-twitch="'+esc(e.twitch)+'">'
+          + '<div class="tv"><img src="img/apple-touch-icon.png" alt=""><span class="cam">'+esc(camera(e))+'</span>'
+          + (L ? '<span class="sig live"><i></i>En direct</span><span class="viewers">'+vus.toLocaleString("fr-FR")+' spectateur'+(vus > 1 ? "s" : "")+(L.depuis ? '<span class="dur"> · '+duree(L.depuis)+'</span>' : '')+'</span>'
+               : off ? '<span class="sig">Hors ligne</span>' : '')
+          + '</div><div class="info"><h3>'+esc(nom(e))+'</h3>'
+          + '<p class="what">'+(L ? '<em>'+esc(L.titre)+'</em>'+(L.jeu ? ' · '+esc(L.jeu) : '')
+               : esc(off ? "Signal coupé. L'écran se rallume au prochain direct." : (e.texte || "Son point de vue sur le Programme.")))+'</p>'
+          + '<div class="acts">'+(off ? '' : '<button class="btn sm" type="button" data-watch="'+esc(e.twitch)+'">Regarder ici</button>')
+          + '<a class="link" href="https://www.twitch.tv/'+esc(e.twitch)+'" target="_blank" rel="noopener">'+(off ? "Sa chaîne" : "Sur Twitch")+' <span class="ar">↗</span></a></div>'
+          + '</div></article>';
+      });
+      grid.innerHTML = html;
+      count.textContent = connu() ? (nLive ? nLive+" écran"+(nLive > 1 ? "s" : "")+" en direct" : "Aucun écran allumé") : "";
+      marquer();
+    }
+    function charger(){
+      fetch("/api/ecrans?c=" + ECRANS.map(function(e){ return e.twitch }).join(","))
+        .then(function(r){ return r.ok ? r.json() : null })
+        .then(function(d){ if(d){ etat = d; charge = true } dessiner() })
+        .catch(function(){ dessiner() });
+    }
+    grid.addEventListener("click", function(ev){ var b = ev.target.closest("[data-watch]"); if(b) allumer(b.getAttribute("data-watch")) });
+    stop.addEventListener("click", eteindre);
+    eteindre(); dessiner(); charger();
+    setInterval(function(){ if(!document.hidden) charger() }, 60000);
+  })();
 
   // ---------- Poussière d'or (accueil) et neige (Programme 01) ----------
   function field(canvas, opts){
