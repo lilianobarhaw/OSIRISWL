@@ -160,7 +160,7 @@ export async function POST(req) {
       const r = await publierOffrande(i, id.split(":")[1]);
       if (r.erreur) return reply(r.erreur);
       await logEvent({ title: r.test ? "Offrande de test lancée" : "Offrande lancée", description: `<@${user.id}> a lancé **${r.titre}** dans <#${r.salon}> (${r.heures} h) : ${r.offrandes.join(" · ")}`, user });
-      return reply(`Offrande publiée dans <#${r.salon}>. Le vote se ferme dans ${r.heures} h.${r.test ? "\nC'est un test : ce salon ne compte pas pour les rangs. Supprime les deux messages quand tu as fini." : ""}`);
+      return reply(`Offrande publiée dans <#${r.salon}>. Le vote se ferme dans ${r.heures} h.${r.notifies ? " Mécènes (tous les rangs) et staff notifiés." : ""}${r.test ? "\nC'est un test : ce salon ne compte pas pour les rangs. Supprime les deux messages quand tu as fini." : ""}`);
     }
 
     // Fenêtre de /annonce envoyée → message publié dans le salon

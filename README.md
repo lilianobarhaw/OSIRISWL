@@ -170,11 +170,11 @@ Le bot compte les sondages votés par chaque Mécène dans #offrandes (un sondag
 
 ### Lancer un vote : `/offrande`
 
-Taper `/offrande` n'importe où : une fenêtre demande le titre, la durée (en heures, de 1 à 168) et 2 ou 3 Offrandes (1re ligne : le nom, qui devient le choix du sondage ; lignes suivantes : la description). Le bot publie dans #offrandes une carte aux couleurs d'Osiris (bannière `img/offrande.png`, description de chaque Offrande, heure de fin affichée à l'heure locale de chacun), puis le sondage Discord juste en dessous, avec ❄️ 🕯️ 🗝️ devant les choix. Le vote reste un vrai sondage Discord : il compte pour les rangs. Chaque lancement est noté dans #logs-commandes.
+Taper `/offrande` n'importe où : une fenêtre demande le titre, la durée (en heures, de 1 à 168) et 2 ou 3 Offrandes (1re ligne : le nom, qui devient le choix du sondage ; lignes suivantes : la description). Le bot publie dans #offrandes une carte aux couleurs d'Osiris (bannière `img/offrande.png`, description de chaque Offrande, heure de fin affichée à l'heure locale de chacun), puis le sondage Discord juste en dessous, avec ❄️ 🕯️ 🗝️ devant les choix. La carte mentionne les rôles Mécène, Mécène d'argent, Mécène d'or, Grand Mécène et Staff (pas lors d'un test). Le vote reste un vrai sondage Discord : il compte pour les rangs. Chaque lancement est noté dans #logs-commandes.
 
 Pour essayer sans fausser les rangs : `/offrande salon:#un-salon-staff`. La carte et le sondage partent dans ce salon, qui n'est pas compté.
 
-Permissions du bot dans #offrandes : Voir le salon, Envoyer des messages, Intégrer des liens, **Créer des sondages**. La bannière et l'icône viennent du site : `SITE_URL` doit être rempli.
+Permissions du bot dans #offrandes : Voir le salon, Envoyer des messages, Intégrer des liens, **Créer des sondages**, **Mentionner @everyone, @here et tous les rôles** (sinon les rôles s'affichent mais personne n'est notifié). La bannière et l'icône viennent du site : `SITE_URL` doit être rempli.
 
 | Variable | Valeur |
 | --- | --- |
