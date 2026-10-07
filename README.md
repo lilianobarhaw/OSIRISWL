@@ -59,7 +59,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_TICKET_CATEGORY_ID` | Identifiant de la catégorie des tickets |
 | `DISCORD_STAFF_ROLE_ID` | Identifiant du rôle staff |
 | `SESSION_SECRET` | Une longue phrase aléatoire (32 caractères ou plus) |
-| `SITE_URL` | Adresse du site sans `/` final, ex. `https://osiris-rp.vercel.app` |
+| `SITE_URL` | Adresse du site sans `/` final, ex. `https://osiriswl.vercel.app` |
 | `DISCORD_PUBLIC_KEY` | Public Key de l'application (onglet General Information), pour les tickets d'aide |
 | `DISCORD_ADMIN_ROLE_ID` | Identifiant du rôle Admin : seuls les admins voient les tickets « Problème avec le staff » |
 | `DISCORD_HELP_CATEGORY_ID` | Facultatif. Catégorie Discord des tickets d'aide (sinon, celle des candidatures) |
@@ -103,7 +103,8 @@ Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du c
    - `/aide-panneau` : publie le bouton « Créer un ticket » dans le salon.
    - `/fermer` : ferme le ticket où on la tape. Ticket d'aide : staff ou auteur. Ticket de candidature : staff seulement.
    - `/casting resultat:…` (dans un ticket de candidature) : publie le résultat au candidat, donne le rôle correspondant et retire le rôle Postulant.
-4. Les commandes staff ne sont visibles que pour ceux qui ont la permission « Gérer les messages ». Pour changer qui les voit : Paramètres du serveur → Intégrations → Osiris. Le bot vérifie aussi que la personne a le rôle Staff ou Admin.
+   - `/offrande` : lance un vote des Mécènes dans #offrandes (voir « Rangs des Mécènes »).
+   - Les commandes de modération sont décrites plus bas.
 
 ## Sécurité
 
@@ -166,6 +167,14 @@ Le bot compte les sondages votés par chaque Mécène dans #offrandes (un sondag
 - À la main : `https://<ton-domaine>/api/rangs?key=<SETUP_KEY>` ; ajouter `&simulation=1` pour voir ce qui changerait sans rien modifier.
 - Sécurité : un candidat (rôle Candidat) perd automatiquement le rôle Mécène et ses rangs ; `/casting resultat:Retenu` les retire aussi tout de suite.
 - Le portail développeur doit garder « Server Members Intent » activé (le bot lit la liste des membres).
+
+### Lancer un vote : `/offrande`
+
+Taper `/offrande` n'importe où : une fenêtre demande le titre, la durée (en heures, de 1 à 168) et 2 ou 3 Offrandes (1re ligne : le nom, qui devient le choix du sondage ; lignes suivantes : la description). Le bot publie dans #offrandes une carte aux couleurs d'Osiris (bannière `img/offrande.png`, description de chaque Offrande, heure de fin affichée à l'heure locale de chacun), puis le sondage Discord juste en dessous, avec ❄️ 🕯️ 🗝️ devant les choix. Le vote reste un vrai sondage Discord : il compte pour les rangs. Chaque lancement est noté dans #logs-commandes.
+
+Pour essayer sans fausser les rangs : `/offrande salon:#un-salon-staff`. La carte et le sondage partent dans ce salon, qui n'est pas compté.
+
+Permissions du bot dans #offrandes : Voir le salon, Envoyer des messages, Intégrer des liens, **Créer des sondages**. La bannière et l'icône viennent du site : `SITE_URL` doit être rempli.
 
 | Variable | Valeur |
 | --- | --- |

@@ -14,6 +14,7 @@ import { CATEGORIES, panelMessage } from "../lib/aide.js";
 import { CASTING } from "../lib/commandes.js";
 import { moderation, isModCommand } from "../lib/moderation.js";
 import { logEvent, logCommand } from "../lib/logs.js";
+import { offrandeModal, publierOffrande } from "../lib/offrande.js";
 
 const VIEW = 1024n, SEND = 2048n, EMBED = 16384n, ATTACH = 32768n, HISTORY = 65536n;
 const bits = (...p) => p.reduce((a, b) => a | b, 0n).toString();
@@ -99,6 +100,8 @@ async function command(i, user) {
 
   if (name === "fermer") return (await closeTicket(i, user)) || reply("Ticket fermé.");
 
+  if (name === "offrande") return json(offrandeModal(opt("salon")));
+
   if (name === "casting") {
     const chRes = await bot(`/channels/${i.channel_id}`);
     const topic = chRes.ok ? (await chRes.json()).topic || "" : "";
@@ -149,6 +152,15 @@ export async function POST(req) {
       const skip = i.data.name === "annonce" && !refused; // l'annonce est notée quand elle est publiée
       const [res] = await Promise.all([command(i, user), skip ? null : logCommand(i, user, refused)]);
       return res;
+    }
+
+    // Fenêtre de /offrande envoyée → carte Osiris + sondage dans #offrandes
+    if (i.type === 5 && id.startsWith("offrande_envoi")) {
+      if (!isDirection(i.member)) return reply(DIRECTION_ONLY);
+      const r = await publierOffrande(i, id.split(":")[1]);
+      if (r.erreur) return reply(r.erreur);
+      await logEvent({ title: r.test ? "Offrande de test lancée" : "Offrande lancée", description: `<@${user.id}> a lancé **${r.titre}** dans <#${r.salon}> (${r.heures} h) : ${r.offrandes.join(" · ")}`, user });
+      return reply(`Offrande publiée dans <#${r.salon}>. Le vote se ferme dans ${r.heures} h.${r.test ? "\nC'est un test : ce salon ne compte pas pour les rangs. Supprime les deux messages quand tu as fini." : ""}`);
     }
 
     // Fenêtre de /annonce envoyée → message publié dans le salon
