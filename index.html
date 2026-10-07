@@ -246,9 +246,9 @@ main section.block{padding-block:120px 20px}
 @media (max-width:720px){.reels{grid-template-columns:1fr}}
 
 /* Calendrier */
-.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;position:relative}
+.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;position:relative}
 .timeline::before{content:"";position:absolute;left:0;right:0;top:9px;height:1px;background:var(--line)}
-.timeline li{position:relative;padding:34px 18px 0 0}
+.timeline li{position:relative;padding:34px 14px 0 0}
 .timeline li::before{content:"";position:absolute;left:0;top:4px;width:11px;height:11px;border:1px solid var(--brass-soft);background:var(--ground);transform:rotate(45deg)}
 .timeline li.done::before{background:var(--brass-soft)}
 .timeline li.soon::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(233,207,120,.6)}
@@ -256,6 +256,12 @@ main section.block{padding-block:120px 20px}
 .timeline b{display:block;font-family:var(--display);font-weight:400;font-size:19px;line-height:1.25;margin:6px 0 4px}
 .timeline span{font-size:14px;color:var(--dim)}
 .timeline li.done b,.timeline li.done span{opacity:.55}
+@media (max-width:1200px){
+  .timeline{grid-template-columns:1fr;padding-left:30px}
+  .timeline::before{left:5px;right:auto;top:0;bottom:0;width:1px;height:auto}
+  .timeline li{padding:0 0 26px}
+  .timeline li::before{left:-30px;top:5px}
+}
 .nights{margin-top:56px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 56px;align-items:start}
 .nights h3{font-family:var(--display);font-weight:400;font-size:26px;margin:0 0 8px}
 .nights p{margin:0;color:var(--dim)}
@@ -519,11 +525,12 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
         <p>Du casting à la dernière soirée. Les dates sont données à l'heure de Paris.</p>
       </div>
       <ol class="timeline rv" id="timeline">
-        <li data-from="2027-02-20T23:30:00+01:00"><span class="d">20 février · 23h30</span><b>Ouverture du casting</b><span>En direct de la finale du TOURNOI BARHAW, avec la première cinématique, « Ils s'ennuient ».</span></li>
+        <li data-from="2027-02-20T23:30:00+01:00"><span class="d">20 février · 23h30</span><b>Ouverture du casting</b><span>En direct de la finale du TOURNOI BARHAW, avec la première cinématique, « Ils s'ennuient ».</span></li>
         <li data-from="2027-03-14T23:59:00+01:00"><span class="d">14 mars · 23h59</span><b>Fin du casting</b><span>Les dossiers sont étudiés par Osiris.</span></li>
-        <li data-from="2027-03-20T00:00:00+01:00"><span class="d">20 mars</span><b>Les 35 candidats</b><span>Deuxième cinématique, « Trente-cinq ».</span></li>
+        <li data-from="2027-03-15T00:00:00+01:00"><span class="d">15 – 26 mars</span><b>Entretiens</b><span>Les dossiers retenus passent un entretien vocal avec l'équipe, sur le Discord.</span></li>
+        <li data-from="2027-03-27T00:00:00+01:00"><span class="d">27 mars</span><b>Les 35 candidats</b><span>Deuxième cinématique, « Trente-cinq », et la liste des whitelistés.</span></li>
         <li data-from="2027-04-02T20:30:00+02:00"><span class="d">2 – 3 avril</span><b>Vote d'ouverture</b><span>Les Mécènes décident comment l'hiver commence.</span></li>
-        <li data-from="2027-04-03T20:30:00+02:00"><span class="d">3 avril · 20h30</span><b>Ouverture du Programme</b><span>Troisième cinématique, « Moteur ».</span></li>
+        <li data-from="2027-04-03T20:30:00+02:00"><span class="d">3 avril · 20h30</span><b>Ouverture du Programme</b><span>Troisième cinématique, « Moteur ».</span></li>
         <li data-from="2027-05-15T20:30:00+02:00"><span class="d">15 mai</span><b>Dernière soirée</b><span>Tout le monde ne sortira pas de l'hiver.</span></li>
       </ol>
       <div class="nights">
@@ -609,13 +616,13 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     tiktok: "https://www.tiktok.com/@rposiris"
   };
   // Cinématiques : coller l'identifiant YouTube quand la vidéo est en ligne.
-  // Miniature : mettre une image dans img/ et son chemin dans « affiche » (rien n'est chargé depuis YouTube avant le clic)
+  // Miniature : mettre une image dans img/ et son chemin dans « affiche » (rien n'est chargé depuis YouTube avant le clic)
   // (pour https://www.youtube.com/watch?v=AbCdEf12345, l'identifiant est AbCdEf12345)
   var FILMS = [
     { titre: "Générique", quand: "Disponible", texte: "L'Œil s'ouvre. Le générique d'Osiris.", video: "video/osiris-rp.mp4", affiche: "img/generique.jpg" },
-    { titre: "« Ils s'ennuient »", quand: "20 février 2027", date: "2027-02-20T23:30:00+01:00", texte: "Cassius Vale a un problème : ses spectateurs s'ennuient.", youtube: "" },
-    { titre: "« Trente-cinq »", quand: "20 mars 2027", date: "2027-03-20T00:00:00+01:00", texte: "Des centaines de dossiers. Trente-cinq élus.", youtube: "" },
-    { titre: "« Moteur »", quand: "3 avril 2027", date: "2027-04-03T20:30:00+02:00", texte: "Le décor est prêt. Le Programme peut commencer.", youtube: "" }
+    { titre: "« Ils s'ennuient »", quand: "20 février 2027", date: "2027-02-20T23:30:00+01:00", texte: "Cassius Vale a un problème : ses spectateurs s'ennuient.", youtube: "" },
+    { titre: "« Trente-cinq »", quand: "27 mars 2027", date: "2027-03-27T00:00:00+01:00", texte: "Des centaines de dossiers. Trente-cinq élus.", youtube: "" },
+    { titre: "« Moteur »", quand: "3 avril 2027", date: "2027-04-03T20:30:00+02:00", texte: "Le décor est prêt. Le Programme peut commencer.", youtube: "" }
   ];
   // =======================================================
 
@@ -658,7 +665,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
   var STEPS = [
     { t: "2027-02-20T23:30:00+01:00", label: "Ouverture du casting dans" },
     { t: "2027-03-14T23:59:00+01:00", label: "Fin du casting dans" },
-    { t: "2027-03-20T00:00:00+01:00", label: "Annonce des 35 candidats dans" },
+    { t: "2027-03-27T00:00:00+01:00", label: "Annonce des 35 candidats dans" },
     { t: "2027-04-03T20:30:00+02:00", label: "Ouverture du Programme 01 dans" }
   ];
   var END = new Date("2027-05-16T01:00:00+02:00").getTime();
