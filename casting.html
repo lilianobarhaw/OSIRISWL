@@ -152,6 +152,15 @@ body{margin:0}[hidden]{display:none!important}.hp{position:absolute;left:-9999px
 a.btn{text-decoration:none;display:inline-block}
 .who{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:14px;color:var(--bone)}
 .flabel{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.cd-label{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.btn.off{background:transparent;color:var(--dim);border:1px solid var(--line);pointer-events:none}
+.lockbox{padding:44px 22px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px}
+.lockbox img{width:64px;height:64px;mix-blend-mode:screen;opacity:.9}
+.lockbox .lk{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--alarm);border:1px solid rgba(181,86,74,.5);padding:4px 10px}
+.lockbox h3{font-family:var(--display);font-weight:400;font-size:clamp(22px,4vw,30px);line-height:1.2;margin:4px 0 0;text-wrap:balance}
+.lockbox p{margin:0;color:var(--dim);max-width:46ch}
+.lockbox .lkc{font-family:var(--mono);font-size:clamp(18px,4.4vw,26px);color:var(--bone);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.testnote{margin:0;padding:10px 16px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--brass);background:rgba(196,162,101,.06)}
 </style>
 </head>
 <body>
@@ -170,14 +179,15 @@ a.btn{text-decoration:none;display:inline-block}
     <span class="eyebrow">Programme 01</span>
     <h1>Osiris recherche 35 candidats.</h1>
     <p class="sub">Aucune expérience requise. Aucun retour garanti.</p>
+    <span class="cd-label" id="cd-label">Ouverture du casting dans</span>
     <div class="count" aria-live="off">
       <div><b id="cd-d">000</b><span>Jours</span></div>
       <div><b id="cd-h">00</b><span>Heures</span></div>
       <div><b id="cd-m">00</b><span>Minutes</span></div>
       <div><b id="cd-s">00</b><span>Secondes</span></div>
     </div>
-    <span class="date">Ouverture du Programme 01 · samedi 3 avril 2027 · 20h30</span>
-    <a class="btn" href="#candidature" style="text-decoration:none">Déposer ma candidature</a>
+    <span class="date" id="cd-date">Ouverture du casting · samedi 27 février 2027</span>
+    <a class="btn" id="hero-cta" href="#candidature" style="text-decoration:none">Déposer ma candidature</a>
   </section>
 
   <section class="manifesto" aria-labelledby="m">
@@ -206,11 +216,20 @@ a.btn{text-decoration:none;display:inline-block}
     <div>
       <span class="label">Dossier de candidature</span>
       <h2 id="a">Devenir candidat</h2>
-      <p class="intro">Remplis ton dossier. Connecte-toi avec Discord, remplis ton dossier : il ouvre un ticket privé avec le staff sur le serveur Osiris. Tu recevras un numéro de candidat : garde-le.</p>
+      <p class="intro">Connecte-toi avec Discord et remplis ton dossier : il ouvre un ticket privé avec le staff sur le serveur Osiris. Tu recevras un numéro de candidat : garde-le.</p>
     </div>
     <div class="dossier">
       <div class="top"><span>Formulaire C-01 · Programme 01</span><span>Confidentiel</span></div>
-      <div class="gate" id="gate">
+      <p class="testnote" id="testnote" hidden>Mode test : le casting est fermé au public, mais ton compte peut envoyer un dossier pour tester.</p>
+      <div class="lockbox" id="lock" hidden>
+        <img src="img/apple-touch-icon.png" alt="" width="64" height="64">
+        <span class="lk" id="lock-tag">Formulaire scellé</span>
+        <h3 id="lock-title">Le casting n'est pas encore ouvert</h3>
+        <div class="lkc" id="lock-count" aria-live="off"></div>
+        <p id="lock-text">Le formulaire s'ouvrira ici à la fin du compte à rebours. En attendant, rejoins le Discord et prépare ton personnage.</p>
+        <a class="btn ghost" href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Rejoindre le Discord</a>
+      </div>
+      <div class="gate" id="gate" hidden>
         <p>Pour passer le casting, connecte-toi avec ton compte Discord. Tu rejoindras automatiquement le serveur Osiris, et ta candidature y ouvrira un ticket privé avec le staff.</p>
         <a class="btn" href="/api/auth/login">Se connecter avec Discord</a>
         <span class="formerr" id="gate-err" role="alert"></span>
@@ -281,10 +300,17 @@ Entrez votre code d'accès.</div>
 <script>
 (function(){
   var STEPS = [{"h": "e73a36f8264731f64049b86564604e671d4bb1cfc0f6ab26803a5ad18040fee2", "c": "c3x9fXVrenx+E/C6ZHJxf3l2HRNzcn1yfBN9fH4TcmZkfGF6Y/C6HTo5el9DE0FWV1JBV1VdRx0QZ1xGWlxGQUMdOXpcQBNHVRNXWkJcXUcQQkZWEEdGE1VAE0VfX1xdRFJaQVUdE31VE19WQxNQQV9aQBNAUkAdOjlwW1VBUFtVE1BWXEZaE0FGWhNeFFJGQlJaRxBZUl5RWkATVPCIE0JWXlxeR1ZBEFdWE1xSE15ZXVYdEHxdE15WE19FWhNSEF9SWkNA8JoQQkYURV0TQERSR0ZEE1ZHEEZdE15GXvCZQVwTChMCBB458LpTQVpAEFBWE0FGFFpcE/CaRFJaRxwTQEZZRVoTVFYTQF9dE11FXvCaQlwd"}, {"h": "b5d2d1709ca8838ba4e9c22996303eced8c7330f9494e2b4b90ea8c1d66afd9f", "c": "Bw4dFwABE3Rydg0FBwAIEGFlBhljEhoFHREVdAsXBgcIBQqHyHo7PQckPCogITN0YUUsJjwlJCkkdFJYLS87ZHNkICFSQi1vRBQ7KyI8UF4tYR42JiMzNVxaJmF0ZDwqJHRHXi8tK2Q6KzQnEVsiYSAhICMkejs9Ci09ZCYqNXRSViApje1pNy46EVksLG4gKCoydF1SNjM9ZDk2LiRDUjBhIys9N29eY1IvKD1kKiFhJUQQDDInNiA3YTBYQ2MlaSElKCR5XPTpLCtqaQckJkVWKi8rN2koJCBFRSYybiY7LS04VFk3YT4oPDdhJURSYy0rN2klNCBDUjBv"}, {"h": "cb52595ea9159e2a95e299f6f88daf1c1f9526c8cf51dfc5271c5a0ee5101ab8", "c": "GCBkJD1kOyApMzqW7WUiJW8kLyogMGQkOCUhJmYjOS1qT0QIOjYjKCg6NiMoam8AIzIlMCo2bicqcigpIXV+ZToxbz5hKTk3KCwrNi4haExGFishK2QrN2Y2LSY3JCkhb2hmEgQaEGh/c2ITdUwIOiorK2kjN2YnOXU3MS8iKXI1Mz51KCBuACYhJSk+MWQhaQs8OzQvP3tkDCI3byEnMz46KjFuNTo3ZjI5dSU2bjI6fExMrtXQZRpq"}];
-  var target = new Date("2027-04-03T20:30:00+02:00").getTime();
+  // La cible du compte à rebours est choisie par le script du casting (window.osirisCompte) :
+  // ouverture du casting, puis fin du casting, puis ouverture du Programme 01.
+  var target = new Date("2027-02-27T00:00:00+01:00").getTime();
   function pad(n,l){n=String(n);while(n.length<l)n="0"+n;return n}
   function tick(){
-    var d=Math.max(0,target-Date.now());
+    var c=window.osirisCompte;
+    if(c){target=c.cible;
+      var lb=document.getElementById("cd-label"),dt=document.getElementById("cd-date");
+      if(lb.textContent!==c.label)lb.textContent=c.label;
+      if(dt.textContent!==c.date)dt.textContent=c.date;}
+    var d=Math.max(0,target-(Date.now()+((c&&c.decalage)||0)));
     var s=Math.floor(d/1000);
     document.getElementById("cd-d").textContent=pad(Math.floor(s/86400),3);
     document.getElementById("cd-h").textContent=pad(Math.floor(s%86400/3600),2);
@@ -422,8 +448,45 @@ Entrez votre code d'accès.</div>
   var q=new URLSearchParams(location.search);
   if(q.get("login")==="erreur")gerr.textContent="La connexion avec Discord a échoué. Réessaie.";
   if(q.get("login")==="serveur")gerr.textContent="Tu es connecté, mais tu n'as pas pu être ajouté au serveur Osiris. Rejoins-le avec l'invitation du Discord, puis reviens ici.";
-  function showForm(){gate.hidden=true;f.hidden=false;document.getElementById("w-who-name").textContent=(me.name||me.username)+" (@"+me.username+")";document.getElementById("w-logout").hidden=false}
-  function showGate(msg){f.hidden=true;gate.hidden=false;if(msg)gerr.textContent=msg}
+  // ---------- Ouverture du casting ----------
+  // Dates par défaut ; le serveur (/api/casting) donne les vraies dates et l'heure exacte.
+  var C={ouverture:Date.parse("2027-02-27T00:00:00+01:00"),fermeture:Date.parse("2027-03-14T23:59:59+01:00"),programme:Date.parse("2027-04-03T20:30:00+02:00"),testeur:false,decalage:0};
+  var lock=document.getElementById("lock"),heroCta=document.getElementById("hero-cta"),courant=null;
+  function maintenant(){return Date.now()+C.decalage}
+  function etat(){var n=maintenant();var e=n<C.ouverture?"bientot":n>C.fermeture?"ferme":"ouvert";return (e!=="ouvert"&&C.testeur)?"test":e}
+  function jour(t){var s=new Date(t).toLocaleDateString("fr-FR",{timeZone:"Europe/Paris",weekday:"long",day:"numeric",month:"long",year:"numeric"});var h=new Date(t).toLocaleTimeString("fr-FR",{timeZone:"Europe/Paris",hour:"2-digit",minute:"2-digit"});return h==="00:00"?s:s+" · "+h.replace(":","h")}
+  function reste(t){var s=Math.max(0,Math.floor((t-maintenant())/1000));return Math.floor(s/86400)+" j "+String(Math.floor(s%86400/3600)).padStart(2,"0")+" h "+String(Math.floor(s%3600/60)).padStart(2,"0")+" min "+String(s%60).padStart(2,"0")+" s"}
+  function locked(){return courant==="bientot"||courant==="ferme"}
+  function appliquer(){
+    var e=etat(), b=e==="test"?(maintenant()<C.ouverture?"bientot":maintenant()>C.fermeture?"ferme":"ouvert"):e;
+    window.osirisCompte=b==="bientot"?{cible:C.ouverture,label:"Ouverture du casting dans",date:"Ouverture du casting · "+jour(C.ouverture),decalage:C.decalage}
+      :b==="ferme"?{cible:C.programme,label:"Ouverture du Programme 01 dans",date:"Ouverture du Programme 01 · samedi 3 avril 2027 · 20h30",decalage:C.decalage}
+      :{cible:C.fermeture,label:"Fin du casting dans",date:"Fin du casting · "+jour(C.fermeture),decalage:C.decalage};
+    if(e==="bientot")document.getElementById("lock-count").textContent=reste(C.ouverture);
+    if(e===courant)return;
+    courant=e;
+    document.getElementById("testnote").hidden=e!=="test";
+    if(locked()){
+      f.hidden=true;gate.hidden=true;rec.hidden=true;lock.hidden=false;
+      document.getElementById("lock-tag").textContent=e==="bientot"?"Formulaire scellé":"Casting terminé";
+      document.getElementById("lock-title").textContent=e==="bientot"?"Le casting ouvre le "+jour(C.ouverture):"Le casting est fermé";
+      document.getElementById("lock-count").hidden=e!=="bientot";
+      document.getElementById("lock-text").textContent=e==="bientot"?"Le formulaire s'ouvrira ici à la fin du compte à rebours. En attendant, rejoins le Discord et prépare ton personnage.":"Les dossiers sont entre les mains d'Osiris. Les 35 candidats seront annoncés le 20 mars. Tu peux suivre le Programme de l'autre côté de l'écran, en tant que Mécène.";
+      heroCta.textContent=e==="bientot"?"Le casting ouvre bientôt":"Casting terminé";
+    }else{
+      lock.hidden=true;heroCta.textContent="Déposer ma candidature";
+      if(rec.hidden){if(me)showForm();else showGate()}
+    }
+  }
+  function showForm(){if(locked())return;gate.hidden=true;f.hidden=false;document.getElementById("w-who-name").textContent=(me.name||me.username)+" (@"+me.username+")";document.getElementById("w-logout").hidden=false}
+  function showGate(msg){if(locked())return;f.hidden=true;gate.hidden=false;if(msg)gerr.textContent=msg}
+  appliquer(); setInterval(appliquer,1000);
+  fetch("/api/casting",{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(j){
+    if(!j||!j.ouverture)return;
+    C.ouverture=Date.parse(j.ouverture);C.fermeture=Date.parse(j.fermeture);C.testeur=!!j.testeur;
+    if(j.maintenant)C.decalage=Date.parse(j.maintenant)-Date.now();
+    courant=null;appliquer();
+  }).catch(function(){});
   fetch("/api/me",{credentials:"same-origin"}).then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&j.user){me=j.user;showForm()}}).catch(function(){});
   f.addEventListener("submit",function(e){
     e.preventDefault();err.textContent="";
@@ -468,6 +531,7 @@ Entrez votre code d'accès.</div>
         if(r.ok)show("ok",j);
         else if(r.status===401){btn.disabled=false;btn.textContent="Soumettre mon dossier";me=null;showGate("Ta connexion a expiré. Reconnecte-toi avec Discord, ton dossier est gardé.")}
         else if(r.status===409)show("exists",j);
+        else if(r.status===403){btn.disabled=false;btn.textContent="Soumettre mon dossier";err.textContent=j.error||"Le casting est fermé.";courant=null;appliquer()}
         else show("fail",j);
       })}).catch(function(){show("fail",{error:"serveur injoignable"})});
   });
@@ -479,5 +543,6 @@ Entrez votre code d'accès.</div>
   document.getElementById("r-edit").addEventListener("click",function(){rec.hidden=true;f.hidden=false});
 })();
 </script>
+<script src="son.js" defer></script>
 </body>
 </html>

@@ -436,7 +436,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
             </div>
             <span class="chip" id="p01-chip">Casting du 27 février au 14 mars 2027</span>
             <div class="acts">
-              <a class="btn" href="/casting">Le casting</a>
+              <a class="btn" href="/casting" data-casting>Le casting</a>
               <a class="link" href="#calendrier">Le calendrier <span class="ar">→</span></a>
             </div>
           </div>
@@ -551,7 +551,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
           <span class="who">Jouer</span>
           <h3>Candidat</h3>
           <p>Vivre le Programme de l'intérieur. 35 places, sur dossier, en whitelist. Il faut être présent aux soirées choisies.</p>
-          <a class="btn" href="/casting">Le casting</a>
+          <a class="btn" href="/casting" data-casting>Le casting</a>
         </article>
         <article class="path rv">
           <span class="who">Décider</span>
@@ -602,7 +602,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
   // ====================== À REMPLIR ======================
   // Liens du serveur (laisser "" pour cacher un bouton)
   var LIENS = {
-    discord: "",
+    discord: "https://discord.gg/YMdPEYeam7",
     twitch: "https://www.twitch.tv/lilianobarhaw",
     tiktok: ""
   };
@@ -684,6 +684,10 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     else if(now >= new Date("2027-03-15T00:00:00+01:00").getTime() && now < new Date("2027-04-03T20:30:00+02:00").getTime()) chip.textContent = "Casting fermé · ouverture le 3 avril à 20h30";
     else if(now >= new Date("2027-04-03T20:30:00+02:00").getTime() && now < END) chip.textContent = "En cours · mer., ven. et sam. de 20h30 à 1h";
     else if(now >= END) chip.textContent = "Programme terminé";
+    // Boutons du casting : leur texte suit les dates (la page /casting reste verrouillée hors des dates)
+    var castLabel = now < new Date("2027-02-27T00:00:00+01:00").getTime() ? "Casting · 27 février"
+      : now < new Date("2027-03-15T00:00:00+01:00").getTime() ? "Déposer ma candidature" : "Casting terminé";
+    $$("[data-casting]").forEach(function(a){ a.textContent = castLabel });
   })();
 
   // ---------- Salle de projection ----------
@@ -822,5 +826,6 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
   }
 })();
 </script>
+<script src="son.js" defer></script>
 </body>
 </html>

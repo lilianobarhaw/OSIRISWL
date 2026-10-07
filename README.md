@@ -10,6 +10,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `casting.html` : la page de candidature (compte à rebours, dossier, connexion Discord, terminal « Accès candidat »), à l'adresse `/casting`.
 - `vercel.json` : `cleanUrls` pour que `/casting` ouvre `casting.html`.
 - `video/osiris-rp.mp4` : le générique (animation de l'Œil), lu dans la salle de projection.
+- `son.js` + `audio/ambiance.mp3` : l'ambiance sonore (composition originale, libre de droits, boucle de 96 s). Elle démarre au premier clic du visiteur (les navigateurs interdisent le son automatique), à volume bas, avec un bouton « Ambiance » en bas à gauche pour la couper ; le choix est retenu. Pour changer de musique : remplacer `audio/ambiance.mp3` et mettre sa durée dans `BOUCLE` (son.js). Volume : `VOLUME` dans son.js.
 - `img/` : le logo d'Osiris (dessin de l'artiste, non retouché) : `oeil.webp` / `oeil.png` pour la page, `favicon.png` et `apple-touch-icon.png` pour l'onglet et les téléphones, `og.png` pour l'aperçu des liens sur Discord et les réseaux. Si l'adresse du site change, modifier aussi la ligne `og:image` dans `index.html`.
 - `lib/discord.js` : sessions signées (cookie HttpOnly), cookies, appels à l'API Discord.
 - `api/auth/login.js` : redirige vers Discord (scopes `identify guilds.join`).
@@ -80,6 +81,15 @@ L'ancienne variable `DISCORD_WEBHOOK` n'est plus utilisée.
 3. Ouvrir une fois `https://<ton-domaine>/api/panel?key=<SETUP_KEY>&channel=<identifiant du salon d'aide>` : le message « Créer un ticket » apparaît dans le salon.
 4. Parcours : bouton « Créer un ticket » → menu des catégories → fenêtre « Explique ton problème » → salon privé avec le staff. Les tickets « Problème avec le staff » ne sont visibles que par le rôle Admin. Un seul ticket ouvert par personne et par catégorie. Le bouton « Fermer le ticket » supprime le salon (staff ou auteur).
 5. Diagnostic : `https://<ton-domaine>/api/interactions`.
+
+## Casting : dates et verrouillage
+
+Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du casting. Avant, la page affiche « Formulaire scellé » avec le compte à rebours ; après, « Casting terminé ». Le serveur refuse aussi tout dossier envoyé hors de ces dates (`api/candidature.js`), même si quelqu'un contourne la page.
+
+- Dates par défaut dans `lib/casting.js` : ouverture le 27 février 2027 à 0h, fermeture le 14 mars 2027 à 23h59 (heure de Paris).
+- Pour les changer sans toucher au code, variables Vercel `CASTING_OUVERTURE` et `CASTING_FERMETURE`, au format `2027-02-27T21:00:00+01:00`. Penser à changer aussi les dates affichées sur l'accueil (`index.html`).
+- `CASTING_TESTEURS` : identifiants Discord (séparés par des virgules) qui peuvent tester le formulaire même quand le casting est fermé. La page leur affiche « Mode test ».
+- État actuel : `https://<ton-domaine>/api/casting` (ou la ligne `casting` de `/api/candidature`).
 
 ## Commandes slash
 
