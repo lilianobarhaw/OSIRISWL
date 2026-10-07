@@ -157,3 +157,23 @@ Les alertes arrivent dans le salon des sanctions. L'équipe n'est jamais bloqué
 Avec `DISCORD_LOGS_CHANNEL_ID`, le bot note dans ce salon : chaque commande utilisée (qui, laquelle, dans quel salon, avec quelles options), les tentatives refusées, les tickets ouverts et fermés, les annonces publiées.
 
 Les messages supprimés ou modifiés, les arrivées et départs et les actions faites à la main ne passent pas par le site : Discord ne les envoie qu'à un programme connecté en permanence. C'est le rôle du dossier séparé `osiris-logs` (voir son LISEZMOI).
+
+## Rangs des Mécènes
+
+Le bot compte les sondages votés par chaque Mécène dans #offrandes (un sondage = un vote, quelle que soit la réponse) et donne le rôle du rang atteint : Mécène d'argent à 6 votes, Mécène d'or à 12, Grand Mécène à 18 (paliers dans `lib/rangs.js`). On ne redescend jamais. À chaque promotion : message privé au Mécène et annonce dans #le-salon. Chaque nuit, un rapport est posté dans #logs-commandes, avec les 3 Mécènes les plus fidèles des 7 derniers jours.
+
+- Automatique : chaque nuit (Vercel, `vercel.json` → `crons`, entre 2h et 3h UTC).
+- À la main : `https://<ton-domaine>/api/rangs?key=<SETUP_KEY>` ; ajouter `&simulation=1` pour voir ce qui changerait sans rien modifier.
+- Sécurité : un candidat (rôle Candidat) perd automatiquement le rôle Mécène et ses rangs ; `/casting resultat:Retenu` les retire aussi tout de suite.
+- Le portail développeur doit garder « Server Members Intent » activé (le bot lit la liste des membres).
+
+| Variable | Valeur |
+| --- | --- |
+| `DISCORD_OFFRANDES_CHANNEL_ID` | Identifiant du salon #offrandes (les sondages) |
+| `DISCORD_LOGE_SALON_ID` | Facultatif. Identifiant de #le-salon, pour annoncer les promotions |
+| `DISCORD_MECENE_ROLE_ID` | Rôle Mécène (accès à la Loge) |
+| `DISCORD_MECENE_ARGENT_ROLE_ID` | Rôle Mécène d'argent |
+| `DISCORD_MECENE_OR_ROLE_ID` | Rôle Mécène d'or |
+| `DISCORD_GRAND_MECENE_ROLE_ID` | Rôle Grand Mécène |
+| `DISCORD_CANDIDAT_ROLE_ID` | Rôle Candidat (déjà utilisé par /casting) |
+| `CRON_SECRET` | Une suite de caractères au hasard (16 ou plus) : Vercel l'envoie au lancement de chaque nuit |
