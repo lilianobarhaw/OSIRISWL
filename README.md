@@ -172,7 +172,9 @@ Le bot compte les sondages votés par chaque Mécène dans #offrandes (un sondag
 
 ### Lancer un vote : `/offrande`
 
-Taper `/offrande` n'importe où : une fenêtre demande le titre, la durée (en heures, de 1 à 168) et 2 ou 3 Offrandes (1re ligne : le nom, qui devient le choix du sondage ; lignes suivantes : la description). Le bot publie dans #offrandes une carte aux couleurs d'Osiris (bannière `img/offrande.png`, description de chaque Offrande, heure de fin affichée à l'heure locale de chacun), puis le sondage Discord juste en dessous, avec ❄️ 🕯️ 🗝️ devant les choix. La carte mentionne les rôles Mécène, Mécène d'argent, Mécène d'or, Grand Mécène et Staff (pas lors d'un test). Le vote reste un vrai sondage Discord : il compte pour les rangs. Chaque lancement est noté dans #logs-commandes.
+Taper `/offrande` n'importe où : une fenêtre demande le titre, la durée (en minutes, 10 par défaut, ou par exemple « 2h ») et 2 ou 3 Offrandes (1re ligne : le nom, qui devient le choix du sondage ; lignes suivantes : la description). Le bot publie dans #offrandes une carte aux couleurs d'Osiris (bannière `img/offrande.png`, description de chaque Offrande, heure de fin affichée à l'heure locale de chacun), puis le sondage Discord juste en dessous, avec ❄️ 🕯️ 🗝️ devant les choix. La carte mentionne les rôles Mécène, Mécène d'argent, Mécène d'or, Grand Mécène et Staff (pas lors d'un test). Le vote reste un vrai sondage Discord : il compte pour les rangs. Chaque lancement est noté dans #logs-commandes.
+
+**Votes de moins d'une heure** : Discord n'accepte pas de sondage de moins d'une heure. Le sondage est donc créé pour l'heure entière, la carte annonce la vraie heure de fin, et le journal Osiris (programme sur le VPS) ferme le sondage à cette heure-là. Si le journal est arrêté, le sondage reste ouvert jusqu'au bout de l'heure.
 
 Pour essayer sans fausser les rangs : `/offrande salon:#un-salon-staff`. La carte et le sondage partent dans ce salon, qui n'est pas compté.
 

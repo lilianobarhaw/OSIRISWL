@@ -159,8 +159,8 @@ export async function POST(req) {
       if (!isDirection(i.member)) return reply(DIRECTION_ONLY);
       const r = await publierOffrande(i, id.split(":")[1]);
       if (r.erreur) return reply(r.erreur);
-      await logEvent({ title: r.test ? "Offrande de test lancée" : "Offrande lancée", description: `<@${user.id}> a lancé **${r.titre}** dans <#${r.salon}> (${r.heures} h) : ${r.offrandes.join(" · ")}`, user });
-      return reply(`Offrande publiée dans <#${r.salon}>. Le vote se ferme dans ${r.heures} h.${r.notifies ? " Mécènes (tous les rangs) et staff notifiés." : ""}${r.test ? "\nC'est un test : ce salon ne compte pas pour les rangs. Supprime les deux messages quand tu as fini." : ""}`);
+      await logEvent({ title: r.test ? "Offrande de test lancée" : "Offrande lancée", description: `<@${user.id}> a lancé **${r.titre}** dans <#${r.salon}> (${r.duree}) : ${r.offrandes.join(" · ")}`, user });
+      return reply(`Offrande publiée dans <#${r.salon}>. Le vote se ferme dans ${r.duree}.${r.ferme ? " Discord affiche 1 h sur le sondage : le journal Osiris le fermera à l'heure annoncée sur la carte (il doit tourner sur le VPS)." : ""}${r.notifies ? " Mécènes (tous les rangs) et staff notifiés." : ""}${r.test ? "\nC'est un test : ce salon ne compte pas pour les rangs. Supprime les deux messages quand tu as fini." : ""}`);
     }
 
     // Fenêtre de /annonce envoyée → message publié dans le salon
