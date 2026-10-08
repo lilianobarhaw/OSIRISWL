@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- ============================================================
+     OSIRIS — correspondance privée. Une convocation par personne.
+     ============================================================ -->
+<title>Convocation · Osiris RP</title>
+<meta name="description" content="Une convocation personnelle d'Osiris vous attend.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0B0D">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png?v=2">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Osiris RP">
+<meta property="og:title" content="Une convocation vous attend">
+<meta property="og:description" content="Correspondance privée d'Osiris. À ouvrir à l'abri des regards.">
+<meta property="og:image" content="https://osiriswl.vercel.app/img/convocation.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="fonts/polices.css">
+<link rel="preload" as="font" type="font/woff" href="fonts/marcellus.woff" crossorigin>
+<link rel="preload" as="image" href="img/oeil.webp" type="image/webp">
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#0A0B0D;
+  --panel:#111317;
+  --line:#23262C;
+  --bone:#E6E0D3;
+  --dim:#8B877D;
+  --faint:#55534D;
+  --brass:#C4A265;
+  --brass-soft:#8E7747;
+  --gold:#E9CF78;
+  --display:"Marcellus", "Trajan Pro", Georgia, serif;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--ground)}
+body{margin:0;color:var(--bone);font-family:var(--serif);font-size:18px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:clip;min-height:100svh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);z-index:5}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 38%,rgba(196,162,101,.07),transparent 60%);z-index:-1}
+[hidden]{display:none!important}
+a{color:inherit}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+.gold-text{background:linear-gradient(180deg,#fbf0b8 0%,#e9cf78 45%,#a9853f 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--brass);color:#16130C;border:0;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;padding:14px 22px;cursor:pointer;text-decoration:none;transition:filter .2s,background .2s,color .2s}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--brass);border:1px solid var(--brass-soft)}
+.btn.ghost:hover{background:rgba(196,162,101,.08);filter:none}
+.btn:focus-visible,a:focus-visible,button:focus-visible{outline:1px solid var(--bone);outline-offset:3px}
+.btn[disabled]{opacity:.6;cursor:progress}
+
+/* ---------- Enveloppe scellée ---------- */
+.seal{position:fixed;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:32px 20px;text-align:center;background:var(--ground);transition:opacity .7s ease,visibility .7s}
+.seal.gone{opacity:0;visibility:hidden}
+.seal .mini{width:min(150px,36vw);aspect-ratio:1051/877;mix-blend-mode:screen;opacity:.5}
+.seal .mini img{width:100%;height:100%;display:block}
+.seal .pour{display:flex;flex-direction:column;align-items:center;gap:6px}
+.seal .pour span{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.seal .pour b{font-family:var(--display);font-weight:400;font-size:clamp(34px,7vw,56px);line-height:1.1;letter-spacing:.04em;max-width:16ch;overflow-wrap:anywhere}
+.seal .num{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--faint)}
+.seal .wax{position:relative;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#d8b77a,#9c7a3e 55%,#5e4520 100%);box-shadow:0 0 0 3px rgba(196,162,101,.18),0 10px 30px rgba(0,0,0,.6);display:grid;place-items:center;margin:4px 0 2px}
+.seal .wax::after{content:"O";width:46px;height:46px;border-radius:50%;border:1px solid rgba(60,40,15,.5);display:grid;place-items:center;font-family:var(--display);font-size:26px;line-height:1;color:rgba(70,48,18,.75);text-shadow:0 1px 0 rgba(255,236,190,.45)}
+.seal p{margin:0;font-style:italic;color:var(--dim);font-size:16px}
+
+/* ---------- Lettre ---------- */
+main{max-width:680px;margin:0 auto;padding:56px 22px 40px;display:flex;flex-direction:column;align-items:center}
+.eye{position:relative;width:min(340px,70vw);aspect-ratio:1051/877;mix-blend-mode:screen}
+.eye img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
+.eye .glint{position:absolute;left:40.53%;top:33.41%;width:110%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(circle closest-side,rgba(255,248,220,.95) 0,rgba(240,210,120,.4) 7%,rgba(240,210,120,0) 26%),radial-gradient(ellipse 50% 1.5% at 50% 50%,rgba(255,240,200,.95) 0,rgba(233,190,100,.35) 35%,rgba(233,190,100,0) 100%)}
+.letter{width:100%;margin-top:22px;display:flex;flex-direction:column;gap:20px}
+.head{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.rule{position:relative;width:min(420px,80%);height:1px;background:linear-gradient(90deg,rgba(233,207,120,0),rgba(233,207,120,.85),rgba(233,207,120,0))}
+.rule::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;background:var(--gold);transform:translate(-50%,-50%) rotate(45deg)}
+.body{border:1px solid var(--line);background:rgba(17,19,23,.72);padding:34px 34px 30px;display:flex;flex-direction:column;gap:16px}
+.body h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(30px,5.4vw,42px);line-height:1.15;letter-spacing:.02em;overflow-wrap:anywhere}
+.body p{margin:0;color:#D9D3C6}
+.body .ps{border-left:2px solid var(--brass-soft);padding:2px 0 2px 16px;font-style:italic;color:var(--bone)}
+.sign{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.sign b{font-family:var(--serif);font-style:italic;font-weight:400;font-size:24px;color:var(--bone)}
+.sign span{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.date{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:22px 16px;border:1px solid var(--brass-soft);background:linear-gradient(180deg,rgba(196,162,101,.07),rgba(196,162,101,0))}
+.date strong{font-family:var(--display);font-weight:400;font-size:clamp(21px,4vw,30px);line-height:1.3;letter-spacing:.03em}
+.date .count{font-family:var(--mono);font-size:15px;letter-spacing:.06em;color:var(--bone);font-variant-numeric:tabular-nums}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.actions .btn{flex:1 1 auto;white-space:nowrap}
+.note{margin:0;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+footer{max-width:680px;margin:0 auto;padding:22px 22px 80px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);border-top:1px solid var(--line)}
+footer a{text-decoration:none}
+footer a:hover{color:var(--bone)}
+
+/* Apparition de la lettre */
+.rv{opacity:0;transform:translateY(14px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.open .rv{opacity:1;transform:none}
+.open .rv:nth-child(2){transition-delay:.15s}
+.open .rv:nth-child(3){transition-delay:.3s}
+.open .rv:nth-child(4){transition-delay:.45s}
+.open .rv:nth-child(5){transition-delay:.6s}
+.open .rv:nth-child(6){transition-delay:.75s}
+
+/* Convocation introuvable */
+.void{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:40px 22px}
+.void h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(28px,5vw,40px)}
+.void p{margin:0;color:var(--dim);max-width:34ch}
+
+@media (max-width:560px){
+  body{font-size:17px}
+  main{padding-top:36px}
+  .body{padding:26px 20px 24px}
+}
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none;transition:none}
+  .seal{transition:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Enveloppe -->
+<div class="seal" id="seal" hidden>
+  <div class="mini" aria-hidden="true"><img src="img/oeil.webp" alt=""></div>
+  <div class="label">Osiris · correspondance privée</div>
+  <div class="pour"><span>Pour</span><b id="seal-name"></b></div>
+  <div class="num" id="seal-num"></div>
+  <div class="wax" aria-hidden="true"></div>
+  <button class="btn" id="open" type="button">Ouvrir la convocation</button>
+  <p>À ouvrir à l'abri des regards.</p>
+</div>
+
+<!-- Lettre -->
+<main id="main" hidden>
+  <div class="eye" id="eye" role="img" aria-label="L'Œil d'Osiris">
+    <picture><source srcset="img/oeil.webp" type="image/webp"><img src="img/oeil.png" alt="" width="1051" height="877" draggable="false"></picture>
+    <span class="glint" aria-hidden="true"></span>
+  </div>
+  <div class="letter">
+    <div class="head rv">
+      <div class="label" id="ref"></div>
+      <div class="rule" aria-hidden="true"></div>
+    </div>
+    <article class="body rv">
+      <h1 id="name"></h1>
+      <p>Osiris a remarqué votre nom.</p>
+      <p>Avant d'ouvrir son casting au public, la compagnie a choisi de prévenir quelques personnes. Vous en faites partie.</p>
+      <p>Trente-cinq places seulement. Vous passerez par le casting, comme tout le monde. Mais votre dossier, nous l'attendons.</p>
+      <p>Cette convocation ne vous garantit rien. Elle signifie seulement que nous vous regardons déjà.</p>
+      <p class="ps" id="ps" hidden></p>
+      <div class="sign"><b>Cassius Vale</b><span>Fondateur d'Osiris</span></div>
+    </article>
+    <div class="date rv">
+      <div class="label" id="date-label">Ouverture du casting</div>
+      <strong id="date-text">Samedi 20 février 2027 · 23 h 30</strong>
+      <div class="count" id="count" aria-live="off"></div>
+    </div>
+    <div class="actions rv">
+      <a class="btn" href="/casting">Le casting</a>
+      <a class="btn ghost" href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Rejoindre le Discord</a>
+      <button class="btn ghost" id="save" type="button">Enregistrer ma convocation</button>
+    </div>
+    <p class="note rv">Programme 01 · L'Hiver de Ludendorff</p>
+  </div>
+</main>
+
+<!-- Convocation introuvable -->
+<div class="void" id="void" hidden>
+  <div class="label">Osiris · correspondance privée</div>
+  <h1>Aucune convocation ici.</h1>
+  <p>Ce lien est incomplet ou a été modifié. Vérifiez le message dans lequel vous l'avez reçu.</p>
+  <a class="btn ghost" href="/">Accueil d'Osiris</a>
+</div>
+
+<footer id="foot" hidden>
+  <span>© Osiris RP</span>
+  <span><a href="/">Accueil</a> · <a href="/casting">Casting</a> · <a href="legal">Informations légales</a></span>
+</footer>
+
+<script>
+(function(){
+  // ====================== Lecture de la convocation ======================
+  // Le contenu (prénom, numéro, post-scriptum) est dans le lien, après le « # ».
+  // Cette partie du lien n'est jamais envoyée au serveur : rien n'est enregistré nulle part.
+  var CLE = "OSIRIS·PROGRAMME-01";
+  var OUVERTURE = new Date("2027-02-20T23:30:00+01:00").getTime();
+  var FERMETURE = new Date("2027-03-14T23:59:59+01:00").getTime();
+
+  function octets(s){ return new TextEncoder().encode(s) }
+  function melanger(b){ var k = octets(CLE), o = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) o[i] = b[i] ^ k[i % k.length] ^ ((i * 31) & 255); return o }
+  function deb64(t){ t = t.replace(/-/g, "+").replace(/_/g, "/"); while (t.length % 4) t += "="; var s = atob(t), o = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) o[i] = s.charCodeAt(i); return o }
+  function empreinte(s){ var h = 0x811c9dc5; for (var i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0 } return ("0000" + h.toString(36)).slice(-4) }
+  function lire(code){
+    try {
+      var p = code.split(".");
+      if (p.length !== 2) return null;
+      var json = new TextDecoder().decode(melanger(deb64(p[0])));
+      if (empreinte(json) !== p[1]) return null;
+      var d = JSON.parse(json);
+      if (!d || typeof d.p !== "string" || !d.p.trim()) return null;
+      return { prenom: d.p.trim().slice(0, 40), numero: Math.max(1, Math.min(999, parseInt(d.n, 10) || 1)), ps: typeof d.s === "string" ? d.s.trim().slice(0, 240) : "" };
+    } catch (e) { return null }
+  }
+
+  var $ = function(s){ return document.querySelector(s) };
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var d = lire(decodeURIComponent(location.hash.slice(1)));
+  window.addEventListener("hashchange", function(){ location.reload() });
+
+  if (!d) { $("#void").hidden = false; return }
+
+  var numero = "N° " + ("00" + d.numero).slice(-3);
+  document.title = "Convocation · " + d.prenom + " · Osiris RP";
+  $("#seal-name").textContent = d.prenom;
+  $("#seal-num").textContent = "Convocation " + numero;
+  $("#name").textContent = d.prenom + ",";
+  $("#ref").textContent = "Programme 01 · Convocation " + numero;
+  if (d.ps) { $("#ps").textContent = "P.-S. " + d.ps; $("#ps").hidden = false }
+
+  // ====================== Compte à rebours ======================
+  function pad(n){ return (n < 10 ? "0" : "") + n }
+  function tick(){
+    var now = Date.now(), count = $("#count");
+    if (now < OUVERTURE) {
+      var s = Math.floor((OUVERTURE - now) / 1000);
+      count.textContent = "Dans " + Math.floor(s / 86400) + " j " + pad(Math.floor(s % 86400 / 3600)) + " h " + pad(Math.floor(s % 3600 / 60)) + " min " + pad(s % 60) + " s";
+    } else if (now <= FERMETURE) {
+      $("#date-label").textContent = "Le casting est ouvert";
+      $("#date-text").textContent = "Jusqu'au dimanche 14 mars 2027 · 23 h 59";
+      count.textContent = "Votre dossier est attendu.";
+    } else {
+      $("#date-label").textContent = "Casting du Programme 01";
+      $("#date-text").textContent = "Le casting est terminé";
+      count.textContent = "Les 35 candidats ont été choisis.";
+    }
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ====================== Ouverture : l'œil s'ouvre, puis la lettre ======================
+  var eye = $("#eye"), eyeImg = $("#eye img"), glint = $("#eye .glint");
+  var PX = 40.53, PY = 33.41;
+  function masque(r){
+    var v = r === null ? "" : "radial-gradient(circle at " + PX + "% " + PY + "%, #000 " + Math.max(0, r - 16).toFixed(2) + "%, transparent " + r.toFixed(2) + "%)";
+    eyeImg.style.webkitMaskImage = v; eyeImg.style.maskImage = v;
+  }
+  function eclat(force, ms){ if (glint.animate) glint.animate([{opacity:0},{opacity:force,offset:.28},{opacity:0}], {duration:ms, easing:"ease-out"}) }
+
+  function ouvrir(){
+    $("#open").disabled = true;
+    $("#main").hidden = false; $("#foot").hidden = false;
+    if (reduce) { $("#seal").hidden = true; document.body.classList.add("open"); return }
+    masque(0);
+    $("#seal").classList.add("gone");
+    setTimeout(function(){ $("#seal").hidden = true }, 750);
+    var t0 = performance.now();
+    function frame(now){
+      var k = Math.min(1, Math.max(0, (now - t0 - 450) / 1700));
+      var e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      masque(e * 116);
+      if (k < 1) requestAnimationFrame(frame); else masque(null);
+    }
+    requestAnimationFrame(frame);
+    setTimeout(function(){ eclat(1, 1300) }, 1850);
+    setTimeout(function(){ document.body.classList.add("open") }, 2200);
+  }
+
+  $("#seal").hidden = false;
+  $("#open").addEventListener("click", ouvrir);
+  if (!reduce) setInterval(function(){ if (!document.hidden && document.body.classList.contains("open")) eclat(.45, 1500) }, 9000);
+
+  // ====================== Image à enregistrer (format story 1080 × 1920) ======================
+  function charger(src){ return new Promise(function(ok, ko){ var i = new Image(); i.onload = function(){ ok(i) }; i.onerror = ko; i.src = src }) }
+  function espace(g, txt, x, y, esp){
+    var lettres = Array.from(txt), l = lettres.map(function(c){ return g.measureText(c).width });
+    var total = l.reduce(function(a, b){ return a + b }, 0) + esp * (lettres.length - 1), cx = x - total / 2;
+    g.textAlign = "left";
+    lettres.forEach(function(c, i){ g.fillText(c, cx, y); cx += l[i] + esp });
+    return total;
+  }
+
+  async function carte(){
+    await Promise.all(["400 140px Marcellus", "400 30px 'IBM Plex Mono'", "italic 400 48px 'Source Serif 4'"].map(function(f){ return document.fonts.load(f) }));
+    var W = 1080, H = 1920, c = document.createElement("canvas"); c.width = W; c.height = H;
+    var g = c.getContext("2d");
+    g.fillStyle = "#0A0B0D"; g.fillRect(0, 0, W, H);
+    var halo = g.createRadialGradient(W / 2, 600, 0, W / 2, 600, 760);
+    halo.addColorStop(0, "rgba(196,162,101,.13)"); halo.addColorStop(1, "rgba(196,162,101,0)");
+    g.fillStyle = halo; g.fillRect(0, 0, W, H);
+    g.fillStyle = "rgba(255,255,255,.02)"; for (var y = 0; y < H; y += 3) g.fillRect(0, y, W, 1);
+
+    g.textBaseline = "alphabetic";
+    g.fillStyle = "#C4A265"; g.font = "400 26px 'IBM Plex Mono'";
+    espace(g, "OSIRIS · CORRESPONDANCE PRIVÉE", W / 2, 300, 8);
+
+    var oeil = await charger("img/oeil.png"), ew = 660, eh = ew * 877 / 1051;
+    g.globalCompositeOperation = "screen"; g.drawImage(oeil, (W - ew) / 2, 350, ew, eh); g.globalCompositeOperation = "source-over";
+
+    g.fillStyle = "#C4A265"; g.font = "400 28px 'IBM Plex Mono'";
+    espace(g, "CONVOCATION " + numero, W / 2, 985, 9);
+
+    var taille = 150; g.font = "400 " + taille + "px Marcellus";
+    var largeur = g.measureText(d.prenom).width;
+    if (largeur > 900) { taille = Math.max(56, Math.floor(taille * 900 / largeur)); g.font = "400 " + taille + "px Marcellus" }
+    var yn = 1150, or = g.createLinearGradient(0, yn - taille * .8, 0, yn + taille * .1);
+    or.addColorStop(0, "#fbf0b8"); or.addColorStop(.45, "#e9cf78"); or.addColorStop(1, "#a9853f");
+    g.fillStyle = or; g.textAlign = "center";
+    g.shadowColor = "rgba(233,207,120,.35)"; g.shadowBlur = 28;
+    g.fillText(d.prenom, W / 2, yn, 940);
+    g.shadowBlur = 0;
+
+    var ry = 1225, filet = g.createLinearGradient(W / 2 - 280, 0, W / 2 + 280, 0);
+    filet.addColorStop(0, "rgba(233,207,120,0)"); filet.addColorStop(.5, "rgba(233,207,120,.9)"); filet.addColorStop(1, "rgba(233,207,120,0)");
+    g.fillStyle = filet; g.fillRect(W / 2 - 280, ry, 560, 2);
+    g.save(); g.translate(W / 2, ry + 1); g.rotate(Math.PI / 4); g.fillStyle = "#E9CF78"; g.fillRect(-6, -6, 12, 12); g.restore();
+
+    g.fillStyle = "#E6E0D3"; g.font = "italic 400 50px 'Source Serif 4'"; g.textAlign = "center";
+    g.fillText("Osiris a remarqué votre nom.", W / 2, 1330, 960);
+
+    g.strokeStyle = "rgba(142,119,71,.9)"; g.lineWidth = 2; g.strokeRect(150, 1410, W - 300, 170);
+    g.fillStyle = "#C4A265"; g.font = "400 24px 'IBM Plex Mono'";
+    espace(g, "OUVERTURE DU CASTING", W / 2, 1468, 7);
+    g.fillStyle = "#E6E0D3"; g.font = "400 50px Marcellus"; g.textAlign = "center";
+    g.fillText("20 février 2027 · 23 h 30", W / 2, 1540, 740);
+
+    g.fillStyle = "#8B877D"; g.font = "400 26px 'IBM Plex Mono'";
+    espace(g, "osiriswl.vercel.app", W / 2, 1650, 3);
+    return c;
+  }
+
+  $("#save").addEventListener("click", async function(){
+    var b = this, texte = b.textContent; b.disabled = true; b.textContent = "Préparation…";
+    try {
+      var c = await carte();
+      var blob = await new Promise(function(ok){ c.toBlob(ok, "image/png") });
+      var nom = "Convocation Osiris - " + d.prenom.replace(/[\\/:*?"<>|]+/g, "").trim() + ".png";
+      var fichier = new File([blob], nom, { type: "image/png" });
+      var mobile = window.matchMedia && matchMedia("(pointer: coarse)").matches;
+      if (mobile && navigator.canShare && navigator.canShare({ files: [fichier] })) {
+        try { await navigator.share({ files: [fichier], title: "Ma convocation · Osiris RP" }) } catch (e) {}
+      } else {
+        var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nom;
+        document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove() }, 4000);
+      }
+    } catch (e) {
+      b.textContent = "Impossible pour l'instant"; setTimeout(function(){ b.textContent = texte }, 2500);
+    } finally {
+      b.disabled = false; if (b.textContent === "Préparation…") b.textContent = texte;
+    }
+  });
+})();
+</script>
+<script src="son.js" defer></script>
+</body>
+</html>
