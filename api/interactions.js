@@ -42,6 +42,9 @@ function checkSignature(body, signature, timestamp) {
 
 const reply = (content, extra = {}) => json({ type: 4, data: { content, flags: EPHEMERAL, allowed_mentions: { parse: [] }, ...extra } });
 const update = (content) => json({ type: 7, data: { content, components: [], embeds: [] } });
+// Discord n'attend la réponse que 3 secondes, démarrage du serveur compris (souvent 1 s après un déploiement).
+// Au-delà de RAPIDE, on répond « Osiris réfléchit… » et le résultat arrive dès que c'est fini.
+const RAPIDE = 1200;
 const DIRECTION_ONLY = "Les commandes d'Osiris sont réservées aux fondateurs et aux admins.";
 
 // Ferme un ticket d'aide (staff ou auteur) ou de candidature (staff seulement).
@@ -75,7 +78,7 @@ async function command(i, user) {
   // sinon Discord affiche « Osiris réfléchit… » et la réponse arrive dès que c'est fini.
   if (isModCommand(name)) {
     const work = moderation(i, user).catch((e) => "Erreur : " + (e?.message || "inconnue"));
-    const fast = await Promise.race([work, sleep(2200).then(() => null)]);
+    const fast = await Promise.race([work, sleep(RAPIDE).then(() => null)]);
     if (fast !== null) return reply(fast);
     keepAlive(work.then((content) => editOriginal(i, content)));
     return json({ type: 5, data: { flags: EPHEMERAL } });
@@ -85,13 +88,24 @@ async function command(i, user) {
   if (name === "canal17") {
     const cible = opt("membre");
     const work = (cible ? canal17.valider(i, user, cible) : canal17.liste(i)).catch((e) => "Erreur : " + (e?.message || "inconnue"));
-    const fast = await Promise.race([work, sleep(2200).then(() => null)]);
+    const fast = await Promise.race([work, sleep(RAPIDE).then(() => null)]);
     if (fast !== null) return reply(fast);
     keepAlive(work.then((content) => editOriginal(i, content)));
     return json({ type: 5, data: { flags: EPHEMERAL } });
   }
 
-  if (name === "canal17-voix") return json(canal17.voixModal(opt("mention"), opt("salon")));
+  // Avec un document : le bot le dépose dans les logs pendant qu'on écrit le message (voir lib/canal17.js).
+  if (name === "canal17-voix") {
+    const att = opt("document") ? i.data.resolved?.attachments?.[opt("document")] : null;
+    if (att) {
+      const err = canal17.verifierDocument(att);
+      if (err) return reply(err);
+      const depot = canal17.preparerDocument(i, att).catch((e) => console.error("Canal 17, dépôt du document :", e?.message));
+      keepAlive(depot);
+      await Promise.race([depot, sleep(1000)]);
+    }
+    return json(canal17.voixModal(opt("mention"), opt("salon"), att ? i.id : ""));
+  }
 
   if (name === "aide-panneau") {
     const r = await bot(`/channels/${i.channel_id}/messages`, { method: "POST", body: JSON.stringify(panelMessage()) });
@@ -164,7 +178,10 @@ export async function POST(req) {
     if (i.type === 2) {
       const refused = !isDirection(i.member);
       const skip = i.data.name === "annonce" && !refused; // l'annonce est notée quand elle est publiée
-      const [res] = await Promise.all([command(i, user), skip ? null : logCommand(i, user, refused)]);
+      // Le journal de la commande ne doit pas retarder la réponse (Discord n'attend que 3 secondes).
+      const log = skip ? null : logCommand(i, user, refused).catch(() => {});
+      const res = await command(i, user);
+      if (log) { keepAlive(log); await Promise.race([log, sleep(150)]); }
       return res;
     }
 
@@ -180,10 +197,15 @@ export async function POST(req) {
     // Fenêtre de /canal17-voix envoyée → message de la voix dans #canal-17 (ou le salon choisi)
     if (i.type === 5 && id.startsWith("canal17_voix:")) {
       if (!isDirection(i.member)) return reply(DIRECTION_ONLY);
-      const r = await canal17.publierVoix(i, id);
-      if (r.erreur) return reply(r.erreur);
-      await logEvent({ title: "Voix du canal 17", description: `<@${user.id}> a fait parler la voix dans <#${r.salon}> : ${r.texte.slice(0, 300)}`, user });
-      return reply(`La voix a parlé dans <#${r.salon}>.`);
+      const work = canal17.publierVoix(i, id).then(async (r) => {
+        if (r.erreur) return r.erreur;
+        await logEvent({ title: "Voix du canal 17", description: `<@${user.id}> a fait parler la voix dans <#${r.salon}> : ${r.texte.slice(0, 300)}`, user });
+        return `La voix a parlé dans <#${r.salon}>.`;
+      }).catch((e) => "Erreur : " + (e?.message || "inconnue"));
+      const fast = await Promise.race([work, sleep(RAPIDE).then(() => null)]);
+      if (fast !== null) return reply(fast);
+      keepAlive(work.then((content) => editOriginal(i, content)));
+      return json({ type: 5, data: { flags: EPHEMERAL } });
     }
 
     // Fenêtre de /annonce envoyée → message publié dans le salon

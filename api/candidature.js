@@ -2,7 +2,7 @@
 // et ouvre un ticket privé (salon visible par lui et le staff) sur le serveur Osiris.
 
 import { env, json, readSession, bot } from "../lib/discord.js";
-import { etatCasting, dateFr } from "../lib/casting.js";
+import { etatCasting, etatPour, dateFr } from "../lib/casting.js";
 
 const LIMITS = { age: 3, exp: 40, stream: 120, name: 60, role: 60, story: 2000, q1: 1000, q2: 1000 };
 
@@ -42,7 +42,7 @@ export async function POST(req) {
   if (!user) return json({ error: "Connecte-toi avec Discord pour envoyer ta candidature." }, 401);
 
   // Le casting n'accepte des dossiers qu'entre son ouverture et sa fermeture (sauf comptes de test).
-  const c = etatCasting(user.id);
+  const c = await etatPour(user); // le canal 17 a 17 minutes d'avance
   if (c.etat !== "ouvert" && !c.testeur) {
     const error = c.etat === "bientot" ? `Le casting n'est pas encore ouvert. Ouverture le ${dateFr(c.ouverture)}.` : "Le casting est fermé.";
     return json({ error, etat: c.etat }, 403);

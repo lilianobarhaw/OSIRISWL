@@ -162,6 +162,7 @@ a.btn{text-decoration:none;display:inline-block}
 .lockbox .lk{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--alarm);border:1px solid rgba(181,86,74,.5);padding:4px 10px}
 .lockbox h3{font-family:var(--display);font-weight:400;font-size:clamp(22px,4vw,30px);line-height:1.2;margin:4px 0 0;text-wrap:balance}
 .lockbox p{margin:0;color:var(--dim);max-width:46ch}
+.lockbox .c17{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-soft);padding-bottom:2px}
 .lockbox .lkc{font-family:var(--mono);font-size:clamp(18px,4.4vw,26px);color:var(--bone);font-variant-numeric:tabular-nums;letter-spacing:.04em}
 .testnote{margin:0;padding:10px 16px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--brass);background:rgba(196,162,101,.06)}
 </style>
@@ -230,6 +231,7 @@ a.btn{text-decoration:none;display:inline-block}
         <h3 id="lock-title">Le casting n'est pas encore ouvert</h3>
         <div class="lkc" id="lock-count" aria-live="off"></div>
         <p id="lock-text">Le formulaire s'ouvrira ici à la fin du compte à rebours. En attendant, rejoins le Discord et prépare ton personnage.</p>
+        <a class="c17" id="lock-c17" href="/api/auth/login" hidden>Canal 17 ? Identifie-toi.</a>
         <a class="btn ghost" href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Rejoindre le Discord</a>
       </div>
       <div class="gate" id="gate" hidden>
@@ -468,6 +470,8 @@ Entrez votre code d'accès.</div>
       :b==="ferme"?{cible:C.programme,label:"Ouverture du Programme 01 dans",date:"Ouverture du Programme 01 · samedi 3 avril 2027 · 20h30",decalage:C.decalage}
       :{cible:C.fermeture,label:"Fin du casting dans",date:"Fin du casting · "+jour(C.fermeture),decalage:C.decalage};
     if(e==="bientot")document.getElementById("lock-count").textContent=reste(C.ouverture);
+    // Les 17 dernières minutes : le canal 17 peut s'identifier pour ouvrir son formulaire en avance (voir lib/canal17.js).
+    document.getElementById("lock-c17").hidden=!(e==="bientot"&&!me&&!C.canal17&&C.ouverture-maintenant()<=17*60*1000);
     if(e===courant)return;
     courant=e;
     document.getElementById("testnote").hidden=e!=="test";
@@ -488,7 +492,7 @@ Entrez votre code d'accès.</div>
   appliquer(); setInterval(appliquer,1000);
   fetch("/api/casting",{credentials:"same-origin",cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(j){
     if(!j||!j.ouverture)return;
-    C.ouverture=Date.parse(j.ouverture);C.fermeture=Date.parse(j.fermeture);C.testeur=!!j.testeur;
+    C.ouverture=Date.parse(j.ouverture);C.fermeture=Date.parse(j.fermeture);C.testeur=!!j.testeur;C.canal17=!!j.canal17;
     if(j.maintenant)C.decalage=Date.parse(j.maintenant)-Date.now();
     courant=null;appliquer();
   }).catch(function(){});
