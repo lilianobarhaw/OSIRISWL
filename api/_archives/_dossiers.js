@@ -2,7 +2,8 @@
 // Ce dossier commence par « _ » : Vercel n'en fait pas une page, et vercel.json bloque son accès direct.
 // Le dépôt GitHub doit rester PRIVÉ : les pièces des enquêtes sont dans pieces/.
 //
-// Pour écrire une enquête : remplir intro, pieces, mot de passe (reponses) et fin.
+// Pour écrire une enquête : remplir intro, pieces, mot de passe (reponses), fin et recompense (un fragment du lore,
+// une image dans pieces/, que seuls ceux qui ont résolu le dossier peuvent voir).
 //   - pieces : chaque pièce a une référence (ref). visible: true = affichée tout de suite ;
 //     visible: false = cachée, il faut trouver sa référence dans une autre pièce et la taper dans « Consulter une référence ».
 //   - reponses : empreintes des mots de passe acceptés (jamais le mot en clair). Pour en calculer une :
@@ -27,6 +28,8 @@ export const DOSSIERS = [
     ],
     reponses: ["9ce8b8ca1413d50149cca8d33d99f9b0f2c77411654d2e7c3fe166e7bf476070"],
     fin: "Dossier refermé. Cette nuit-là, la machine n° 4 a tourné pour rien… ou pour couvrir quelque chose. Osiris a noté votre nom.",
+    // La récompense : un fragment du lore d'Osiris, visible seulement par ceux qui ont résolu le dossier.
+    recompense: { titre: "Fragment 01 · Ordre d'effacement", fichier: "01-fragment.jpg", texte: "Ce document n'aurait jamais dû sortir des archives d'Osiris." },
   },
   { num: "02", ouverture: "2026-11-14T21:00:00+01:00" },
   { num: "03", ouverture: "2026-11-28T21:00:00+01:00" },

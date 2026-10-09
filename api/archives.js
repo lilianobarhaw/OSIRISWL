@@ -30,6 +30,9 @@ const canal17 = async (user) => (user ? estMembre(optEnv("DISCORD_GUILD_ID"), us
 const urlPiece = (d, p) => `/api/archives?d=${d.num}&ref=${encodeURIComponent(p.ref)}`;
 const trouver = (num) => DOSSIERS.find((d) => d.num === String(num || "").padStart(2, "0"));
 
+// Le fragment de lore débloqué par un dossier.
+const fragment = (d) => (d.recompense ? { titre: d.recompense.titre, texte: d.recompense.texte, url: `/api/archives?d=${d.num}&fragment=1` } : undefined);
+
 // L'annonce Discord d'un podium (rang 1, 2 ou 3).
 function carteAnnonce(d, user, rang) {
   return {
@@ -83,6 +86,21 @@ export async function GET(req) {
   const user = await session(req);
   const c17 = await canal17(user);
 
+  // Le fragment de lore d'un dossier : seulement pour ceux qui l'ont résolu (et les testeurs)
+  if (url.searchParams.get("fragment")) {
+    const d = trouver(url.searchParams.get("d"));
+    let ok = false;
+    if (d?.recompense && user) {
+      if (testeur(user)) ok = true;
+      else { try { ok = enqueteurs(await lireRegistre(false), d.num).includes(user.id) || enqueteurs(await lireRegistre(true), d.num).includes(user.id); } catch {} }
+    }
+    if (!ok) return new Response("Fragment scellé", { status: 403 });
+    try {
+      const data = await readFile(new URL(`./_archives/pieces/${d.recompense.fichier}`, import.meta.url));
+      return new Response(data, { headers: { "Content-Type": "image/jpeg", "Cache-Control": "private, max-age=600" } });
+    } catch { return new Response("Fragment introuvable", { status: 404 }); }
+  }
+
   // Une pièce (image)
   if (url.searchParams.get("ref")) {
     const d = trouver(url.searchParams.get("d"));
@@ -115,6 +133,7 @@ export async function GET(req) {
       resolus: qui.length,
       resolu: !!user && qui.includes(user.id),
       fin: user && qui.includes(user.id) ? d.fin : undefined,
+      recompense: user && qui.includes(user.id) ? fragment(d) : undefined,
     };
   });
   return json({
@@ -168,7 +187,7 @@ export async function POST(req) {
       }).catch(() => null);
       apercu = !!r?.ok;
     }
-    return json({ ok: true, test: true, apercu, rang: 0, fin: d.fin });
+    return json({ ok: true, test: true, apercu, rang: 0, fin: d.fin, recompense: fragment(d) });
   }
 
   const guild = optEnv("DISCORD_GUILD_ID");
@@ -208,5 +227,5 @@ export async function POST(req) {
       total = qui.length;
     }
   }
-  return json({ ok: true, rang, total, fin: d.fin });
+  return json({ ok: true, rang, total, fin: d.fin, recompense: fragment(d) });
 }

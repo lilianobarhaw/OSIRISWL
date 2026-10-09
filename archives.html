@@ -72,6 +72,8 @@ form.ligne input:focus{outline:none;border-color:var(--brass)}
 form.ligne .msg{width:100%}
 .msg.err{color:var(--alarm)} .msg.ok{color:var(--ok)}
 .fin{border-left:2px solid var(--brass);padding:4px 0 4px 16px;font-style:italic}
+.fragment{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.fragment .badge{align-self:flex-start}
 .sep{height:1px;background:var(--line);border:0;margin:0}
 .attente{text-align:center;padding:40px 16px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;gap:12px;align-items:center}
 .attente .c{font-family:var(--mono);font-size:clamp(18px,4.4vw,26px);font-variant-numeric:tabular-nums}
@@ -183,7 +185,7 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
       + '<form class="ligne" id="f-ref" autocomplete="off"><label for="i-ref">Consulter une référence</label><input id="i-ref" maxlength="20" placeholder="XXX-0000" spellcheck="false"><button class="btn ghost">Consulter</button><p class="msg" id="m-ref"></p></form>'
       + '<hr class="sep">'
       + (d.resolu
-          ? '<p class="msg ok">✓ Tu as résolu ce dossier.</p>' + (d.fin ? '<p class="fin">' + echap(d.fin) + '</p>' : '')
+          ? '<p class="msg ok">✓ Tu as résolu ce dossier.</p>' + (d.fin ? '<p class="fin">' + echap(d.fin) + '</p>' : '') + recompense(d.recompense)
           : '<form class="ligne" id="f-rep" autocomplete="off"><label for="i-rep">Mot de passe du dossier ' + d.num + '</label><input id="i-rep" maxlength="80" spellcheck="false"><button class="btn">Valider</button><p class="msg" id="m-rep"></p></form><div id="r-rep"></div>')
       + '</article>';
     $("vue").innerHTML = html;
@@ -212,10 +214,17 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
         if (j.connexion) { m.className = "msg err"; m.innerHTML = 'Connecte-toi avec Discord pour valider : <a class="btn ghost" style="margin-left:8px" href="/api/auth/login?retour=archives">Se connecter</a>'; return }
         if (!j.ok) { m.className = "msg err"; m.textContent = j.erreur || "Ce n'est pas le bon mot de passe."; return }
         var rang = j.test ? "Mode test : rien n'est noté." + (j.apercu ? " Un aperçu de l'annonce est parti dans #registre-archives." : " (Aperçu de l'annonce impossible : vérifie DISCORD_ARCHIVES_REGISTRE_ID et que le bot peut écrire dans ce salon.)") : j.rang ? "Tu es " + (j.rang === 1 ? "le premier" : "le " + j.rang + "ᵉ") + " à résoudre ce dossier." + (j.rang <= 3 ? " Ton nom est annoncé sur le Discord." : "") : "";
-        f.outerHTML = '<p class="msg ok">✓ Dossier résolu. ' + rang + '</p>' + (j.fin ? '<p class="fin">' + echap(j.fin) + '</p>' : '');
+        f.outerHTML = '<p class="msg ok">✓ Dossier résolu. ' + rang + '</p>' + (j.fin ? '<p class="fin">' + echap(j.fin) + '</p>' : '') + recompense(j.recompense);
+        brancherPieces();
         if (!j.test) { d.resolu = true; d.resolus = Math.max(d.resolus || 0, j.total || 0); liste() }
       });
     });
+  }
+
+  function recompense(r){
+    if (!r) return "";
+    return '<div class="fragment"><span class="badge">Fragment débloqué</span><p class="msg">' + echap(r.texte) + '</p>'
+      + '<div class="pieces"><button class="piece neuve" data-src="' + r.url + '"><img src="' + r.url + '" alt="' + echap(r.titre) + '"><span><b>' + echap(r.titre) + '</b></span></button></div></div>';
   }
 
   function brancherPieces(){
