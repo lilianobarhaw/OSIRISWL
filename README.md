@@ -39,7 +39,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 2. Il revient sur la page `/casting`, connecté, et il est ajouté au serveur Osiris s'il n'y était pas.
 3. Il remplit le dossier et le soumet.
 4. Un salon `candidature-<numéro>-<pseudo>` est créé dans la catégorie des tickets, visible seulement par lui, le staff et le bot. Le dossier y est posté, avec une mention du candidat et du rôle staff.
-5. Il reçoit le rôle « Postulant » si la variable `DISCORD_POSTULANT_ROLE_ID` est configurée. Le bot doit avoir la permission « Gérer les rôles », et son rôle doit être placé au-dessus de Postulant.
+5. Il reçoit le rôle « Postulant » si la variable `DISCORD_POSTULANT_ROLE_ID` est configurée, et perd le rôle « Aspirant » si `DISCORD_ASPIRANT_ROLE_ID` est configurée. Le bot doit avoir la permission « Gérer les rôles », et son rôle doit être placé au-dessus de Postulant et d'Aspirant.
 6. Un seul ticket par candidat : s'il en a déjà un, le site lui donne le lien vers celui-ci.
 
 ## Préparer Discord
@@ -71,6 +71,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_REMPLACANT_ROLE_ID` | Facultatif. Rôle « Remplaçant », donné par `/casting resultat:Liste d'attente` |
 | `DISCORD_MECENE_ROLE_ID` | Facultatif. Rôle « Mécène », donné par `/casting resultat:Non retenu` |
 | `DISCORD_POSTULANT_ROLE_ID` | Facultatif. Identifiant du rôle « Postulant », donné automatiquement à chaque candidat qui envoie un dossier |
+| `DISCORD_ASPIRANT_ROLE_ID` | Facultatif. Identifiant du rôle « Aspirant » (pris dans le processus d'accueil du Discord) : retiré automatiquement quand le candidat envoie son dossier, et par `/casting` |
 | `DISCORD_FONDATEUR_ROLE_ID` | Identifiant du rôle Fondateur : avec le rôle Admin, le seul autorisé à utiliser les commandes du bot |
 | `DISCORD_LOGS_CHANNEL_ID` | Identifiant du salon privé `#logs-commandes` : qui a utilisé quelle commande du bot, tickets ouverts et fermés, annonces |
 | `DISCORD_SANCTIONS_CHANNEL_ID` | Identifiant du salon privé des sanctions : historique, compteur d'avertissements et alertes de l'antispam |

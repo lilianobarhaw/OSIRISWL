@@ -117,8 +117,8 @@ async function command(i, user) {
       if (!r.ok) warn.push(`${envKey} (code ${r.status})`);
     };
     await setRole(res.role, "PUT");
-    // Un candidat retenu ne doit plus voir la Loge des Mécènes : on retire Postulant, Mécène et les rangs.
-    const retirer = ["DISCORD_POSTULANT_ROLE_ID", ...(opt("resultat") === "retenu" ? ["DISCORD_MECENE_ROLE_ID", "DISCORD_MECENE_ARGENT_ROLE_ID", "DISCORD_MECENE_OR_ROLE_ID", "DISCORD_GRAND_MECENE_ROLE_ID"] : [])];
+    // Un candidat retenu ne doit plus voir la Loge des Mécènes : on retire Postulant (et Aspirant), Mécène et les rangs.
+    const retirer = ["DISCORD_POSTULANT_ROLE_ID", "DISCORD_ASPIRANT_ROLE_ID", ...(opt("resultat") === "retenu" ? ["DISCORD_MECENE_ROLE_ID", "DISCORD_MECENE_ARGENT_ROLE_ID", "DISCORD_MECENE_OR_ROLE_ID", "DISCORD_GRAND_MECENE_ROLE_ID"] : [])];
     await Promise.all(retirer.map((k) => setRole(k, "DELETE")));
     await bot(`/channels/${i.channel_id}/messages`, {
       method: "POST",

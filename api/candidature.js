@@ -32,6 +32,7 @@ export function GET() {
     fonction: "OK",
     variables: missing.length ? "MANQUANTES : " + missing.join(", ") : "OK : toutes les variables sont configurées",
     role_postulant: process.env.DISCORD_POSTULANT_ROLE_ID ? "activé" : "désactivé (variable DISCORD_POSTULANT_ROLE_ID absente)",
+    role_aspirant: process.env.DISCORD_ASPIRANT_ROLE_ID ? "activé : retiré à l'envoi du dossier" : "désactivé (variable DISCORD_ASPIRANT_ROLE_ID absente)",
     casting: (() => { const c = etatCasting(); return `${c.etat} · ouverture ${dateFr(c.ouverture)} · fermeture ${dateFr(c.fermeture)}`; })(),
   });
 }
@@ -103,6 +104,16 @@ export async function POST(req) {
       headers: { "X-Audit-Log-Reason": "Candidature envoyée depuis le site Osiris" },
     });
     if (!roleRes.ok) roleWarning = `\n⚠️ Le rôle Postulant n'a pas pu être donné (code ${roleRes.status}). Vérifie que le bot a « Gérer les rôles » et que son rôle est au-dessus de Postulant.`;
+  }
+
+  // Rôle « Aspirant » retiré : le joueur a envoyé son dossier, il devient Postulant (facultatif).
+  const aspirant = (process.env.DISCORD_ASPIRANT_ROLE_ID || "").trim();
+  if (aspirant) {
+    const aspRes = await bot(`/guilds/${guild}/members/${user.id}/roles/${aspirant}`, {
+      method: "DELETE",
+      headers: { "X-Audit-Log-Reason": "Candidature envoyée : Aspirant devient Postulant" },
+    });
+    if (!aspRes.ok && aspRes.status !== 404) roleWarning += `\n⚠️ Le rôle Aspirant n'a pas pu être retiré (code ${aspRes.status}). Vérifie que le rôle du bot est au-dessus d'Aspirant.`;
   }
 
   const embed = {
