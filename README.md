@@ -30,6 +30,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `api/commands.js` : envoie la liste des commandes slash à Discord.
 - `lib/moderation.js` : les commandes de modération et les paliers de sanctions automatiques (à modifier ici).
 - `lib/logs.js` : le journal des commandes (qui, quoi, où, quand).
+- `lib/canal17.js` : la récompense du jeu de piste (commandes `/canal17` et `/canal17-voix`, voir « Canal 17 »).
 - `lib/antispam.js` et `api/antispam.js` : les règles antispam (AutoMod de Discord) et leur installation.
 - `package.json` : `"type": "module"`.
 
@@ -74,6 +75,8 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_ASPIRANT_ROLE_ID` | Facultatif. Identifiant du rôle « Aspirant » (pris dans le processus d'accueil du Discord) : retiré automatiquement quand le candidat envoie son dossier, et par `/casting` |
 | `DISCORD_FONDATEUR_ROLE_ID` | Identifiant du rôle Fondateur : avec le rôle Admin, le seul autorisé à utiliser les commandes du bot |
 | `DISCORD_LOGS_CHANNEL_ID` | Identifiant du salon privé `#logs-commandes` : qui a utilisé quelle commande du bot, tickets ouverts et fermés, annonces |
+| `DISCORD_CANAL17_ROLE_ID` | Facultatif. Rôle « Canal 17 », donné par `/canal17` à ceux qui ont trouvé le code du jeu de piste |
+| `DISCORD_CANAL17_CHANNEL_ID` | Facultatif. Salon caché `#canal-17`, visible seulement par le rôle Canal 17 (et le bot) |
 | `DISCORD_SANCTIONS_CHANNEL_ID` | Identifiant du salon privé des sanctions : historique, compteur d'avertissements et alertes de l'antispam |
 
 Redéployer après chaque modification des variables. Vérification : ouvrir `https://<ton-domaine>/api/candidature` → doit afficher « toutes les variables sont configurées ».
@@ -87,6 +90,18 @@ L'ancienne variable `DISCORD_WEBHOOK` n'est plus utilisée.
 3. Ouvrir une fois `https://<ton-domaine>/api/panel?key=<SETUP_KEY>&channel=<identifiant du salon d'aide>` : le message « Créer un ticket » apparaît dans le salon.
 4. Parcours : bouton « Créer un ticket » → menu des catégories → fenêtre « Explique ton problème » → salon privé avec le staff. Les tickets « Problème avec le staff » ne sont visibles que par le rôle Admin. Un seul ticket ouvert par personne et par catégorie. Le bouton « Fermer le ticket » supprime le salon (staff ou auteur).
 5. Diagnostic : `https://<ton-domaine>/api/interactions`.
+
+## Canal 17 (récompense du jeu de piste)
+
+Le terminal « canal 17 » de la page casting mène à un code final. Le joueur qui le trouve l'envoie dans un ticket.
+
+1. Sur Discord : créer le rôle « Canal 17 » (aucune permission) et le salon privé `#canal-17` (@everyone : ne voit pas ; Canal 17 : voit et écrit ; le bot Osiris : voit et écrit). Le rôle du bot doit être au-dessus de Canal 17.
+2. Sur Vercel : `DISCORD_CANAL17_ROLE_ID` et `DISCORD_CANAL17_CHANNEL_ID`, puis redéployer.
+3. Renvoyer les commandes à Discord : `/api/commands?key=<SETUP_KEY>`.
+4. Dans le ticket du joueur : `/canal17 membre:@joueur`. Il reçoit le rôle et un numéro d'ordre (n° 1 à 17) ; une voix inconnue lui répond dans le ticket et l'accueille dans `#canal-17`. Après 17 personnes, la voix répond que le canal est complet.
+5. `/canal17` sans membre : la liste. `/canal17-voix` : écrire au nom de la voix (dans `#canal-17`, ou un autre salon ; option pour mentionner le rôle). La voix ne dit jamais qui elle est.
+
+Réservé aux fondateurs et aux admins, comme les autres commandes. Le nombre de places est `PLACES` dans `lib/canal17.js`.
 
 ## Casting : dates et verrouillage
 

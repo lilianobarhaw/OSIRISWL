@@ -5,7 +5,8 @@
 //   3. Envoi                 → salon privé créé, staff (ou admins) mentionnés
 //   4. « Fermer le ticket »  → salon supprimé (staff ou auteur du ticket)
 // Et les commandes slash, réservées aux fondateurs et aux admins :
-//   /annonce, /aide-panneau, /fermer, /casting (lib/commandes.js)
+//   /annonce, /aide-panneau, /fermer, /casting, /offrande (lib/commandes.js)
+//   /canal17, /canal17-voix : la récompense du jeu de piste (lib/canal17.js)
 //   /warn, /unwarn, /sanctions, /mute, /unmute, /kick, /ban, /unban, /clear, /slowmode (lib/moderation.js)
 
 import { createPublicKey, verify } from "node:crypto";
@@ -15,6 +16,7 @@ import { CASTING } from "../lib/commandes.js";
 import { moderation, isModCommand } from "../lib/moderation.js";
 import { logEvent, logCommand } from "../lib/logs.js";
 import { offrandeModal, publierOffrande } from "../lib/offrande.js";
+import * as canal17 from "../lib/canal17.js";
 
 const VIEW = 1024n, SEND = 2048n, EMBED = 16384n, ATTACH = 32768n, HISTORY = 65536n;
 const bits = (...p) => p.reduce((a, b) => a | b, 0n).toString();
@@ -78,6 +80,18 @@ async function command(i, user) {
     keepAlive(work.then((content) => editOriginal(i, content)));
     return json({ type: 5, data: { flags: EPHEMERAL } });
   }
+
+  // Canal 17 (jeu de piste) : plusieurs appels à Discord, donc même principe que la modération.
+  if (name === "canal17") {
+    const cible = opt("membre");
+    const work = (cible ? canal17.valider(i, user, cible) : canal17.liste(i)).catch((e) => "Erreur : " + (e?.message || "inconnue"));
+    const fast = await Promise.race([work, sleep(2200).then(() => null)]);
+    if (fast !== null) return reply(fast);
+    keepAlive(work.then((content) => editOriginal(i, content)));
+    return json({ type: 5, data: { flags: EPHEMERAL } });
+  }
+
+  if (name === "canal17-voix") return json(canal17.voixModal(opt("mention"), opt("salon")));
 
   if (name === "aide-panneau") {
     const r = await bot(`/channels/${i.channel_id}/messages`, { method: "POST", body: JSON.stringify(panelMessage()) });
@@ -161,6 +175,15 @@ export async function POST(req) {
       if (r.erreur) return reply(r.erreur);
       await logEvent({ title: r.test ? "Offrande de test lancée" : "Offrande lancée", description: `<@${user.id}> a lancé **${r.titre}** dans <#${r.salon}> (${r.duree}) : ${r.offrandes.join(" · ")}`, user });
       return reply(`Offrande publiée dans <#${r.salon}>. Le vote se ferme dans ${r.duree}.${r.ferme ? " Discord affiche 1 h sur le sondage : le journal Osiris le fermera à l'heure annoncée sur la carte (il doit tourner sur le VPS)." : ""}${r.notifies ? " Mécènes (tous les rangs) et staff notifiés." : ""}${r.test ? "\nC'est un test : ce salon ne compte pas pour les rangs. Supprime les deux messages quand tu as fini." : ""}`);
+    }
+
+    // Fenêtre de /canal17-voix envoyée → message de la voix dans #canal-17 (ou le salon choisi)
+    if (i.type === 5 && id.startsWith("canal17_voix:")) {
+      if (!isDirection(i.member)) return reply(DIRECTION_ONLY);
+      const r = await canal17.publierVoix(i, id);
+      if (r.erreur) return reply(r.erreur);
+      await logEvent({ title: "Voix du canal 17", description: `<@${user.id}> a fait parler la voix dans <#${r.salon}> : ${r.texte.slice(0, 300)}`, user });
+      return reply(`La voix a parlé dans <#${r.salon}>.`);
     }
 
     // Fenêtre de /annonce envoyée → message publié dans le salon
@@ -310,5 +333,6 @@ export function GET() {
     commandes: "réservées à la permission Administrateur" + (has("DISCORD_FONDATEUR_ROLE_ID") ? ", au rôle Fondateur" : "") + (has("DISCORD_ADMIN_ROLE_ID") ? " et au rôle Admin" : ""),
     salon_des_logs: has("DISCORD_LOGS_CHANNEL_ID") ? "OK" : "ATTENTION : DISCORD_LOGS_CHANNEL_ID absent, les commandes ne sont pas notées",
     salon_des_sanctions: has("DISCORD_SANCTIONS_CHANNEL_ID") ? "OK" : "ATTENTION : DISCORD_SANCTIONS_CHANNEL_ID absent, les avertissements ne sont pas comptés",
+    canal_17: canal17.manque().length ? "désactivé : il manque " + canal17.manque().join(", ") : `OK (${canal17.PLACES} places)`,
   });
 }
