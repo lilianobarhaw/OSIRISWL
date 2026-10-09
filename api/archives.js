@@ -1,0 +1,182 @@
+// Les Archives d'Osiris (page /archives) : une enquête tous les 15 jours, des pièces à fouiller, un mot de passe.
+//   GET  /api/archives                     → la liste des dossiers (le contenu seulement s'ils sont ouverts)
+//   GET  /api/archives?d=01&ref=REG-2930   → l'image d'une pièce (si le dossier est ouvert et la référence existe)
+//   POST /api/archives {action:"consulter", d, ref}      → ouvre une pièce cachée à partir de sa référence
+//   POST /api/archives {action:"repondre", d, reponse}   → vérifie le mot de passe (connexion Discord obligatoire)
+// Bonne réponse : rôle « Enquêteur » (DISCORD_ENQUETEUR_ROLE_ID), une ligne dans le registre privé
+// (DISCORD_ARCHIVES_REGISTRE_ID), et pour les 3 premiers, une annonce sur Discord (DISCORD_ARCHIVES_ANNONCE_ID).
+// Les comptes de CASTING_TESTEURS voient les dossiers avant leur date, en mode test (rien n'est noté ni annoncé).
+
+import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { json, readSession, bot, optEnv, sleep } from "../lib/discord.js";
+import { DOSSIERS } from "./_archives/_dossiers.js";
+
+const COULEUR = 0xc4a265;
+const MEDAILLES = ["🥇", "🥈", "🥉"];
+const PLACES = ["le premier", "le deuxième", "le troisième"];
+
+const normaliser = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
+const empreinte = (s) => createHash("sha256").update("osiris-archives:" + normaliser(s)).digest("hex");
+const ouvert = (d) => Date.now() >= Date.parse(d.ouverture);
+const pret = (d) => !!(d.titre && d.pieces?.length && d.reponses?.length);
+const testeur = (user) => !!user && optEnv("CASTING_TESTEURS").split(/[\s,;]+/).includes(String(user.id));
+const visible = (d, user) => pret(d) && (ouvert(d) || testeur(user));
+const urlPiece = (d, p) => `/api/archives?d=${d.num}&ref=${encodeURIComponent(p.ref)}`;
+const trouver = (num) => DOSSIERS.find((d) => d.num === String(num || "").padStart(2, "0"));
+
+async function session(req) { try { return await readSession(req); } catch { return null; } }
+
+// ---------- Le registre : un salon privé où le bot note chaque dossier résolu ----------
+// Lu au plus une fois par minute (mémoire de l'instance), pour ne pas solliciter Discord à chaque visite.
+let cache = { at: 0, lignes: [] };
+
+async function lireRegistre(force) {
+  const salon = optEnv("DISCORD_ARCHIVES_REGISTRE_ID");
+  if (!salon) return [];
+  if (!force && Date.now() - cache.at < 60_000) return cache.lignes;
+  const lignes = [];
+  let avant = "";
+  for (let page = 0; page < 10; page++) {
+    const r = await bot(`/channels/${salon}/messages?limit=100${avant ? "&before=" + avant : ""}`);
+    if (!r.ok) break;
+    const lot = await r.json();
+    for (const m of lot) {
+      const x = /dossier (\d+) · <@(\d+)>/.exec(m.content || "");
+      if (x) lignes.push({ num: x[1], id: x[2], msg: m.id });
+    }
+    if (lot.length < 100) break;
+    avant = lot.at(-1).id;
+  }
+  lignes.sort((a, b) => (BigInt(a.msg) < BigInt(b.msg) ? -1 : 1)); // ordre d'arrivée
+  cache = { at: Date.now(), lignes };
+  return lignes;
+}
+
+// Les enquêteurs d'un dossier, dans l'ordre (une personne ne compte qu'une fois).
+function enqueteurs(lignes, num) {
+  const vus = [];
+  for (const l of lignes) if (l.num === num && !vus.includes(l.id)) vus.push(l.id);
+  return vus;
+}
+
+// ---------- Lecture ----------
+
+export async function GET(req) {
+  const url = new URL(req.url);
+  const user = await session(req);
+
+  // Une pièce (image)
+  if (url.searchParams.get("ref")) {
+    const d = trouver(url.searchParams.get("d"));
+    const ref = String(url.searchParams.get("ref")).toUpperCase().trim();
+    const p = d && visible(d, user) && d.pieces.find((x) => x.ref === ref);
+    if (!p) return new Response("Pièce introuvable", { status: 404 });
+    try {
+      const data = await readFile(new URL(`./_archives/pieces/${p.fichier}`, import.meta.url));
+      return new Response(data, { headers: { "Content-Type": p.fichier.endsWith(".png") ? "image/png" : "image/jpeg", "Cache-Control": "private, max-age=600" } });
+    } catch {
+      return new Response("Pièce introuvable", { status: 404 });
+    }
+  }
+
+  let lignes = [];
+  try { lignes = await lireRegistre(false); } catch {}
+  const dossiers = DOSSIERS.map((d) => {
+    const base = { num: d.num, ouverture: d.ouverture, ouvert: ouvert(d) };
+    if (!visible(d, user)) return { ...base, pret: false, titre: null }; // ouvert mais pas prêt = « en préparation »
+    const qui = enqueteurs(lignes, d.num);
+    return {
+      ...base,
+      pret: true,
+      test: !ouvert(d),
+      titre: d.titre,
+      intro: d.intro,
+      pieces: d.pieces.filter((p) => p.visible).map((p) => ({ ref: p.ref, titre: p.titre, url: urlPiece(d, p) })),
+      resolus: qui.length,
+      resolu: !!user && qui.includes(user.id),
+      fin: user && qui.includes(user.id) ? d.fin : undefined,
+    };
+  });
+  return json({
+    maintenant: new Date().toISOString(),
+    connecte: user ? { name: user.name || user.username } : null,
+    testeur: testeur(user),
+    dossiers,
+  }, 200, { "Cache-Control": "no-store" });
+}
+
+// ---------- Actions ----------
+
+export async function POST(req) {
+  let b;
+  try { b = await req.json(); } catch { return json({ erreur: "Requête invalide." }, 400); }
+  const user = await session(req);
+  const d = trouver(b.d);
+  if (!d || !visible(d, user)) return json({ erreur: "Ce dossier est encore scellé." }, 403);
+
+  // Consulter une référence trouvée dans une pièce
+  if (b.action === "consulter") {
+    const ref = String(b.ref || "").toUpperCase().replace(/\s+/g, "").slice(0, 20);
+    const p = d.pieces.find((x) => x.ref.replace(/\s+/g, "") === ref);
+    if (!p) { await sleep(400); return json({ erreur: "Aucune pièce à cette référence." }, 404); }
+    return json({ ok: true, piece: { ref: p.ref, titre: p.titre, url: urlPiece(d, p) } });
+  }
+
+  if (b.action !== "repondre") return json({ erreur: "Action inconnue." }, 400);
+  if (!user) return json({ erreur: "Connecte-toi avec Discord pour valider ta réponse.", connexion: true }, 401);
+
+  const essai = String(b.reponse || "").slice(0, 80);
+  if (!normaliser(essai) || !d.reponses.includes(empreinte(essai))) {
+    await sleep(1200); // ralentit ceux qui essaient tous les mots
+    return json({ ok: false, erreur: "Ce n'est pas le bon mot de passe." });
+  }
+
+  // Mode test (comptes de CASTING_TESTEURS avant l'ouverture) : rien n'est noté ni annoncé.
+  if (!ouvert(d)) return json({ ok: true, test: true, rang: 0, fin: d.fin });
+
+  const guild = optEnv("DISCORD_GUILD_ID");
+  const role = optEnv("DISCORD_ENQUETEUR_ROLE_ID");
+  if (role && guild) {
+    await bot(`/guilds/${guild}/members/${user.id}/roles/${role}`, { method: "PUT", headers: { "X-Audit-Log-Reason": encodeURIComponent(`Archives : dossier ${d.num} résolu`) } }).catch(() => {});
+  }
+
+  // Le registre décide du rang (ordre d'arrivée des messages).
+  const registre = optEnv("DISCORD_ARCHIVES_REGISTRE_ID");
+  let rang = 0, total = 0;
+  if (registre) {
+    let lignes = await lireRegistre(true);
+    if (!enqueteurs(lignes, d.num).includes(user.id)) {
+      await bot(`/channels/${registre}/messages`, {
+        method: "POST",
+        body: JSON.stringify({ content: `🗂 dossier ${d.num} · <@${user.id}> · ${user.username}`, allowed_mentions: { parse: [] } }),
+      });
+      lignes = await lireRegistre(true);
+      const qui = enqueteurs(lignes, d.num);
+      rang = qui.indexOf(user.id) + 1;
+      total = qui.length;
+      const annonce = optEnv("DISCORD_ARCHIVES_ANNONCE_ID");
+      if (annonce && rang >= 1 && rang <= 3) {
+        await bot(`/channels/${annonce}/messages`, {
+          method: "POST",
+          body: JSON.stringify({
+            content: `<@${user.id}>`,
+            allowed_mentions: { users: [user.id] },
+            embeds: [{
+              author: { name: "OSIRIS · LES ARCHIVES" },
+              title: `Dossier ${d.num} · ${d.titre}`,
+              url: (optEnv("SITE_URL") || "https://osiriswl.vercel.app") + "/archives",
+              description: `${MEDAILLES[rang - 1]} <@${user.id}> est ${PLACES[rang - 1]} à résoudre l'enquête.${rang === 3 ? "\n\nLe podium est complet. Le dossier reste ouvert à tous." : ""}`,
+              color: COULEUR,
+            }],
+          }),
+        }).catch(() => {});
+      }
+    } else {
+      const qui = enqueteurs(lignes, d.num);
+      rang = qui.indexOf(user.id) + 1;
+      total = qui.length;
+    }
+  }
+  return json({ ok: true, rang, total, fin: d.fin });
+}

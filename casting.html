@@ -300,7 +300,7 @@ Entrez votre code d'accès.</div>
 
   <footer>
     <span>© Osiris · Tous les regards sont enregistrés</span>
-    <span><a href="/">Accueil</a> · <a href="legal#mentions">Mentions légales</a> · <a href="legal#donnees">Confidentialité</a></span>
+    <span><a href="/">Accueil</a> · <a href="archives">Archives</a> · <a href="legal#mentions">Mentions légales</a> · <a href="legal#donnees">Confidentialité</a></span>
     <span class="clock" id="clock" title="Dernier signal reçu : 03:33">--:--:--</span>
   </footer>
 </div>
@@ -494,9 +494,10 @@ Entrez votre code d'accès.</div>
     if(!j||!j.ouverture)return;
     C.ouverture=Date.parse(j.ouverture);C.fermeture=Date.parse(j.fermeture);C.testeur=!!j.testeur;C.canal17=!!j.canal17;
     if(j.maintenant)C.decalage=Date.parse(j.maintenant)-Date.now();
+    if(j.user)me=j.user;
     courant=null;appliquer();
+    if(me)showForm();
   }).catch(function(){});
-  fetch("/api/me",{credentials:"same-origin"}).then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&j.user){me=j.user;showForm()}}).catch(function(){});
   f.addEventListener("submit",function(e){
     e.preventDefault();err.textContent="";
     if(!me){showGate("Connecte-toi avec Discord pour envoyer ta candidature.");return}

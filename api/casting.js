@@ -6,5 +6,7 @@ import { etatPour } from "../lib/casting.js";
 export async function GET(req) {
   let user = null;
   try { user = await readSession(req); } catch {}
-  return json(await etatPour(user), 200, { "Cache-Control": "no-store" });
+  // user : le candidat connecté (remplace l'ancien /api/me, pour rester sous la limite de 12 fonctions de Vercel Hobby)
+  const moi = user ? { id: user.id, username: user.username, name: user.name } : null;
+  return json({ ...(await etatPour(user)), user: moi }, 200, { "Cache-Control": "no-store" });
 }

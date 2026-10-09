@@ -1,7 +1,9 @@
 // Redirige le candidat vers Discord pour se connecter.
+// ?retour=archives : revenir sur /archives après la connexion (sinon, sur /casting).
 import { env, cookie } from "../../lib/discord.js";
 
-export function GET() {
+export function GET(req) {
+  const retour = new URL(req.url).searchParams.get("retour") === "archives" ? "archives" : "casting";
   const state = crypto.randomUUID();
   const params = new URLSearchParams({
     client_id: env("DISCORD_CLIENT_ID"),
@@ -12,5 +14,6 @@ export function GET() {
   });
   const headers = new Headers({ Location: "https://discord.com/oauth2/authorize?" + params });
   headers.append("Set-Cookie", cookie("osiris_state", state, 600));
+  headers.append("Set-Cookie", cookie("osiris_retour", retour, 600));
   return new Response(null, { status: 302, headers });
 }

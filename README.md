@@ -12,6 +12,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `casting.html` : la page de candidature (compte à rebours, dossier, connexion Discord, terminal « Accès candidat »), à l'adresse `/casting`.
 - `vercel.json` : `cleanUrls` pour que `/casting` ouvre `casting.html`.
 - `video/osiris-rp.mp4` : le générique (animation de l'Œil), lu dans la salle de projection.
+- `archives.html` (adresse `/archives`) + `api/archives.js` + `api/_archives/` : les Archives d'Osiris, une enquête tous les 15 jours (voir « Archives »).
 - `convocation.html` (adresse `/convocation#…`) : la convocation personnelle d'un élu. L'enveloppe à son nom, l'œil qui s'ouvre, la lettre de Cassius Vale (avec un P.-S. facultatif), le compte à rebours du casting, et un bouton pour enregistrer sa convocation en image (format story). Le prénom, le numéro et le P.-S. sont écrits dans le lien, après le `#` : cette partie n'est jamais envoyée au serveur, rien n'est enregistré. Les liens se créent avec le générateur privé « Convocations Osiris ». Aperçu Discord : `img/convocation.png`. Page non référencée par les moteurs de recherche.
 - `legal.html` (adresse `/legal`) : mentions légales, mention de fiction, données personnelles (RGPD), cookies, conditions d'utilisation, crédits. Liée en bas de toutes les pages et sous le formulaire de candidature. Mettre à jour la date en haut de la page à chaque changement.
 - `fonts/` : les polices du site (Marcellus, IBM Plex Mono, Source Serif 4), hébergées sur le site pour ne rien envoyer à Google. Licences OFL dans le dossier.
@@ -21,7 +22,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `api/auth/login.js` : redirige vers Discord (scopes `identify guilds.join`).
 - `api/auth/callback.js` : récupère le compte, ajoute le joueur au serveur Osiris, ouvre la session (6 h).
 - `api/auth/logout.js` : ferme la session.
-- `api/me.js` : dit à la page si le joueur est connecté.
+- `api/casting.js` : dit à la page casting si le formulaire est ouvert et si le joueur est connecté (l'ancien `api/me.js` y est fusionné : l'offre Hobby de Vercel limite un site à 12 fonctions dans `api/`).
 - `api/candidature.js` : `GET` = diagnostic des variables ; `POST` = crée le ticket.
 - `api/interactions.js` : tickets d'aide (bouton, menu des catégories, fenêtre, salon privé, fermeture).
 - `api/panel.js` : publie le message « Créer un ticket » dans le salon d'aide.
@@ -105,6 +106,17 @@ Le terminal « canal 17 » de la page casting mène à un code final. Le joueur 
 
 Réservé aux fondateurs et aux admins, comme les autres commandes. Le nombre de places est `PLACES` dans `lib/canal17.js`.
 
+## Archives (enquêtes du site)
+
+Une enquête s'ouvre tous les 15 jours, le samedi à 21 h (heure de Paris), sur `/archives`. Chaque dossier contient des pièces (images) ; certaines sont cachées et s'ouvrent quand on tape leur référence. On valide le mot de passe en se connectant avec Discord.
+
+1. Sur Discord : créer le rôle « Enquêteur » (aucune permission), un salon **privé** `#registre-archives` (le bot y note chaque dossier résolu, c'est lui qui donne les rangs) et choisir le salon public des annonces (par exemple `#annonce`). Le bot Osiris doit voir et écrire dans ces deux salons, et son rôle doit être au-dessus d'Enquêteur.
+2. Sur Vercel : `DISCORD_ENQUETEUR_ROLE_ID`, `DISCORD_ARCHIVES_REGISTRE_ID`, `DISCORD_ARCHIVES_ANNONCE_ID`, puis redéployer.
+3. Bonne réponse : rôle Enquêteur, une ligne dans le registre, et pour les trois premiers d'un dossier, une annonce (🥇 🥈 🥉) dans le salon public.
+4. Écrire une enquête : `api/_archives/_dossiers.js` (titre, intro, pièces, empreinte du mot de passe, texte de fin ; la commande pour calculer l'empreinte est en haut du fichier) et les images dans `api/_archives/pieces/`. Un dossier sans contenu reste « en préparation ».
+5. Tester avant la date : les comptes de `CASTING_TESTEURS` voient les dossiers en avance, en « mode test » (rien n'est noté ni annoncé).
+6. Les mots de passe ne sont jamais écrits en clair, et les pièces ne sont servies qu'à partir de l'heure d'ouverture. Le dépôt GitHub doit rester **privé**.
+
 ## Casting : dates et verrouillage
 
 Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du casting. Avant, la page affiche « Formulaire scellé » avec le compte à rebours ; après, « Casting terminé ». Le serveur refuse aussi tout dossier envoyé hors de ces dates (`api/candidature.js`), même si quelqu'un contourne la page.
@@ -136,9 +148,9 @@ Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du c
 - Champ piège anti-robots (`site`), ignoré s'il est rempli.
 - Les tickets d'aide vérifient la signature Discord de chaque requête (clé publique Ed25519).
 
-## Jeu de piste (réservé au staff)
+## Jeu de piste et Archives
 
-Réponses, dans l'ordre : `0333`, `CANDIDAT17`, `LUDENDORFF`. Code final : `THOT-17-A3`.
+Les réponses du jeu de piste et des Archives ne sont écrites nulle part dans ce dépôt : la direction les garde. Le dépôt GitHub doit rester **privé**, et le site bloque l'accès direct à `/README.md`, `/lib/…` et `/api/_archives/…` (`vercel.json`, redirections).
 
 ## Offre Vercel
 

@@ -1,16 +1,19 @@
 // Retour de Discord : récupère le compte, ajoute le candidat au serveur Osiris, ouvre la session.
 import { API, env, parseCookies, cookie, makeSession, bot } from "../../lib/discord.js";
 
-function back(query) {
-  const headers = new Headers({ Location: env("SITE_URL") + "/casting" + query + "#candidature" });
+function back(query, retour) {
+  const page = retour === "archives" ? "/archives" + query : "/casting" + query + "#candidature";
+  const headers = new Headers({ Location: env("SITE_URL") + page });
+  headers.append("Set-Cookie", cookie("osiris_retour", "", 0));
   return { headers, res: () => new Response(null, { status: 302, headers }) };
 }
 
 export async function GET(req) {
   const url = new URL(req.url);
+  const retour = parseCookies(req).osiris_retour;
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
-  const fail = back("?login=erreur");
+  const fail = back("?login=erreur", retour);
   fail.headers.append("Set-Cookie", cookie("osiris_state", "", 0));
 
   if (!code || !state || parseCookies(req).osiris_state !== state) return fail.res();
@@ -39,7 +42,7 @@ export async function GET(req) {
     body: JSON.stringify({ access_token: token.access_token }),
   });
 
-  const ok = back(join.ok ? "" : "?login=serveur");
+  const ok = back(join.ok ? "" : "?login=serveur", retour);
   ok.headers.append("Set-Cookie", cookie("osiris_state", "", 0));
   ok.headers.append(
     "Set-Cookie",

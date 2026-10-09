@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Les Archives · Osiris RP</title>
+<meta name="description" content="Des documents d'Osiris ont fuité. Tous les quinze jours, un dossier s'ouvre. Trouvez le mot de passe.">
+<meta name="theme-color" content="#0A0B0D">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png?v=2">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Osiris RP">
+<meta property="og:title" content="Les Archives d'Osiris">
+<meta property="og:description" content="Des documents ont fuité. Tous les quinze jours, un dossier s'ouvre. Trouvez le mot de passe.">
+<meta property="og:image" content="https://osiriswl.vercel.app/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="fonts/polices.css">
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#0A0B0D; --panel:#121418; --line:#23262C; --bone:#E6E0D3; --dim:#8B877D; --faint:#55534D;
+  --brass:#C4A265; --brass-soft:#8E7747; --gold:#E9CF78; --alarm:#B5564A; --ok:#7FA27A;
+  --display:"Marcellus", Georgia, serif; --serif:"Source Serif 4", Georgia, serif; --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ground)}
+body{margin:0;color:var(--bone);font-family:var(--serif);font-size:17px;line-height:1.65;padding:0 16px 64px;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);z-index:5}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+header.bar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:22px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+header.bar .mark{font-family:var(--display);font-size:18px;letter-spacing:.32em;color:var(--bone);display:flex;align-items:center;gap:12px;white-space:nowrap;text-decoration:none}
+header.bar .mark img{width:36px;height:36px;mix-blend-mode:screen}
+.compte{text-align:right}
+.compte a{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-soft)}
+.hero{display:flex;flex-direction:column;gap:14px;padding-top:12px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,8vw,64px);line-height:1.05;margin:0}
+.hero p{margin:0;color:var(--dim);max-width:60ch}
+/* Liste des dossiers */
+.dossiers{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:0;margin:0;list-style:none}
+.dossiers button{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;width:100%;min-height:118px;padding:16px;border:1px solid var(--line);background:var(--panel);cursor:pointer;transition:border-color .2s}
+.dossiers button:hover:not([disabled]),.dossiers button[aria-current="true"]{border-color:var(--brass)}
+.dossiers button[disabled]{cursor:default;opacity:.55}
+.dossiers .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.dossiers .t{font-family:var(--display);font-size:19px;line-height:1.25}
+.dossiers .s{margin-top:auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--dim)}
+.dossiers .s.ok{color:var(--ok)}
+.scelle .t{color:var(--faint)}
+@media (max-width:520px){.dossiers button{min-height:92px;padding:12px}.dossiers .t{font-size:16px}.dossiers .s{font-size:10px}.dossier{padding:22px 16px}}
+/* Un dossier */
+.dossier{border:1px solid var(--line);background:var(--panel);padding:28px 22px;display:flex;flex-direction:column;gap:24px}
+.dossier h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,5vw,36px);line-height:1.15;margin:4px 0 0}
+.dossier .intro p{margin:0 0 10px}
+.badge{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--brass-soft);color:var(--brass);padding:3px 8px;margin-right:8px}
+.badge.test{border-color:var(--alarm);color:var(--alarm)}
+.pieces{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.piece{all:unset;cursor:zoom-in;display:flex;flex-direction:column;gap:8px}
+.piece img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;border:1px solid var(--line);background:#0e0f12;display:block}
+.piece span{font-family:var(--mono);font-size:12px;color:var(--dim);line-height:1.4}
+.piece b{color:var(--brass);font-weight:500}
+.piece.neuve img{outline:1px solid var(--brass);animation:apparition 1.2s ease}
+@keyframes apparition{from{opacity:0;filter:brightness(3)}to{opacity:1;filter:none}}
+form.ligne{display:flex;gap:10px;flex-wrap:wrap}
+form.ligne label{width:100%;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+form.ligne input{flex:1 1 220px;min-width:0;background:#0b0c0f;border:1px solid var(--line);color:var(--bone);font-family:var(--mono);font-size:16px;letter-spacing:.08em;padding:12px 14px;text-transform:uppercase}
+form.ligne input:focus{outline:none;border-color:var(--brass)}
+.btn{background:var(--brass);color:#16130C;border:0;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;padding:12px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn.ghost{background:transparent;color:var(--brass);border:1px solid var(--brass-soft)}
+.msg{font-family:var(--mono);font-size:13px;min-height:1.4em;margin:0}
+form.ligne .msg{width:100%}
+.msg.err{color:var(--alarm)} .msg.ok{color:var(--ok)}
+.fin{border-left:2px solid var(--brass);padding:4px 0 4px 16px;font-style:italic}
+.sep{height:1px;background:var(--line);border:0;margin:0}
+.attente{text-align:center;padding:40px 16px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;gap:12px;align-items:center}
+.attente .c{font-family:var(--mono);font-size:clamp(18px,4.4vw,26px);font-variant-numeric:tabular-nums}
+/* Agrandir une pièce */
+.loupe{position:fixed;inset:0;z-index:20;background:rgba(5,6,8,.94);display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+.loupe[hidden]{display:none}
+.loupe img{max-width:100%;max-height:100%;object-fit:contain}
+footer{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line);padding-top:20px}
+footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <a class="mark" href="/"><img src="img/oeil.webp" alt="" width="36" height="36">OSIRIS</a>
+    <span class="compte" id="compte">…</span>
+  </header>
+
+  <section class="hero">
+    <span class="eyebrow">Archives · accès non autorisé</span>
+    <h1>Les Archives</h1>
+    <p>Des documents d'Osiris ont fuité. Tous les quinze jours, un nouveau dossier s'ouvre. Fouillez les pièces, trouvez le mot de passe. Les trois premiers sont annoncés sur le Discord.</p>
+  </section>
+
+  <ul class="dossiers" id="liste" aria-label="Dossiers"></ul>
+
+  <section id="vue"></section>
+
+  <footer>
+    <span>© Osiris · Tous les regards sont enregistrés</span>
+    <span><a href="/">Accueil</a> · <a href="casting">Casting</a> · <a href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Discord</a> · <a href="legal">Mentions légales</a></span>
+  </footer>
+</div>
+<div class="loupe" id="loupe" hidden><img alt=""></div>
+
+<script>
+(function(){
+  var data = null, choisi = null, decalage = 0, minuterie = null;
+  var $ = function(id){ return document.getElementById(id) };
+  var lsGet = function(k){ try { return JSON.parse(localStorage.getItem(k) || "null") } catch(e){ return null } };
+  var lsSet = function(k, v){ try { localStorage.setItem(k, JSON.stringify(v)) } catch(e){} };
+  var echap = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c] }) };
+  function jour(iso){
+    var d = new Date(iso);
+    var j = d.toLocaleDateString("fr-FR", {timeZone:"Europe/Paris", weekday:"long", day:"numeric", month:"long"});
+    var h = d.toLocaleTimeString("fr-FR", {timeZone:"Europe/Paris", hour:"2-digit", minute:"2-digit"}).replace(":", " h ").replace(" h 00", " h");
+    return j + " à " + h;
+  }
+  function reste(iso){
+    var s = Math.max(0, Math.floor((Date.parse(iso) - Date.now() - decalage) / 1000));
+    return Math.floor(s/86400) + " j " + String(Math.floor(s%86400/3600)).padStart(2,"0") + " h " + String(Math.floor(s%3600/60)).padStart(2,"0") + " min " + String(s%60).padStart(2,"0") + " s";
+  }
+
+  function charger(){
+    return fetch("/api/archives", {credentials:"same-origin", cache:"no-store"}).then(function(r){ return r.json() }).then(function(j){
+      data = j; decalage = Date.now() - Date.parse(j.maintenant);
+      compte(); liste();
+      var ouverts = j.dossiers.filter(function(d){ return d.pret });
+      var voulu = (location.hash.match(/^#d(\d+)/) || [])[1];
+      var cible = ouverts.find(function(d){ return d.num === voulu }) || ouverts[ouverts.length - 1];
+      cible ? afficher(cible.num) : attente();
+    }).catch(function(){ $("vue").innerHTML = '<p class="msg err">Les archives ne répondent pas. Réessaie dans un instant.</p>' });
+  }
+
+  function compte(){
+    var c = $("compte");
+    if (data.connecte) c.innerHTML = "Enquêteur · " + echap(data.connecte.name) + (data.testeur ? " · mode test" : "");
+    else c.innerHTML = '<a href="/api/auth/login?retour=archives">Se connecter avec Discord</a>';
+  }
+
+  function liste(){
+    var prochain = data.dossiers.find(function(d){ return !d.ouvert });
+    $("liste").innerHTML = data.dossiers.map(function(d){
+      if (d.pret) {
+        var s = d.resolu ? '<span class="s ok">✓ Résolu</span>' : '<span class="s">' + (d.test ? "Test · avant ouverture" : (d.resolus ? d.resolus + (d.resolus > 1 ? " enquêteurs ont trouvé" : " enquêteur a trouvé") : "Personne n'a encore trouvé")) + '</span>';
+        return '<li><button data-num="' + d.num + '"' + (choisi === d.num ? ' aria-current="true"' : '') + '><span class="n">Dossier ' + d.num + '</span><span class="t">' + echap(d.titre) + '</span>' + s + '</button></li>';
+      }
+      var txt = d.ouvert ? "En préparation" : (prochain && prochain.num === d.num ? "S'ouvre dans " + reste(d.ouverture) : "S'ouvre le " + jour(d.ouverture));
+      return '<li class="scelle"><button disabled><span class="n">Dossier ' + d.num + '</span><span class="t">Scellé</span><span class="s"' + (prochain && prochain.num === d.num ? ' data-compte="' + d.ouverture + '"' : '') + '>' + txt + '</span></button></li>';
+    }).join("");
+    Array.prototype.forEach.call($("liste").querySelectorAll("button[data-num]"), function(b){
+      b.addEventListener("click", function(){ afficher(b.dataset.num); history.replaceState(null, "", "#d" + b.dataset.num); $("vue").scrollIntoView({behavior:"smooth"}) });
+    });
+    clearInterval(minuterie);
+    minuterie = setInterval(function(){
+      var el = document.querySelector("[data-compte]");
+      if (el) { if (Date.parse(el.dataset.compte) - Date.now() - decalage <= 0) { clearInterval(minuterie); setTimeout(charger, 1500) } else el.textContent = "S'ouvre dans " + reste(el.dataset.compte) }
+      var c = $("attente-c"); if (c) c.textContent = reste(c.dataset.cible);
+    }, 1000);
+  }
+
+  function attente(){
+    var p = data.dossiers.find(function(d){ return !d.ouvert });
+    $("vue").innerHTML = p ? '<div class="attente"><span class="eyebrow">Dossier ' + p.num + '</span><h2 style="font-family:var(--display);font-weight:400;margin:0">Le premier dossier s\'ouvre le ' + jour(p.ouverture) + '</h2><span class="c" id="attente-c" data-cible="' + p.ouverture + '">' + reste(p.ouverture) + '</span><p class="msg">Connecte-toi avec Discord pour pouvoir valider tes réponses.</p></div>' : "";
+  }
+
+  function carte(p, neuve){
+    return '<button class="piece' + (neuve ? ' neuve' : '') + '" data-src="' + p.url + '"><img src="' + p.url + '" alt="' + echap(p.titre) + '" loading="lazy"><span><b>' + echap(p.ref) + '</b> · ' + echap(p.titre) + '</span></button>';
+  }
+
+  function afficher(num){
+    var d = data.dossiers.find(function(x){ return x.num === num }); if (!d) return;
+    choisi = num; liste();
+    var trouvees = lsGet("osiris-archives-" + num) || [];
+    var html = '<article class="dossier">'
+      + '<div><span class="badge">Dossier ' + d.num + '</span>' + (d.test ? '<span class="badge test">Mode test</span>' : '') + '<h2>' + echap(d.titre) + '</h2></div>'
+      + '<div class="intro">' + d.intro.map(function(p){ return '<p>' + echap(p) + '</p>' }).join("") + '</div>'
+      + '<div class="pieces" id="pieces">' + d.pieces.map(function(p){ return carte(p) }).join("") + trouvees.map(function(p){ return carte(p) }).join("") + '</div>'
+      + '<form class="ligne" id="f-ref" autocomplete="off"><label for="i-ref">Consulter une référence</label><input id="i-ref" maxlength="20" placeholder="XXX-0000" spellcheck="false"><button class="btn ghost">Consulter</button><p class="msg" id="m-ref"></p></form>'
+      + '<hr class="sep">'
+      + (d.resolu
+          ? '<p class="msg ok">✓ Tu as résolu ce dossier.</p>' + (d.fin ? '<p class="fin">' + echap(d.fin) + '</p>' : '')
+          : '<form class="ligne" id="f-rep" autocomplete="off"><label for="i-rep">Mot de passe du dossier ' + d.num + '</label><input id="i-rep" maxlength="80" spellcheck="false"><button class="btn">Valider</button><p class="msg" id="m-rep"></p></form><div id="r-rep"></div>')
+      + '</article>';
+    $("vue").innerHTML = html;
+    brancherPieces();
+
+    $("f-ref").addEventListener("submit", function(e){
+      e.preventDefault();
+      var ref = $("i-ref").value.trim(); if (!ref) return;
+      var m = $("m-ref"); m.className = "msg"; m.textContent = "Recherche dans les archives…";
+      envoyer({action:"consulter", d:num, ref:ref}).then(function(j){
+        if (!j.ok) { m.className = "msg err"; m.textContent = j.erreur || "Aucune pièce à cette référence."; return }
+        var deja = d.pieces.concat(trouvees).some(function(p){ return p.ref === j.piece.ref });
+        if (!deja) { trouvees.push(j.piece); lsSet("osiris-archives-" + num, trouvees); $("pieces").insertAdjacentHTML("beforeend", carte(j.piece, true)); brancherPieces() }
+        m.className = "msg ok"; m.textContent = deja ? "Tu as déjà cette pièce." : "Pièce " + j.piece.ref + " ajoutée au dossier.";
+        $("i-ref").value = "";
+      });
+    });
+
+    var f = $("f-rep"); if (!f) return;
+    f.addEventListener("submit", function(e){
+      e.preventDefault();
+      var rep = $("i-rep").value.trim(); if (!rep) return;
+      var m = $("m-rep"), b = f.querySelector("button"); b.disabled = true; m.className = "msg"; m.textContent = "Vérification…";
+      envoyer({action:"repondre", d:num, reponse:rep}).then(function(j){
+        b.disabled = false;
+        if (j.connexion) { m.className = "msg err"; m.innerHTML = 'Connecte-toi avec Discord pour valider : <a class="btn ghost" style="margin-left:8px" href="/api/auth/login?retour=archives">Se connecter</a>'; return }
+        if (!j.ok) { m.className = "msg err"; m.textContent = j.erreur || "Ce n'est pas le bon mot de passe."; return }
+        var rang = j.test ? "Mode test : rien n'est noté ni annoncé." : j.rang ? "Tu es " + (j.rang === 1 ? "le premier" : "le " + j.rang + "ᵉ") + " à résoudre ce dossier." + (j.rang <= 3 ? " Ton nom est annoncé sur le Discord." : "") : "";
+        f.outerHTML = '<p class="msg ok">✓ Dossier résolu. ' + rang + '</p>' + (j.fin ? '<p class="fin">' + echap(j.fin) + '</p>' : '');
+        if (!j.test) { d.resolu = true; d.resolus = Math.max(d.resolus || 0, j.total || 0); liste() }
+      });
+    });
+  }
+
+  function brancherPieces(){
+    Array.prototype.forEach.call(document.querySelectorAll(".piece"), function(p){
+      p.onclick = function(){ var l = $("loupe"); l.querySelector("img").src = p.dataset.src; l.hidden = false };
+    });
+  }
+  $("loupe").addEventListener("click", function(){ this.hidden = true });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") $("loupe").hidden = true });
+
+  function envoyer(corps){
+    return fetch("/api/archives", {method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body:JSON.stringify(corps)})
+      .then(function(r){ return r.json() }).catch(function(){ return {erreur:"Les archives ne répondent pas. Réessaie."} });
+  }
+
+  if (/login=erreur/.test(location.search)) setTimeout(function(){ alert0("La connexion Discord a échoué. Réessaie.") }, 0);
+  function alert0(t){ var p = document.createElement("p"); p.className = "msg err"; p.textContent = t; document.querySelector(".hero").appendChild(p) }
+  charger();
+})();
+</script>
+<script src="son.js" defer></script>
+</body>
+</html>

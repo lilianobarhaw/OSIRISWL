@@ -2,9 +2,39 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "crons": [
-    { "path": "/api/rangs", "schedule": "0 2 * * *" }
+    {
+      "path": "/api/rangs",
+      "schedule": "0 2 * * *"
+    }
   ],
   "functions": {
-    "api/rangs.js": { "maxDuration": 60 }
-  }
+    "api/rangs.js": {
+      "maxDuration": 60
+    },
+    "api/archives.js": {
+      "includeFiles": "api/_archives/**"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/README.md",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/lib/:chemin*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/api/_archives/:chemin*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/package.json",
+      "destination": "/",
+      "permanent": false
+    }
+  ]
 }
