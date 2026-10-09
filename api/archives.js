@@ -6,11 +6,13 @@
 // Bonne réponse : rôle « Enquêteur » (DISCORD_ENQUETEUR_ROLE_ID), une ligne dans le registre privé
 // (DISCORD_ARCHIVES_REGISTRE_ID), et pour les 3 premiers, une annonce sur Discord (DISCORD_ARCHIVES_ANNONCE_ID).
 // Les comptes de CASTING_TESTEURS voient les dossiers avant leur date, en mode test (rien n'est noté ni annoncé).
+// Le canal 17 (rôle DISCORD_CANAL17_ROLE_ID) voit chaque dossier 17 minutes avant tout le monde, pour de vrai.
 
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { json, readSession, bot, optEnv, sleep } from "../lib/discord.js";
 import { DOSSIERS } from "./_archives/_dossiers.js";
+import { estMembre, AVANCE_MS } from "../lib/canal17.js";
 
 const COULEUR = 0xc4a265;
 const MEDAILLES = ["🥇", "🥈", "🥉"];
@@ -18,10 +20,12 @@ const PLACES = ["le premier", "le deuxième", "le troisième"];
 
 const normaliser = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
 const empreinte = (s) => createHash("sha256").update("osiris-archives:" + normaliser(s)).digest("hex");
-const ouvert = (d) => Date.now() >= Date.parse(d.ouverture);
+const ouverture = (d, c17) => Date.parse(d.ouverture) - (c17 ? AVANCE_MS : 0); // l'heure d'ouverture de ce visiteur
+const ouvert = (d, c17) => Date.now() >= ouverture(d, c17);
 const pret = (d) => !!(d.titre && d.pieces?.length && d.reponses?.length);
 const testeur = (user) => !!user && optEnv("CASTING_TESTEURS").split(/[\s,;]+/).includes(String(user.id));
-const visible = (d, user) => pret(d) && (ouvert(d) || testeur(user));
+const visible = (d, user, c17) => pret(d) && (ouvert(d, c17) || testeur(user));
+const canal17 = async (user) => (user ? estMembre(optEnv("DISCORD_GUILD_ID"), user.id) : false);
 const urlPiece = (d, p) => `/api/archives?d=${d.num}&ref=${encodeURIComponent(p.ref)}`;
 const trouver = (num) => DOSSIERS.find((d) => d.num === String(num || "").padStart(2, "0"));
 
@@ -65,12 +69,13 @@ function enqueteurs(lignes, num) {
 export async function GET(req) {
   const url = new URL(req.url);
   const user = await session(req);
+  const c17 = await canal17(user);
 
   // Une pièce (image)
   if (url.searchParams.get("ref")) {
     const d = trouver(url.searchParams.get("d"));
     const ref = String(url.searchParams.get("ref")).toUpperCase().trim();
-    const p = d && visible(d, user) && d.pieces.find((x) => x.ref === ref);
+    const p = d && visible(d, user, c17) && d.pieces.find((x) => x.ref === ref);
     if (!p) return new Response("Pièce introuvable", { status: 404 });
     try {
       const data = await readFile(new URL(`./_archives/pieces/${p.fichier}`, import.meta.url));
@@ -83,13 +88,15 @@ export async function GET(req) {
   let lignes = [];
   try { lignes = await lireRegistre(false); } catch {}
   const dossiers = DOSSIERS.map((d) => {
-    const base = { num: d.num, ouverture: d.ouverture, ouvert: ouvert(d) };
-    if (!visible(d, user)) return { ...base, pret: false, titre: null }; // ouvert mais pas prêt = « en préparation »
+    const base = { num: d.num, ouverture: new Date(ouverture(d, c17)).toISOString(), ouvert: ouvert(d, c17) };
+    // Les 17 dernières minutes avant l'ouverture, les autres voient que le canal 17 est déjà dedans.
+    const dedans = pret(d) && !c17 && Date.now() >= ouverture(d, true) && !ouvert(d, false);
+    if (!visible(d, user, c17)) return { ...base, pret: false, titre: null, canal17Dedans: dedans || undefined }; // ouvert mais pas prêt = « en préparation »
     const qui = enqueteurs(lignes, d.num);
     return {
       ...base,
       pret: true,
-      test: !ouvert(d),
+      test: !ouvert(d, c17),
       titre: d.titre,
       intro: d.intro,
       pieces: d.pieces.filter((p) => p.visible).map((p) => ({ ref: p.ref, titre: p.titre, url: urlPiece(d, p) })),
@@ -102,6 +109,7 @@ export async function GET(req) {
     maintenant: new Date().toISOString(),
     connecte: user ? { name: user.name || user.username } : null,
     testeur: testeur(user),
+    canal17: c17,
     dossiers,
   }, 200, { "Cache-Control": "no-store" });
 }
@@ -112,8 +120,9 @@ export async function POST(req) {
   let b;
   try { b = await req.json(); } catch { return json({ erreur: "Requête invalide." }, 400); }
   const user = await session(req);
+  const c17 = await canal17(user);
   const d = trouver(b.d);
-  if (!d || !visible(d, user)) return json({ erreur: "Ce dossier est encore scellé." }, 403);
+  if (!d || !visible(d, user, c17)) return json({ erreur: "Ce dossier est encore scellé." }, 403);
 
   // Consulter une référence trouvée dans une pièce
   if (b.action === "consulter") {
@@ -133,7 +142,7 @@ export async function POST(req) {
   }
 
   // Mode test (comptes de CASTING_TESTEURS avant l'ouverture) : rien n'est noté ni annoncé.
-  if (!ouvert(d)) return json({ ok: true, test: true, rang: 0, fin: d.fin });
+  if (!ouvert(d, c17)) return json({ ok: true, test: true, rang: 0, fin: d.fin });
 
   const guild = optEnv("DISCORD_GUILD_ID");
   const role = optEnv("DISCORD_ENQUETEUR_ROLE_ID");

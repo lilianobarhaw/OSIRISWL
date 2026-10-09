@@ -129,6 +129,7 @@ html.intro .hero .eye{opacity:0}
 .hero .cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px;position:relative;z-index:1}
 .nextstep{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:10px;position:relative;z-index:1}
 .nextstep b{font-weight:500;color:var(--bone);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.nextstep .c17{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-soft,#8E7747);padding-bottom:2px}
 .live{display:inline-flex;align-items:center;gap:8px}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--alarm);box-shadow:0 0 8px var(--alarm);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.25}}
@@ -425,6 +426,8 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       <span class="live"><i></i>Diffusion privée</span>
       <span id="next-label">Ouverture du Programme 01 dans</span>
       <b id="next-count">— j —</b>
+      <span class="c17" id="c17-badge" hidden>Canal 17 · 17 min d'avance</span>
+      <a class="c17" id="c17-acces" href="/api/auth/login?retour=accueil" hidden>Canal 17 ? Identifie-toi.</a>
     </div>
     <span class="scroll-cue" aria-hidden="true"></span>
   </section>
@@ -794,27 +797,36 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
   } else $$(".rv").forEach(function(el){ el.classList.add("in") });
 
   // ---------- Prochaine étape + calendrier ----------
+  // avance: true = le canal 17 (rôle Discord, visiteur connecté) le voit 17 minutes avant tout le monde.
   var STEPS = [
-    { t: "2027-02-20T23:30:00+01:00", label: "Ouverture du casting dans" },
+    { t: "2027-02-20T23:30:00+01:00", label: "Ouverture du casting dans", avance: true },
     { t: "2027-03-14T23:59:00+01:00", label: "Fin du casting dans" },
-    { t: "2027-03-27T00:00:00+01:00", label: "Annonce des 35 candidats dans" },
-    { t: "2027-04-03T20:30:00+02:00", label: "Ouverture du Programme 01 dans" }
+    { t: "2027-03-27T00:00:00+01:00", label: "Annonce des 35 candidats dans", avance: true },
+    { t: "2027-04-03T20:30:00+02:00", label: "Ouverture du Programme 01 dans", avance: true }
   ];
   var END = new Date("2027-05-16T01:00:00+02:00").getTime();
+  var AVANCE = 17*60*1000, C17 = false, CONNU = false;
   function pad(n){return (n<10?"0":"")+n}
+  function duree(d){ return Math.floor(d/86400)+" j "+pad(Math.floor(d%86400/3600))+" h "+pad(Math.floor(d%3600/60))+" min "+pad(d%60)+" s" }
+  function pour17(iso){ return new Date(iso).getTime() - (C17 ? AVANCE : 0) } // l'heure d'un événement pour ce visiteur
   function tick(){
-    var now = Date.now(), lbl = $("#next-label"), cnt = $("#next-count");
+    var now = Date.now(), lbl = $("#next-label"), cnt = $("#next-count"), c17 = $("#c17-acces");
     var step = STEPS.filter(function(s){ return new Date(s.t).getTime() > now })[0];
     if(step){
-      var d = Math.floor((new Date(step.t).getTime() - now)/1000);
-      lbl.textContent = step.label;
-      cnt.textContent = Math.floor(d/86400)+" j "+pad(Math.floor(d%86400/3600))+" h "+pad(Math.floor(d%3600/60))+" min "+pad(d%60)+" s";
-    } else if(now < END){ lbl.textContent = "Programme 01 en cours ·"; cnt.textContent = "mer. · ven. · sam. 20h30"; }
-    else { lbl.textContent = "Programme 01 terminé ·"; cnt.textContent = "Osiris prépare le suivant"; }
+      var reel = new Date(step.t).getTime();
+      if(C17 && step.avance && now >= reel - AVANCE){
+        lbl.textContent = "Canal 17 · les autres attendent encore"; cnt.textContent = duree(Math.floor((reel - now)/1000));
+      } else {
+        lbl.textContent = step.label; cnt.textContent = duree(Math.floor(((step.avance && C17 ? reel - AVANCE : reel) - now)/1000));
+      }
+      // Les 17 dernières minutes : un lien discret pour que le canal 17 s'identifie.
+      if(c17) c17.hidden = !(step.avance && !CONNU && reel - now <= AVANCE);
+    } else if(now < END){ lbl.textContent = "Programme 01 en cours ·"; cnt.textContent = "mer. · ven. · sam. 20h30"; if(c17) c17.hidden = true; }
+    else { lbl.textContent = "Programme 01 terminé ·"; cnt.textContent = "Osiris prépare le suivant"; if(c17) c17.hidden = true; }
     try{ $("#clock").textContent = new Date().toLocaleTimeString("fr-FR",{timeZone:"Europe/Paris"}) }catch(e){}
   }
   tick(); setInterval(tick, 1000);
-  (function(){
+  function etapes(){
     var now = Date.now(), items = $$("#timeline li"), nextSet = false;
     items.forEach(function(li){
       var t = new Date(li.getAttribute("data-from")).getTime();
@@ -822,23 +834,26 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       else if(!nextSet){ li.classList.add("soon"); nextSet = true; }
     });
     var chip = $("#p01-chip");
-    if(now >= new Date("2027-02-20T23:30:00+01:00").getTime() && now < new Date("2027-03-15T00:00:00+01:00").getTime()) chip.textContent = "Casting ouvert jusqu'au 14 mars, 23h59";
+    if(now >= pour17("2027-02-20T23:30:00+01:00") && now < new Date("2027-03-15T00:00:00+01:00").getTime()) chip.textContent = "Casting ouvert jusqu'au 14 mars, 23h59";
     else if(now >= new Date("2027-03-15T00:00:00+01:00").getTime() && now < new Date("2027-04-03T20:30:00+02:00").getTime()) chip.textContent = "Casting fermé · ouverture le 3 avril à 20h30";
     else if(now >= new Date("2027-04-03T20:30:00+02:00").getTime() && now < END) chip.textContent = "En cours · mer., ven. et sam. de 20h30 à 1h";
     else if(now >= END) chip.textContent = "Programme terminé";
     // Boutons du casting : leur texte suit les dates (la page /casting reste verrouillée hors des dates)
-    var castLabel = now < new Date("2027-02-20T23:30:00+01:00").getTime() ? "Casting · 20 février"
+    var castLabel = now < pour17("2027-02-20T23:30:00+01:00") ? "Casting · 20 février"
       : now < new Date("2027-03-15T00:00:00+01:00").getTime() ? "Déposer ma candidature" : "Casting terminé";
     $$("[data-casting]").forEach(function(a){ a.textContent = castLabel });
-  })();
+  }
+  etapes();
 
   // ---------- Salle de projection ----------
   var EYE = '<img src="img/apple-touch-icon.png" alt="">';
   var PLAY = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="rgba(10,11,13,.55)" stroke="#E9CF78" stroke-width="1.2"/><path d="M26 21v22l18-11-18-11Z" fill="#E9CF78"/></svg>';
   var reels = $("#reels");
+  function salle(){
+  reels.innerHTML = "";
   FILMS.forEach(function(f, i){
-    var el = document.createElement("article"); el.className = "reel rv";
-    var open = !f.date || Date.now() >= new Date(f.date).getTime();
+    var el = document.createElement("article"); el.className = "reel rv" + (C17 ? " in" : "");
+    var open = !f.date || Date.now() >= pour17(f.date);
     var screen = '<div class="screen">';
     if(f.video){
       screen += '<video src="'+f.video+'" poster="'+f.affiche+'" preload="none" controls playsinline></video>';
@@ -851,6 +866,14 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     el.innerHTML = screen + '<div class="meta"><h3>'+(i ? "Cinématique "+i+" · " : "")+f.titre+'</h3><span class="when">'+f.quand+'</span></div><p>'+f.texte+'</p>';
     reels.appendChild(el);
   });
+  }
+  salle();
+  // Canal 17 : un visiteur connecté avec le rôle voit tout 17 minutes avant les autres (décomptes, casting, cinématiques).
+  fetch("/api/casting", {credentials:"same-origin", cache:"no-store"}).then(function(r){ return r.ok ? r.json() : null }).then(function(j){
+    if(!j) return;
+    CONNU = !!j.user;
+    if(j.canal17){ C17 = true; salle(); etapes(); tick(); var b = $("#c17-badge"); if(b) b.hidden = false; }
+  }).catch(function(){});
   reels.addEventListener("click", function(e){
     var b = e.target.closest(".play"); if(!b) return;
     var sc = b.parentNode;

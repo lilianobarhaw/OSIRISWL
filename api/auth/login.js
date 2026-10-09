@@ -1,9 +1,10 @@
 // Redirige le candidat vers Discord pour se connecter.
-// ?retour=archives : revenir sur /archives après la connexion (sinon, sur /casting).
+// ?retour=archives ou ?retour=accueil : où revenir après la connexion (sinon, sur /casting).
 import { env, cookie } from "../../lib/discord.js";
 
 export function GET(req) {
-  const retour = new URL(req.url).searchParams.get("retour") === "archives" ? "archives" : "casting";
+  const voulu = new URL(req.url).searchParams.get("retour");
+  const retour = ["archives", "accueil"].includes(voulu) ? voulu : "casting";
   const state = crypto.randomUUID();
   const params = new URLSearchParams({
     client_id: env("DISCORD_CLIENT_ID"),
