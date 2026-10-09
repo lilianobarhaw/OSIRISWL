@@ -1,0 +1,4 @@
+# Fichiers que Vercel ne met jamais en ligne, même s'ils sont encore sur GitHub.
+# api/me.js : ancien fichier, fusionné dans api/casting.js (Vercel gratuit = 12 fonctions maximum dans api/).
+api/me.js
+README.md
