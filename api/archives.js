@@ -5,7 +5,8 @@
 //   POST /api/archives {action:"repondre", d, reponse}   → vérifie le mot de passe (connexion Discord obligatoire)
 // Bonne réponse : rôle « Enquêteur » (DISCORD_ENQUETEUR_ROLE_ID), une ligne dans le registre privé
 // (DISCORD_ARCHIVES_REGISTRE_ID), et pour les 3 premiers, une annonce sur Discord (DISCORD_ARCHIVES_ANNONCE_ID).
-// Les comptes de CASTING_TESTEURS voient les dossiers avant leur date, en mode test (rien n'est noté ni annoncé).
+// Les comptes de CASTING_TESTEURS voient les dossiers avant leur date, en mode test : rien n'est noté, et un aperçu
+// de l'annonce part dans le salon privé du registre.
 // Le canal 17 (rôle DISCORD_CANAL17_ROLE_ID) voit chaque dossier 17 minutes avant tout le monde, pour de vrai.
 
 import { readFile } from "node:fs/promises";
@@ -28,6 +29,17 @@ const visible = (d, user, c17) => pret(d) && (ouvert(d, c17) || testeur(user));
 const canal17 = async (user) => (user ? estMembre(optEnv("DISCORD_GUILD_ID"), user.id) : false);
 const urlPiece = (d, p) => `/api/archives?d=${d.num}&ref=${encodeURIComponent(p.ref)}`;
 const trouver = (num) => DOSSIERS.find((d) => d.num === String(num || "").padStart(2, "0"));
+
+// L'annonce Discord d'un podium (rang 1, 2 ou 3).
+function carteAnnonce(d, user, rang) {
+  return {
+    author: { name: "OSIRIS · LES ARCHIVES" },
+    title: `Dossier ${d.num} · ${d.titre}`,
+    url: (optEnv("SITE_URL") || "https://osiriswl.vercel.app") + "/archives",
+    description: `${MEDAILLES[rang - 1]} <@${user.id}> est ${PLACES[rang - 1]} à résoudre l'enquête.${rang === 3 ? "\n\nLe podium est complet. Le dossier reste ouvert à tous." : ""}`,
+    color: COULEUR,
+  };
+}
 
 async function session(req) { try { return await readSession(req); } catch { return null; } }
 
@@ -141,8 +153,23 @@ export async function POST(req) {
     return json({ ok: false, erreur: "Ce n'est pas le bon mot de passe." });
   }
 
-  // Mode test (comptes de CASTING_TESTEURS avant l'ouverture) : rien n'est noté ni annoncé.
-  if (!ouvert(d, c17)) return json({ ok: true, test: true, rang: 0, fin: d.fin });
+  // Mode test (comptes de CASTING_TESTEURS avant l'ouverture) : rien n'est noté, pas de rôle, pas d'annonce publique.
+  // Un aperçu de l'annonce part dans le salon privé du registre, pour voir à quoi elle ressemblera.
+  if (!ouvert(d, c17)) {
+    const prive = optEnv("DISCORD_ARCHIVES_REGISTRE_ID") || optEnv("DISCORD_LOGS_CHANNEL_ID");
+    let apercu = false;
+    if (prive) {
+      const r = await bot(`/channels/${prive}/messages`, {
+        method: "POST",
+        body: JSON.stringify({
+          allowed_mentions: { parse: [] },
+          embeds: [{ ...carteAnnonce(d, user, 1), footer: { text: "🧪 Aperçu de test · rien n'est noté · la vraie annonce partira dans le salon des annonces" } }],
+        }),
+      }).catch(() => null);
+      apercu = !!r?.ok;
+    }
+    return json({ ok: true, test: true, apercu, rang: 0, fin: d.fin });
+  }
 
   const guild = optEnv("DISCORD_GUILD_ID");
   const role = optEnv("DISCORD_ENQUETEUR_ROLE_ID");
@@ -171,13 +198,7 @@ export async function POST(req) {
           body: JSON.stringify({
             content: `<@${user.id}>`,
             allowed_mentions: { users: [user.id] },
-            embeds: [{
-              author: { name: "OSIRIS · LES ARCHIVES" },
-              title: `Dossier ${d.num} · ${d.titre}`,
-              url: (optEnv("SITE_URL") || "https://osiriswl.vercel.app") + "/archives",
-              description: `${MEDAILLES[rang - 1]} <@${user.id}> est ${PLACES[rang - 1]} à résoudre l'enquête.${rang === 3 ? "\n\nLe podium est complet. Le dossier reste ouvert à tous." : ""}`,
-              color: COULEUR,
-            }],
+            embeds: [carteAnnonce(d, user, rang)],
           }),
         }).catch(() => {});
       }

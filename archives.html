@@ -211,7 +211,7 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
         b.disabled = false;
         if (j.connexion) { m.className = "msg err"; m.innerHTML = 'Connecte-toi avec Discord pour valider : <a class="btn ghost" style="margin-left:8px" href="/api/auth/login?retour=archives">Se connecter</a>'; return }
         if (!j.ok) { m.className = "msg err"; m.textContent = j.erreur || "Ce n'est pas le bon mot de passe."; return }
-        var rang = j.test ? "Mode test : rien n'est noté ni annoncé." : j.rang ? "Tu es " + (j.rang === 1 ? "le premier" : "le " + j.rang + "ᵉ") + " à résoudre ce dossier." + (j.rang <= 3 ? " Ton nom est annoncé sur le Discord." : "") : "";
+        var rang = j.test ? "Mode test : rien n'est noté." + (j.apercu ? " Un aperçu de l'annonce est parti dans #registre-archives." : " (Aperçu de l'annonce impossible : vérifie DISCORD_ARCHIVES_REGISTRE_ID et que le bot peut écrire dans ce salon.)") : j.rang ? "Tu es " + (j.rang === 1 ? "le premier" : "le " + j.rang + "ᵉ") + " à résoudre ce dossier." + (j.rang <= 3 ? " Ton nom est annoncé sur le Discord." : "") : "";
         f.outerHTML = '<p class="msg ok">✓ Dossier résolu. ' + rang + '</p>' + (j.fin ? '<p class="fin">' + echap(j.fin) + '</p>' : '');
         if (!j.test) { d.resolu = true; d.resolus = Math.max(d.resolus || 0, j.total || 0); liste() }
       });
