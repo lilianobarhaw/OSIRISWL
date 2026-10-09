@@ -130,6 +130,13 @@ html.intro .hero .eye{opacity:0}
 .nextstep{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:10px;position:relative;z-index:1}
 .nextstep b{font-weight:500;color:var(--bone);font-variant-numeric:tabular-nums;letter-spacing:.06em}
 .nextstep .c17{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-soft,#8E7747);padding-bottom:2px}
+.signal{position:fixed;inset:0;z-index:60;background:rgba(6,7,9,.86);display:flex;align-items:center;justify-content:center;padding:16px;animation:signal .5s ease}
+.signal .carte{max-width:460px;width:100%;background:#101216;border:1px solid var(--brass-soft);padding:30px 26px;display:flex;flex-direction:column;gap:14px;align-items:flex-start;box-shadow:0 0 60px rgba(196,162,101,.12)}
+.signal .ey{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+.signal h3{font-family:var(--display);font-weight:400;font-size:28px;line-height:1.15;margin:0;color:var(--bone)}
+.signal p{margin:0;color:var(--dim);line-height:1.6}
+.signal .pt{font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+@keyframes signal{from{opacity:0;filter:brightness(2.2)}to{opacity:1;filter:none}}
 .live{display:inline-flex;align-items:center;gap:8px}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--alarm);box-shadow:0 0 8px var(--alarm);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.25}}
@@ -427,7 +434,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       <span id="next-label">Ouverture du Programme 01 dans</span>
       <b id="next-count">— j —</b>
       <span class="c17" id="c17-badge" hidden>Canal 17 · 17 min d'avance</span>
-      <a class="c17" id="c17-acces" href="/api/auth/login?retour=accueil" hidden>Canal 17 ? Identifie-toi.</a>
+      <a class="c17" id="c17-acces" href="/api/auth/login?retour=canal17" hidden>Canal 17 ? Identifie-toi.</a>
     </div>
     <span class="scroll-cue" aria-hidden="true"></span>
   </section>
@@ -805,7 +812,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     { t: "2027-04-03T20:30:00+02:00", label: "Ouverture du Programme 01 dans", avance: true }
   ];
   var END = new Date("2027-05-16T01:00:00+02:00").getTime();
-  var AVANCE = 17*60*1000, C17 = false, CONNU = false;
+  var AVANCE = 17*60*1000, C17 = false, CONNU = false, CHARGE = false;
   function pad(n){return (n<10?"0":"")+n}
   function duree(d){ return Math.floor(d/86400)+" j "+pad(Math.floor(d%86400/3600))+" h "+pad(Math.floor(d%3600/60))+" min "+pad(d%60)+" s" }
   function pour17(iso){ return new Date(iso).getTime() - (C17 ? AVANCE : 0) } // l'heure d'un événement pour ce visiteur
@@ -819,9 +826,9 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       } else {
         lbl.textContent = step.label; cnt.textContent = duree(Math.floor(((step.avance && C17 ? reel - AVANCE : reel) - now)/1000));
       }
-      // Les 17 dernières minutes : un lien discret pour que le canal 17 s'identifie.
-      if(c17) c17.hidden = !(step.avance && !CONNU && reel - now <= AVANCE);
-    } else if(now < END){ lbl.textContent = "Programme 01 en cours ·"; cnt.textContent = "mer. · ven. · sam. 20h30"; if(c17) c17.hidden = true; }
+      // Un lien discret pour que le canal 17 s'identifie (visiteur non connecté).
+      if(c17) c17.hidden = !(CHARGE && !CONNU);
+    } else if(now < END){ lbl.textContent = "Programme 01 en cours ·"; cnt.textContent = "mer. · ven. · sam. 20h30"; if(c17) c17.hidden = !(CHARGE && !CONNU); }
     else { lbl.textContent = "Programme 01 terminé ·"; cnt.textContent = "Osiris prépare le suivant"; if(c17) c17.hidden = true; }
     try{ $("#clock").textContent = new Date().toLocaleTimeString("fr-FR",{timeZone:"Europe/Paris"}) }catch(e){}
   }
@@ -870,10 +877,32 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
   salle();
   // Canal 17 : un visiteur connecté avec le rôle voit tout 17 minutes avant les autres (décomptes, casting, cinématiques).
   fetch("/api/casting", {credentials:"same-origin", cache:"no-store"}).then(function(r){ return r.ok ? r.json() : null }).then(function(j){
-    if(!j) return;
+    CHARGE = true;
+    if(!j){ tick(); return; }
     CONNU = !!j.user;
-    if(j.canal17){ C17 = true; salle(); etapes(); tick(); var b = $("#c17-badge"); if(b) b.hidden = false; }
-  }).catch(function(){});
+    if(j.canal17){ C17 = true; salle(); etapes(); var b = $("#c17-badge"); if(b) b.hidden = false; }
+    tick();
+    // Retour du lien « Canal 17 ? Identifie-toi. » : on dit au visiteur si le canal 17 le reconnaît.
+    var q = new URLSearchParams(location.search);
+    if(q.get("canal17") === "1"){
+      history.replaceState(null, "", location.pathname + location.hash);
+      signal(q.get("login") === "erreur" ? "erreur" : j.canal17 ? "oui" : "non");
+    }
+  }).catch(function(){ CHARGE = true; tick(); });
+  function signal(etat){
+    var t = {
+      oui: ["Canal 17 · accès reconnu", "Ton signal est enregistré. Ici, tu verras tout 17 minutes avant les autres : les décomptes, les cinématiques, le casting et les Archives.", "Ta connexion dure 6 heures. Avant chaque grand soir, repasse par « Canal 17 ? Identifie-toi. »"],
+      non: ["Signal non reconnu", "Le canal 17 ne te connaît pas. Ceux qui l'ont rejoint ont trouvé un chemin. Il commence quelque part sur la page casting.", ""],
+      erreur: ["Transmission interrompue", "La connexion à Discord a échoué. Réessaie.", ""]
+    }[etat];
+    var d = document.createElement("div"); d.className = "signal"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true");
+    d.innerHTML = '<div class="carte"><span class="ey">Transmission · canal 17</span><h3>' + t[0] + '</h3><p>' + t[1] + '</p>' + (t[2] ? '<p class="pt">' + t[2] + '</p>' : '') + (etat === "non" ? '<a class="btn ghost" href="/casting#terminal">Chercher le chemin</a> ' : '') + '<button class="btn" type="button">Fermer</button></div>';
+    document.body.appendChild(d);
+    var fermer = function(){ d.remove() };
+    d.querySelector("button").addEventListener("click", fermer);
+    d.addEventListener("click", function(e){ if(e.target === d) fermer() });
+    document.addEventListener("keydown", function k(e){ if(e.key === "Escape"){ fermer(); document.removeEventListener("keydown", k) } });
+  }
   reels.addEventListener("click", function(e){
     var b = e.target.closest(".play"); if(!b) return;
     var sc = b.parentNode;

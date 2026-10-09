@@ -2,7 +2,10 @@
 import { API, env, parseCookies, cookie, makeSession, bot } from "../../lib/discord.js";
 
 function back(query, retour) {
-  const page = retour === "archives" ? "/archives" + query : retour === "accueil" ? "/" + query : "/casting" + query + "#candidature";
+  const page = retour === "archives" ? "/archives" + query
+    : retour === "accueil" ? "/" + query
+    : retour === "canal17" ? "/?canal17=1" + query.replace("?", "&")
+    : "/casting" + query + "#candidature";
   const headers = new Headers({ Location: env("SITE_URL") + page });
   headers.append("Set-Cookie", cookie("osiris_retour", "", 0));
   return { headers, res: () => new Response(null, { status: 302, headers }) };
