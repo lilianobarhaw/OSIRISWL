@@ -127,7 +127,7 @@ html.intro .hero .eye{opacity:0}
 .hero h1{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(19px,2.2vw,24px);line-height:1.45;margin:6px 0 0;color:var(--bone);max-width:30em;position:relative;z-index:1}
 .hero .lead{color:var(--dim);margin:0;max-width:36em;position:relative;z-index:1}
 .hero .cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px;position:relative;z-index:1}
-/* Le décompte de l'ouverture officielle (31 octobre 2026, 21 h) : remplace la ligne « prochaine étape » jusqu'à une semaine après */
+/* Le grand décompte : l'ouverture officielle (31 octobre 2026), puis le casting, l'annonce des 35 et le Programme 01. Il remplace la ligne « prochaine étape » jusqu'au 3 avril 2027 */
 .lancement{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;margin:6px 0 4px}
 .lancement .live{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone)}
 .l-compte{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
@@ -137,9 +137,9 @@ html.intro .hero .eye{opacity:0}
 .l-ouvert{display:flex;flex-direction:column;align-items:center;gap:14px}
 .l-ouvert b{font-family:var(--display);font-weight:400;font-size:clamp(30px,4.4vw,46px);line-height:1.1;letter-spacing:.04em}
 .l-texte{margin:0;color:var(--dim);font-size:16px;max-width:34em}
-.hero.avant-ouverture .eye{width:min(360px,72vw,calc(28svh * 1.2))}
-@media (max-height:820px),(max-width:480px){.hero.avant-ouverture .lead{display:none}}
-@media (max-width:480px){.hero.avant-ouverture .eye{width:min(250px,64vw)}}
+.hero.avec-decompte .eye{width:min(360px,72vw,calc(28svh * 1.2))}
+@media (max-height:820px),(max-width:480px){.hero.avec-decompte .lead{display:none}}
+@media (max-width:480px){.hero.avec-decompte .eye{width:min(250px,64vw)}}
 @media (max-width:480px){.l-compte div{min-width:0;padding:10px 4px 8px}}
 .nextstep{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:10px;position:relative;z-index:1}
 .nextstep b{font-weight:500;color:var(--bone);font-variant-numeric:tabular-nums;letter-spacing:.06em}
@@ -462,8 +462,8 @@ footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas
         <div><b id="l-s">—</b><span>secondes</span></div>
       </div>
       <div class="l-ouvert" id="l-ouvert" hidden>
-        <b>C'est officiel.</b>
-        <a class="btn" href="#projection">Voir la première cinématique</a>
+        <b id="l-gros">C'est officiel.</b>
+        <a class="btn" id="l-lien" href="#projection">Voir la première cinématique</a>
       </div>
       <p class="l-texte" id="l-texte">Ouverture officielle du projet : le Discord, le site et la première cinématique.</p>
     </div>
@@ -879,37 +879,52 @@ footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas
   function pad(n){return (n<10?"0":"")+n}
   function duree(d){ return Math.floor(d/86400)+" j "+pad(Math.floor(d%86400/3600))+" h "+pad(Math.floor(d%3600/60))+" min "+pad(d%60)+" s" }
   function pour17(iso){ return new Date(iso).getTime() - (C17 ? AVANCE : 0) } // l'heure d'un événement pour ce visiteur
-  // L'ouverture officielle : le Discord, le site et la première cinématique (samedi 31 octobre 2026, 21 h).
-  var OUVERTURE = "2026-10-31T21:00:00+01:00", APRES_OUVERTURE = 7*86400000, ouvertVu = null;
+  // Le grand décompte du haut de l'accueil : il passe tout seul d'une étape à la suivante.
+  // avance: true = le canal 17 a l'étape 17 minutes avant. « apres » = le moment affiché juste après l'étape (« C'est officiel. »).
+  var GRAND = [
+    { t: "2026-10-31T21:00:00+01:00", avance: true, titre: "Samedi 31 octobre · 21 h", texte: "Ouverture officielle du projet : le Discord, le site et la première cinématique.",
+      apres: { duree: 86400000, titre: "Ouverture officielle du projet", gros: "C'est officiel.", texte: "Le Discord, le site et la première cinématique sont ouverts.", lien: "Voir la première cinématique", href: "#projection" } },
+    { t: "2027-02-20T23:30:00+01:00", avance: true, titre: "Samedi 20 février · 23 h 30", texte: "Ouverture du casting, en direct de la finale du TOURNOI BARHAW, avec la cinématique « Ils s'ennuient »." },
+    { t: "2027-03-14T23:59:00+01:00", titre: "Casting ouvert · jusqu'au dimanche 14 mars, 23 h 59", texte: "Fin du casting : dépose ton dossier avant la fermeture." },
+    { t: "2027-03-27T00:00:00+01:00", avance: true, titre: "27 mars · minuit", texte: "Annonce des 35 candidats, avec la cinématique « Trente-cinq »." },
+    { t: "2027-04-03T20:30:00+02:00", avance: true, titre: "Samedi 3 avril · 20 h 30", texte: "Ouverture du Programme 01 : L'Hiver de Ludendorff, avec la cinématique « Moteur »." }
+  ];
+  var OUVERTURE = GRAND[0].t, ouvertVu = null;
   function lancement(now){
-    var bloc = $("#lancement"), reel = new Date(OUVERTURE).getTime(), cible = pour17(OUVERTURE);
-    var ouvert = now >= cible;
-    // Au passage de 21 h : la cinématique se débloque et les liens du mot du jour apparaissent, sans recharger.
+    var bloc = $("#lancement");
+    // Au passage de l'ouverture officielle : la cinématique se débloque et les liens du mot du jour apparaissent, sans recharger.
+    var ouvert = now >= pour17(OUVERTURE);
     if(ouvert !== ouvertVu){
       $$("[data-apres-lancement]").forEach(function(x){ x.hidden = !ouvert });
       if(ouvertVu === false){ salle(); etapes(); }
       ouvertVu = ouvert;
     }
-    var actif = now < reel + APRES_OUVERTURE;
+    var moment = GRAND.filter(function(e){ return e.apres && now >= (e.avance ? pour17(e.t) : new Date(e.t).getTime()) && now < new Date(e.t).getTime() + e.apres.duree })[0];
+    var etape = GRAND.filter(function(e){ return new Date(e.t).getTime() > now })[0];
+    var actif = !!(moment || etape);
     bloc.hidden = !actif;
-    $(".hero").classList.toggle("avant-ouverture", actif);
-    if(!actif) return false;
-    $("#l-compte").hidden = ouvert; $("#l-ouvert").hidden = !ouvert;
-    if(!ouvert){
-      var d = Math.max(0, Math.floor((cible - now)/1000));
-      $("#l-j").textContent = Math.floor(d/86400); $("#l-h").textContent = pad(Math.floor(d%86400/3600)); $("#l-m").textContent = pad(Math.floor(d%3600/60)); $("#l-s").textContent = pad(d%60);
-      $("#l-titre").textContent = "Samedi 31 octobre · 21 h";
-      $("#l-texte").textContent = "Ouverture officielle du projet : le Discord, le site et la première cinématique.";
-    } else {
-      var reste = Math.floor((reel - now)/1000);
-      $("#l-titre").textContent = C17 && reste > 0 ? "Canal 17 · les autres attendent encore " + pad(Math.floor(reste/60)) + ":" + pad(reste%60) : "Ouverture officielle du projet";
-      $("#l-texte").textContent = "Le Discord, le site et la première cinématique sont ouverts.";
+    $(".hero").classList.toggle("avec-decompte", actif);
+    if(!actif) return false; // le Programme est en cours (ou fini) : la petite ligne reprend
+    $("#l-compte").hidden = !!moment; $("#l-ouvert").hidden = !moment;
+    if(moment){
+      var reste = Math.floor((new Date(moment.t).getTime() - now)/1000);
+      $("#l-titre").textContent = C17 && reste > 0 ? "Canal 17 · les autres attendent encore " + pad(Math.floor(reste/60)) + ":" + pad(reste%60) : moment.apres.titre;
+      $("#l-gros").textContent = moment.apres.gros;
+      $("#l-lien").textContent = moment.apres.lien; $("#l-lien").setAttribute("href", moment.apres.href);
+      $("#l-texte").textContent = moment.apres.texte;
+      return true;
     }
+    var reel = new Date(etape.t).getTime(), cible = etape.avance ? pour17(etape.t) : reel;
+    var attend = now >= cible; // canal 17 : l'étape est déjà là pour lui, les autres l'attendent encore
+    var d = Math.max(0, Math.floor(((attend ? reel : cible) - now)/1000));
+    $("#l-j").textContent = Math.floor(d/86400); $("#l-h").textContent = pad(Math.floor(d%86400/3600)); $("#l-m").textContent = pad(Math.floor(d%3600/60)); $("#l-s").textContent = pad(d%60);
+    $("#l-titre").textContent = attend ? "Canal 17 · les autres attendent encore" : etape.titre;
+    $("#l-texte").textContent = etape.texte;
     return true;
   }
   function tick(){
     var now = Date.now(), lbl = $("#next-label"), cnt = $("#next-count"), c17 = $("#c17-acces");
-    // Jusqu'à une semaine après l'ouverture, le grand décompte prend la place de la prochaine étape.
+    // Jusqu'à l'ouverture du Programme 01, le grand décompte prend la place de la prochaine étape.
     var enLancement = lancement(now);
     lbl.hidden = enLancement; cnt.hidden = enLancement;
     var step = STEPS.filter(function(s){ return new Date(s.t).getTime() > now })[0];

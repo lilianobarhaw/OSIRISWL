@@ -101,7 +101,7 @@ Le soir d'Halloween à 21 h, c'est l'ouverture officielle du projet : le Discord
    Le bouton « Filtre », en bas à droite, n'apparaît que pour les testeurs : un appui montre le site comme le voit le public (le décompte), un autre ramène au mode testeur (`filtre.js`, cookie `osiris_vue`). Pour un visiteur qui n'est pas testeur, il n'existe pas.
 2. Restent ouverts à tous : les mentions légales (`/legal`, obligatoires), les images, les polices, les sons, et les adresses `/api/…`.
 3. À 21 h pile (heure du serveur), le décompte affiche « C'est l'heure. » et recharge la page : le site apparaît. Le canal 17 n'a pas d'avance sur ce décompte-là.
-4. Sur l'accueil, un grand décompte remplace la ligne « prochaine étape » jusqu'à 21 h, puis « C'est officiel. » pendant une semaine.
+4. Sur l'accueil, un grand décompte (quatre cases) remplace la ligne « prochaine étape » : l'ouverture officielle, puis « C'est officiel. » pendant 24 h, puis tout seul l'ouverture du casting (20 février, 23 h 30), la fin du casting (14 mars), l'annonce des 35 (27 mars) et l'ouverture du Programme 01 (3 avril, 20 h 30). Pendant le Programme, la petite ligne reprend. Les étapes sont dans `GRAND` (`index.html`).
 5. Après l'ouverture, `middleware.js` ne fait plus rien (on peut le supprimer). Pour changer la date : `OUVERTURE` dans `middleware.js`, `bientot.html`, `index.html` et `lib/decompte.js`.
 
 **La cinématique.** Le teaser est dans `FILMS` (`index.html`), verrouillé jusqu'à 21 h. Coller son identifiant YouTube dans `youtube`, et programmer la vidéo sur YouTube pour 20 h 43 (le canal 17 la voit 17 minutes avant) : avant cette heure, même avec l'identifiant dans la page, personne ne peut la regarder. Le titre « On vous regarde » est provisoire.
@@ -110,7 +110,7 @@ Le soir d'Halloween à 21 h, c'est l'ouverture officielle du projet : le Discord
 1. Créer un salon **vocal** en haut du serveur (personne ne peut s'y connecter : @everyone sans « Se connecter »). Le bot doit avoir « Gérer les salons » dessus.
 2. Sur Vercel : `DISCORD_DECOMPTE_SALON_ID` (l'identifiant de ce salon), puis redéployer. Renvoyer les commandes : `/api/commands?key=<SETUP_KEY>`.
 3. Taper `/decompte` dans le salon de l'annonce (option `ping` pour @everyone). Le bot publie l'annonce, avec un compte à rebours que Discord met à jour tout seul (« dans 21 jours », puis « dans 3 heures »…), et renomme tout de suite le salon : « ⏳ Ouverture du projet · J-21 ».
-4. Ensuite, le bot renomme le salon chaque nuit (J-20, J-19…, puis « ce soir 21 h » le jour même), et vers 21 h le 31 : « 👁 Osiris est ouvert ». Une semaine après, il n'y touche plus : le salon peut être supprimé.
+4. Ensuite, le bot renomme le salon chaque nuit (J-20, J-19…, puis « ce soir 21 h » le jour même), et vers 21 h le 31 : « 👁 Osiris est ouvert » pendant 24 h. Puis il enchaîne tout seul : « ⏳ Casting · J-111 »…, « 📂 Casting ouvert · J-22 »…, « ⏳ Les 35 candidats · J-12 »…, « ⏳ Programme 01 · J-7 »…, et « 🔴 Programme 01 en cours » jusqu'à la dernière soirée. Le renommage se fait aussi à la première visite de l'accueil ou du casting après un changement. Les étapes sont dans `ETAPES` (`lib/decompte.js`).
 5. À 21 h, le bot ne publie rien : l'annonce de l'ouverture se fait à la main.
 
 ## Tickets d'aide
