@@ -29,6 +29,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `lib/aide.js` : la liste des catégories d'aide et le texte du panneau (à modifier ici).
 - `lib/commandes.js` : les commandes slash et les textes de résultat du casting.
 - `api/commands.js` : envoie la liste des commandes slash à Discord ; avec `&channel=…`, publie le message « Créer un ticket » dans le salon d'aide (l'ancienne adresse `/api/panel` renvoie ici).
+- `filtre.js` : le bouton « Filtre » des testeurs (voir le site comme le public, puis revenir).
 - `middleware.js` + `bientot.html` : avant l'ouverture officielle du projet, le public ne voit que le décompte (voir « Avant l'ouverture officielle »).
 - `lib/decompte.js` : le décompte sur Discord (salon renommé chaque jour, commande `/decompte`).
 - `lib/moderation.js` : les commandes de modération et les paliers de sanctions automatiques (à modifier ici).
@@ -97,6 +98,7 @@ Le soir d'Halloween à 21 h, c'est l'ouverture officielle du projet : le Discord
 
 **Le site.** Jusque-là, le public ne voit que le décompte (`bientot.html`), quelle que soit la page demandée. C'est `middleware.js` qui s'en charge, côté serveur : le reste du site n'est pas envoyé, même en fouillant le code de la page.
 1. Les comptes de `CASTING_TESTEURS` voient tout le site. Pour se connecter : le lien « Équipe » en bas du décompte (ou `/api/auth/login?retour=accueil`). La connexion dure 6 heures.
+   Le bouton « Filtre », en bas à droite, n'apparaît que pour les testeurs : un appui montre le site comme le voit le public (le décompte), un autre ramène au mode testeur (`filtre.js`, cookie `osiris_vue`). Pour un visiteur qui n'est pas testeur, il n'existe pas.
 2. Restent ouverts à tous : les mentions légales (`/legal`, obligatoires), les images, les polices, les sons, et les adresses `/api/…`.
 3. À 21 h pile (heure du serveur), le décompte affiche « C'est l'heure. » et recharge la page : le site apparaît. Le canal 17 n'a pas d'avance sur ce décompte-là.
 4. Sur l'accueil, un grand décompte remplace la ligne « prochaine étape » jusqu'à 21 h, puis « C'est officiel. » pendant une semaine.

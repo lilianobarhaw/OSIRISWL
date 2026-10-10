@@ -1,6 +1,7 @@
 // Avant l'ouverture officielle du projet (samedi 31 octobre 2026, 21 h, heure de Paris), le public ne voit que le décompte :
 // toutes les pages du site affichent bientot.html. Les comptes de CASTING_TESTEURS, connectés avec Discord, voient tout.
 // Pour se connecter en testeur : le lien « Équipe » en bas du décompte (ou /api/auth/login?retour=accueil).
+// Le bouton « Filtre » (filtre.js) permet à un testeur de voir le site comme le public : cookie osiris_vue=public.
 // Restent ouverts : les mentions légales (/legal), les images, polices, sons et vidéos, et les adresses /api/…
 // À 21 h, le décompte recharge la page et le site apparaît. Après l'ouverture, ce fichier ne fait plus rien
 // (on peut le supprimer) ; /bientot renvoie alors vers l'accueil.
@@ -33,6 +34,9 @@ function testeur(request) {
   }
 }
 
+// Le testeur a choisi « Filtre : public » : il voit le décompte comme tout le monde.
+const vuePublique = (request) => /(?:^|;\s*)osiris_vue=public(?:;|$)/.test(request.headers.get("cookie") || "");
+
 export default function middleware(request) {
   const url = new URL(request.url), chemin = url.pathname;
   if (Date.now() >= OUVERTURE) {
@@ -40,7 +44,7 @@ export default function middleware(request) {
     return; // le site est ouvert : rien à faire
   }
   if (/\.[a-z0-9]+$/i.test(chemin) && !/\.html$/i.test(chemin)) return; // un fichier (script, style, image…) : il passe
-  if (OUVERTS.has(chemin) || testeur(request)) return;
+  if (OUVERTS.has(chemin) || (testeur(request) && !vuePublique(request))) return;
   // Une page : on sert le décompte à sa place (l'adresse reste la même dans le navigateur).
   return new Response(null, { headers: { "x-middleware-rewrite": new URL("/bientot", request.url).href, "Cache-Control": "private, no-store" } });
 }
