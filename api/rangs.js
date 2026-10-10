@@ -6,6 +6,7 @@
 // - Pour voir ce qui changerait sans rien toucher : ajouter &simulation=1
 //
 // Mot du jour (lib/mot.js) : /api/rangs?mot=1 (la page /mot).
+// Les écrans (lib/ecrans.js) : /api/rangs?ecrans=1&c=… (qui est en direct sur Twitch, pour l'accueil).
 // Cron de 21 h : /api/rangs?tick=1 → l'annonce du mot de la veille, et le salon du décompte (lib/decompte.js).
 // Le cron de la nuit renomme aussi le salon du décompte.
 // Ils passent par ici parce que le site est au maximum de 12 fonctions sur l'offre gratuite de Vercel.
@@ -14,9 +15,11 @@ import { env, json, optEnv } from "../lib/discord.js";
 import { mettreAJourRangs } from "../lib/rangs.js";
 import { motGET, motPOST, publierMot } from "../lib/mot.js";
 import { majSalon } from "../lib/decompte.js";
+import { ecransGET } from "../lib/ecrans.js";
 
 export async function GET(req) {
   const url = new URL(req.url);
+  if (url.searchParams.has("ecrans")) return ecransGET(req);
   if (url.searchParams.has("mot")) return motGET(req);
   if (url.searchParams.has("tick")) {
     const mot = await publierMot().catch((e) => ({ annonce: false, erreur: e.message }));

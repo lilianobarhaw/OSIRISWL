@@ -1078,7 +1078,7 @@ footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas
       marquer();
     }
     function charger(){
-      fetch("/api/ecrans?c=" + ECRANS.map(function(e){ return e.twitch }).join(","))
+      fetch("/api/rangs?ecrans=1&c=" + ECRANS.map(function(e){ return e.twitch }).join(","))
         .then(function(r){ return r.ok ? r.json() : null })
         .then(function(d){ if(d){ etat = d; charge = true } dessiner() })
         .catch(function(){ dessiner() });

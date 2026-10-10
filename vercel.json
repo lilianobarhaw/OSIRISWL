@@ -21,6 +21,16 @@
   },
   "redirects": [
     {
+      "source": "/api/auth/logout",
+      "destination": "/api/auth/login?sortir=1",
+      "permanent": false
+    },
+    {
+      "source": "/api/ecrans",
+      "destination": "/api/rangs?ecrans=1",
+      "permanent": false
+    },
+    {
       "source": "/api/panel",
       "destination": "/api/commands",
       "permanent": false
