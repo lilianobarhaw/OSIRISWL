@@ -7,7 +7,7 @@
 // Et les commandes slash, réservées aux fondateurs et aux admins :
 //   /annonce, /aide-panneau, /fermer, /casting, /offrande (lib/commandes.js)
 //   /canal17, /canal17-voix : la récompense du jeu de piste (lib/canal17.js)
-//   /decision-realisee : une décision du vote du jour est faite (lib/vote.js)
+//   /decompte : l'annonce de l'ouverture officielle, avec son compte à rebours (lib/decompte.js)
 //   /warn, /unwarn, /sanctions, /mute, /unmute, /kick, /ban, /unban, /clear, /slowmode (lib/moderation.js)
 
 import { createPublicKey, verify } from "node:crypto";
@@ -18,7 +18,7 @@ import { moderation, isModCommand } from "../lib/moderation.js";
 import { logEvent, logCommand } from "../lib/logs.js";
 import { offrandeModal, publierOffrande } from "../lib/offrande.js";
 import * as canal17 from "../lib/canal17.js";
-import { realiserDecision } from "../lib/vote.js";
+import * as decompte from "../lib/decompte.js";
 
 const VIEW = 1024n, SEND = 2048n, EMBED = 16384n, ATTACH = 32768n, HISTORY = 65536n;
 const bits = (...p) => p.reduce((a, b) => a | b, 0n).toString();
@@ -96,9 +96,9 @@ async function command(i, user) {
     return json({ type: 5, data: { flags: EPHEMERAL } });
   }
 
-  // Vote du jour : la décision des Mécènes est faite → « Réalisée » sur le site et annonce dans la Loge.
-  if (name === "decision-realisee") {
-    const work = realiserDecision({ jour: opt("jour"), choix: opt("choix"), note: opt("note"), user }).catch((e) => "Erreur : " + (e?.message || "inconnue"));
+  // Le décompte de l'ouverture : l'annonce dans ce salon (ou un autre), et le salon du décompte renommé tout de suite.
+  if (name === "decompte") {
+    const work = decompte.publier({ salon: opt("salon") || i.channel_id, ping: !!opt("ping"), user }).catch((e) => "Erreur : " + (e?.message || "inconnue"));
     const fast = await Promise.race([work, sleep(RAPIDE).then(() => null)]);
     if (fast !== null) return reply(fast);
     keepAlive(work.then((content) => editOriginal(i, content)));
@@ -367,6 +367,7 @@ export function GET() {
     salon_des_logs: has("DISCORD_LOGS_CHANNEL_ID") ? "OK" : "ATTENTION : DISCORD_LOGS_CHANNEL_ID absent, les commandes ne sont pas notées",
     salon_des_sanctions: has("DISCORD_SANCTIONS_CHANNEL_ID") ? "OK" : "ATTENTION : DISCORD_SANCTIONS_CHANNEL_ID absent, les avertissements ne sont pas comptés",
     canal_17: canal17.manque().length ? "désactivé : il manque " + canal17.manque().join(", ") : `OK (${canal17.PLACES} places)`,
-    vote_du_jour: ["DISCORD_VOTES_REGISTRE_ID", "DISCORD_VOTES_ANNONCE_ID", "DISCORD_VOTES_STAFF_ID"].filter((k) => !has(k)).map((k) => "il manque " + k).join(", ") || "OK",
+    salon_du_decompte: has("DISCORD_DECOMPTE_SALON_ID") ? "OK" : "désactivé : il manque DISCORD_DECOMPTE_SALON_ID",
+    mot_du_jour: has("DISCORD_MOT_REGISTRE_ID") ? "OK" + (has("DISCORD_MOT_ANNONCE_ID") ? ", avec l'annonce du soir" : ", sans annonce du soir") : "désactivé : il manque DISCORD_MOT_REGISTRE_ID",
   });
 }

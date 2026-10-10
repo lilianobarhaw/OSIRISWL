@@ -5,7 +5,6 @@ function back(query, retour) {
   const page = retour === "archives" ? "/archives" + query
     : retour === "accueil" ? "/" + query
     : retour === "canal17" ? "/?canal17=1" + query.replace("?", "&")
-    : retour === "vote" ? "/" + query + "#vote"
     : retour === "mot" ? "/mot" + query
     : "/casting" + query + "#candidature";
   const headers = new Headers({ Location: env("SITE_URL") + page });

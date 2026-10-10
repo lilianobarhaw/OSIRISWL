@@ -26,10 +26,11 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `api/casting.js` : dit à la page casting si le formulaire est ouvert et si le joueur est connecté (l'ancien `api/me.js` y est fusionné : l'offre Hobby de Vercel limite un site à 12 fonctions dans `api/`).
 - `api/candidature.js` : `GET` = diagnostic des variables ; `POST` = crée le ticket.
 - `api/interactions.js` : tickets d'aide (bouton, menu des catégories, fenêtre, salon privé, fermeture).
-- `api/panel.js` : publie le message « Créer un ticket » dans le salon d'aide.
 - `lib/aide.js` : la liste des catégories d'aide et le texte du panneau (à modifier ici).
 - `lib/commandes.js` : les commandes slash et les textes de résultat du casting.
-- `api/commands.js` : envoie la liste des commandes slash à Discord.
+- `api/commands.js` : envoie la liste des commandes slash à Discord ; avec `&channel=…`, publie le message « Créer un ticket » dans le salon d'aide (l'ancienne adresse `/api/panel` renvoie ici).
+- `middleware.js` + `bientot.html` : avant l'ouverture officielle du projet, le public ne voit que le décompte (voir « Avant l'ouverture officielle »).
+- `lib/decompte.js` : le décompte sur Discord (salon renommé chaque jour, commande `/decompte`).
 - `lib/moderation.js` : les commandes de modération et les paliers de sanctions automatiques (à modifier ici).
 - `lib/logs.js` : le journal des commandes (qui, quoi, où, quand).
 - `lib/canal17.js` : la récompense du jeu de piste (commandes `/canal17` et `/canal17-voix`, voir « Canal 17 »).
@@ -80,10 +81,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_CANAL17_ROLE_ID` | Facultatif. Rôle « Canal 17 », donné par `/canal17` à ceux qui ont trouvé le code du jeu de piste |
 | `DISCORD_CANAL17_CHANNEL_ID` | Facultatif. Salon caché `#canal-17`, visible seulement par le rôle Canal 17 (et le bot) |
 | `DISCORD_SANCTIONS_CHANNEL_ID` | Identifiant du salon privé des sanctions : historique, compteur d'avertissements et alertes de l'antispam |
-| `DISCORD_VOTES_REGISTRE_ID` | Vote du jour : salon privé `#registre-votes`, où le bot note chaque vote |
-| `DISCORD_VOTES_ANNONCE_ID` | Vote du jour : salon des Mécènes où le bot publie chaque soir la question et le résultat de la veille |
-| `DISCORD_VOTES_ROLE_ID` | Facultatif. Rôle notifié à chaque nouvelle question du jour |
-| `DISCORD_VOTES_STAFF_ID` | Vote du jour : salon **privé du staff** `#decisions-mecenes`, où le bot poste un « À faire » pour chaque résultat. Le site y lit aussi l'état des décisions |
+| `DISCORD_DECOMPTE_SALON_ID` | Facultatif. Le salon vocal du décompte, renommé chaque jour jusqu'à l'ouverture (« ⏳ Ouverture du projet · J-21 ») |
 | `DISCORD_MOT_REGISTRE_ID` | Mot du jour : salon **privé** `#registre-mots`, où le bot note chaque partie (obligatoire pour jouer) |
 | `DISCORD_MOT_ANNONCE_ID` | Facultatif. Mot du jour : salon où le bot donne chaque soir le mot de la veille, et le lundi le podium de la semaine |
 | `DISCORD_MOT_ROLE_ID` | Facultatif. Rôle donné au premier de la semaine (et retiré au premier de la semaine d'avant) |
@@ -93,11 +91,31 @@ Redéployer après chaque modification des variables. Vérification : ouvrir `ht
 
 L'ancienne variable `DISCORD_WEBHOOK` n'est plus utilisée.
 
+## Avant l'ouverture officielle (samedi 31 octobre 2026, 21 h)
+
+Le soir d'Halloween à 21 h, c'est l'ouverture officielle du projet : le Discord, le site et la première cinématique (le teaser).
+
+**Le site.** Jusque-là, le public ne voit que le décompte (`bientot.html`), quelle que soit la page demandée. C'est `middleware.js` qui s'en charge, côté serveur : le reste du site n'est pas envoyé, même en fouillant le code de la page.
+1. Les comptes de `CASTING_TESTEURS` voient tout le site. Pour se connecter : le lien « Équipe » en bas du décompte (ou `/api/auth/login?retour=accueil`). La connexion dure 6 heures.
+2. Restent ouverts à tous : les mentions légales (`/legal`, obligatoires), les images, les polices, les sons, et les adresses `/api/…`.
+3. À 21 h pile (heure du serveur), le décompte affiche « C'est l'heure. » et recharge la page : le site apparaît. Le canal 17 n'a pas d'avance sur ce décompte-là.
+4. Sur l'accueil, un grand décompte remplace la ligne « prochaine étape » jusqu'à 21 h, puis « C'est officiel. » pendant une semaine.
+5. Après l'ouverture, `middleware.js` ne fait plus rien (on peut le supprimer). Pour changer la date : `OUVERTURE` dans `middleware.js`, `bientot.html`, `index.html` et `lib/decompte.js`.
+
+**La cinématique.** Le teaser est dans `FILMS` (`index.html`), verrouillé jusqu'à 21 h. Coller son identifiant YouTube dans `youtube`, et programmer la vidéo sur YouTube pour 20 h 43 (le canal 17 la voit 17 minutes avant) : avant cette heure, même avec l'identifiant dans la page, personne ne peut la regarder. Le titre « On vous regarde » est provisoire.
+
+**Discord.**
+1. Créer un salon **vocal** en haut du serveur (personne ne peut s'y connecter : @everyone sans « Se connecter »). Le bot doit avoir « Gérer les salons » dessus.
+2. Sur Vercel : `DISCORD_DECOMPTE_SALON_ID` (l'identifiant de ce salon), puis redéployer. Renvoyer les commandes : `/api/commands?key=<SETUP_KEY>`.
+3. Taper `/decompte` dans le salon de l'annonce (option `ping` pour @everyone). Le bot publie l'annonce, avec un compte à rebours que Discord met à jour tout seul (« dans 21 jours », puis « dans 3 heures »…), et renomme tout de suite le salon : « ⏳ Ouverture du projet · J-21 ».
+4. Ensuite, le bot renomme le salon chaque nuit (J-20, J-19…, puis « ce soir 21 h » le jour même), et vers 21 h le 31 : « 👁 Osiris est ouvert ». Une semaine après, il n'y touche plus : le salon peut être supprimé.
+5. À 21 h, le bot ne publie rien : l'annonce de l'ouverture se fait à la main.
+
 ## Tickets d'aide
 
 1. Ajouter les variables `DISCORD_PUBLIC_KEY`, `DISCORD_ADMIN_ROLE_ID`, `SETUP_KEY` (et si besoin `DISCORD_HELP_CATEGORY_ID`), puis redéployer.
 2. Sur https://discord.com/developers/applications → l'application → **General Information** → **Interactions Endpoint URL** : `https://<ton-domaine>/api/interactions` → Save. Discord vérifie l'adresse tout de suite.
-3. Ouvrir une fois `https://<ton-domaine>/api/panel?key=<SETUP_KEY>&channel=<identifiant du salon d'aide>` : le message « Créer un ticket » apparaît dans le salon.
+3. Taper `/aide-panneau` dans le salon d'aide (ou ouvrir une fois `https://<ton-domaine>/api/commands?key=<SETUP_KEY>&channel=<identifiant du salon d'aide>`) : le message « Créer un ticket » apparaît dans le salon.
 4. Parcours : bouton « Créer un ticket » → menu des catégories → fenêtre « Explique ton problème » → salon privé avec le staff. Les tickets « Problème avec le staff » ne sont visibles que par le rôle Admin. Un seul ticket ouvert par personne et par catégorie. Le bouton « Fermer le ticket » supprime le salon (staff ou auteur).
 5. Diagnostic : `https://<ton-domaine>/api/interactions`.
 
@@ -125,27 +143,6 @@ Une enquête s'ouvre tous les 15 jours, le samedi à 21 h (heure de Paris), sur 
 4. Écrire une enquête : `api/_archives/_dossiers.js` (titre, intro, pièces, empreinte du mot de passe, texte de fin ; la commande pour calculer l'empreinte est en haut du fichier) et les images dans `api/_archives/pieces/`. Un dossier sans contenu reste « en préparation ».
 5. Tester avant la date : les comptes de `CASTING_TESTEURS` voient les dossiers en avance, en « mode test » (rien n'est noté ni annoncé).
 6. Les mots de passe ne sont jamais écrits en clair, et les pièces ne sont servies qu'à partir de l'heure d'ouverture. Le dépôt GitHub doit rester **privé**.
-
-## Vote du jour (accueil, section Mécènes)
-
-Chaque soir à 21 h (heure de Paris), une question s'ouvre sur l'accueil pour 24 h. Seuls les Mécènes votent (un rôle Mécène, d'argent, d'or ou Grand Mécène), un vote par personne, et seuls les Mécènes voient le résultat. Le canal 17 voit chaque question 17 minutes avant.
-
-1. Sur Discord : créer un salon **privé** `#registre-votes` (le bot y note chaque vote) et choisir le salon des Mécènes où annoncer la question et le résultat (par exemple un salon de la Loge, invisible des candidats). Le bot Osiris doit voir et écrire dans les deux.
-2. Sur Vercel : `DISCORD_VOTES_REGISTRE_ID` et `DISCORD_VOTES_ANNONCE_ID`, puis redéployer. Facultatif : `DISCORD_VOTES_ROLE_ID`, un rôle à notifier à chaque nouvelle question.
-3. Écrire les questions : `api/_vote/_questions.js` (date, question, 2 à 4 choix, « usage » = ce que le résultat change vraiment). Un jour sans question = pas de vote ce soir-là. Avant la toute première question (le 31 octobre), le bloc reste caché sur l'accueil.
-4. Chaque soir, vers 21 h, le bot publie dans le salon des Mécènes le résultat de la veille puis la nouvelle question (cron `vercel.json`, et à défaut la première visite du site après 21 h). Une marque dans `#registre-votes` évite de publier deux fois.
-5. Tester : les comptes de `CASTING_TESTEURS` voient la question suivante en aperçu quand aucune n'est ouverte (leur vote n'est pas noté).
-6. Tout passe par `api/rangs.js` (`/api/rangs?vote=1`), car le site est au maximum de 12 fonctions sur l'offre gratuite de Vercel.
-
-### Le registre des décisions
-
-Pour ne jamais oublier une promesse faite aux Mécènes, et leur prouver que leur vote a servi.
-
-1. Sur Discord : créer un salon **privé du staff** `#decisions-mecenes` (le bot doit le voir, y écrire et lire l'historique), puis sur Vercel `DISCORD_VOTES_STAFF_ID` et redéployer. Ouvrir une fois `/api/commands?key=<SETUP_KEY>` pour ajouter la commande `/decision-realisee`.
-2. À chaque résultat, le bot y poste un « À faire » : le choix gagnant, **quand** ça doit se voir (champ `quand` de la question) et ce qui a été promis. En cas d'égalité : « À trancher ».
-3. Sur le site, les Mécènes voient le registre complet sous le vote du jour : « À venir · le 3 avril », puis « Réalisée ». Les autres voient seulement le nombre de décisions prises.
-4. Quand c'est fait : `/decision-realisee jour:2026-10-10` (la date est écrite dans le « À faire »), avec `choix:` en cas d'égalité et `note:` si tu veux dire où ça s'est vu. Le message du staff passe en « Réalisée », le site aussi, et le bot annonce dans la Loge « La décision du 10 octobre s'est réalisée ».
-5. Ce salon sert de mémoire au site : ne pas supprimer les messages du bot qui commencent par 📌.
 
 ## Le mot du jour (page /mot)
 
@@ -180,6 +177,7 @@ Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du c
    - `/fermer` : ferme le ticket où on la tape. Ticket d'aide : staff ou auteur. Ticket de candidature : staff seulement.
    - `/casting resultat:…` (dans un ticket de candidature) : publie le résultat au candidat, donne le rôle correspondant et retire le rôle Postulant.
    - `/offrande` : lance un vote des Mécènes dans #offrandes (voir « Rangs des Mécènes »).
+   - `/decompte` : publie l'annonce de l'ouverture officielle du projet, avec un compte à rebours en direct (voir « Avant l'ouverture officielle »). Options `salon` et `ping`.
    - Les commandes de modération sont décrites plus bas.
 
 ## Sécurité
@@ -193,7 +191,7 @@ Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du c
 
 ## Jeu de piste et Archives
 
-Les réponses du jeu de piste et des Archives ne sont écrites nulle part dans ce dépôt : la direction les garde. Le dépôt GitHub doit rester **privé**, et le site bloque l'accès direct à `/README.md`, `/lib/…`, `/api/_archives/…` et `/api/_vote/…` (`vercel.json`, redirections).
+Les réponses du jeu de piste et des Archives ne sont écrites nulle part dans ce dépôt : la direction les garde. Le dépôt GitHub doit rester **privé**, et le site bloque l'accès direct à `/README.md`, `/lib/…`, `/api/_archives/…` et `/api/_mot/…` (`vercel.json`, redirections).
 
 ## Offre Vercel
 

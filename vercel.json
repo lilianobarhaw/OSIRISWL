@@ -7,7 +7,7 @@
       "schedule": "0 2 * * *"
     },
     {
-      "path": "/api/rangs?vote=tick",
+      "path": "/api/rangs?tick=1",
       "schedule": "2 20 * * *"
     }
   ],
@@ -21,6 +21,11 @@
   },
   "redirects": [
     {
+      "source": "/api/panel",
+      "destination": "/api/commands",
+      "permanent": false
+    },
+    {
       "source": "/README.md",
       "destination": "/",
       "permanent": false
@@ -32,11 +37,6 @@
     },
     {
       "source": "/api/_archives/:chemin*",
-      "destination": "/",
-      "permanent": false
-    },
-    {
-      "source": "/api/_vote/:chemin*",
       "destination": "/",
       "permanent": false
     },
