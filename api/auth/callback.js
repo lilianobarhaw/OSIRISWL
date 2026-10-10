@@ -5,6 +5,7 @@ function back(query, retour) {
   const page = retour === "archives" ? "/archives" + query
     : retour === "accueil" ? "/" + query
     : retour === "canal17" ? "/?canal17=1" + query.replace("?", "&")
+    : retour === "vote" ? "/" + query + "#vote"
     : "/casting" + query + "#candidature";
   const headers = new Headers({ Location: env("SITE_URL") + page });
   headers.append("Set-Cookie", cookie("osiris_retour", "", 0));

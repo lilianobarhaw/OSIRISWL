@@ -1,11 +1,11 @@
 // Redirige le candidat vers Discord pour se connecter.
-// ?retour=archives, accueil ou canal17 : où revenir après la connexion (sinon, sur /casting).
-// canal17 : retour sur l'accueil, qui dit si le compte a le rôle Canal 17.
+// ?retour=archives, accueil, canal17 ou vote : où revenir après la connexion (sinon, sur /casting).
+// canal17 : retour sur l'accueil, qui dit si le compte a le rôle Canal 17. vote : retour sur le vote du jour.
 import { env, cookie } from "../../lib/discord.js";
 
 export function GET(req) {
   const voulu = new URL(req.url).searchParams.get("retour");
-  const retour = ["archives", "accueil", "canal17"].includes(voulu) ? voulu : "casting";
+  const retour = ["archives", "accueil", "canal17", "vote"].includes(voulu) ? voulu : "casting";
   const state = crypto.randomUUID();
   const params = new URLSearchParams({
     client_id: env("DISCORD_CLIENT_ID"),

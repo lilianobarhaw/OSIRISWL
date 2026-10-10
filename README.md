@@ -79,6 +79,10 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_CANAL17_ROLE_ID` | Facultatif. Rôle « Canal 17 », donné par `/canal17` à ceux qui ont trouvé le code du jeu de piste |
 | `DISCORD_CANAL17_CHANNEL_ID` | Facultatif. Salon caché `#canal-17`, visible seulement par le rôle Canal 17 (et le bot) |
 | `DISCORD_SANCTIONS_CHANNEL_ID` | Identifiant du salon privé des sanctions : historique, compteur d'avertissements et alertes de l'antispam |
+| `DISCORD_VOTES_REGISTRE_ID` | Vote du jour : salon privé `#registre-votes`, où le bot note chaque vote |
+| `DISCORD_VOTES_ANNONCE_ID` | Vote du jour : salon des Mécènes où le bot publie chaque soir la question et le résultat de la veille |
+| `DISCORD_VOTES_ROLE_ID` | Facultatif. Rôle notifié à chaque nouvelle question du jour |
+| `DISCORD_VOTES_STAFF_ID` | Vote du jour : salon **privé du staff** `#decisions-mecenes`, où le bot poste un « À faire » pour chaque résultat. Le site y lit aussi l'état des décisions |
 
 Redéployer après chaque modification des variables. Vérification : ouvrir `https://<ton-domaine>/api/candidature` → doit afficher « toutes les variables sont configurées ».
 
@@ -117,6 +121,27 @@ Une enquête s'ouvre tous les 15 jours, le samedi à 21 h (heure de Paris), sur 
 5. Tester avant la date : les comptes de `CASTING_TESTEURS` voient les dossiers en avance, en « mode test » (rien n'est noté ni annoncé).
 6. Les mots de passe ne sont jamais écrits en clair, et les pièces ne sont servies qu'à partir de l'heure d'ouverture. Le dépôt GitHub doit rester **privé**.
 
+## Vote du jour (accueil, section Mécènes)
+
+Chaque soir à 21 h (heure de Paris), une question s'ouvre sur l'accueil pour 24 h. Seuls les Mécènes votent (un rôle Mécène, d'argent, d'or ou Grand Mécène), un vote par personne, et seuls les Mécènes voient le résultat. Le canal 17 voit chaque question 17 minutes avant.
+
+1. Sur Discord : créer un salon **privé** `#registre-votes` (le bot y note chaque vote) et choisir le salon des Mécènes où annoncer la question et le résultat (par exemple un salon de la Loge, invisible des candidats). Le bot Osiris doit voir et écrire dans les deux.
+2. Sur Vercel : `DISCORD_VOTES_REGISTRE_ID` et `DISCORD_VOTES_ANNONCE_ID`, puis redéployer. Facultatif : `DISCORD_VOTES_ROLE_ID`, un rôle à notifier à chaque nouvelle question.
+3. Écrire les questions : `api/_vote/_questions.js` (date, question, 2 à 4 choix, « usage » = ce que le résultat change vraiment). Un jour sans question = pas de vote ce soir-là. Avant la toute première question (le 31 octobre), le bloc reste caché sur l'accueil.
+4. Chaque soir, vers 21 h, le bot publie dans le salon des Mécènes le résultat de la veille puis la nouvelle question (cron `vercel.json`, et à défaut la première visite du site après 21 h). Une marque dans `#registre-votes` évite de publier deux fois.
+5. Tester : les comptes de `CASTING_TESTEURS` voient la question suivante en aperçu quand aucune n'est ouverte (leur vote n'est pas noté).
+6. Tout passe par `api/rangs.js` (`/api/rangs?vote=1`), car le site est au maximum de 12 fonctions sur l'offre gratuite de Vercel.
+
+### Le registre des décisions
+
+Pour ne jamais oublier une promesse faite aux Mécènes, et leur prouver que leur vote a servi.
+
+1. Sur Discord : créer un salon **privé du staff** `#decisions-mecenes` (le bot doit le voir, y écrire et lire l'historique), puis sur Vercel `DISCORD_VOTES_STAFF_ID` et redéployer. Ouvrir une fois `/api/commands?key=<SETUP_KEY>` pour ajouter la commande `/decision-realisee`.
+2. À chaque résultat, le bot y poste un « À faire » : le choix gagnant, **quand** ça doit se voir (champ `quand` de la question) et ce qui a été promis. En cas d'égalité : « À trancher ».
+3. Sur le site, les Mécènes voient le registre complet sous le vote du jour : « À venir · le 3 avril », puis « Réalisée ». Les autres voient seulement le nombre de décisions prises.
+4. Quand c'est fait : `/decision-realisee jour:2026-10-10` (la date est écrite dans le « À faire »), avec `choix:` en cas d'égalité et `note:` si tu veux dire où ça s'est vu. Le message du staff passe en « Réalisée », le site aussi, et le bot annonce dans la Loge « La décision du 10 octobre s'est réalisée ».
+5. Ce salon sert de mémoire au site : ne pas supprimer les messages du bot qui commencent par 📌.
+
 ## Casting : dates et verrouillage
 
 Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du casting. Avant, la page affiche « Formulaire scellé » avec le compte à rebours ; après, « Casting terminé ». Le serveur refuse aussi tout dossier envoyé hors de ces dates (`api/candidature.js`), même si quelqu'un contourne la page.
@@ -150,7 +175,7 @@ Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du c
 
 ## Jeu de piste et Archives
 
-Les réponses du jeu de piste et des Archives ne sont écrites nulle part dans ce dépôt : la direction les garde. Le dépôt GitHub doit rester **privé**, et le site bloque l'accès direct à `/README.md`, `/lib/…` et `/api/_archives/…` (`vercel.json`, redirections).
+Les réponses du jeu de piste et des Archives ne sont écrites nulle part dans ce dépôt : la direction les garde. Le dépôt GitHub doit rester **privé**, et le site bloque l'accès direct à `/README.md`, `/lib/…`, `/api/_archives/…` et `/api/_vote/…` (`vercel.json`, redirections).
 
 ## Offre Vercel
 

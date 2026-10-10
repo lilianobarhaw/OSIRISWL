@@ -233,6 +233,58 @@ main section.block{padding-block:120px 20px}
 @media (max-width:960px){.does{grid-template-columns:1fr 1fr}.split{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
 @media (max-width:480px){.does{grid-template-columns:1fr}}
 
+/* Le vote du jour : cadré aux coins, comme une image de caméra */
+.vote{margin-top:56px;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);border:1px solid var(--line);
+  background:linear-gradient(var(--brass),var(--brass)) left top/18px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) left top/1px 18px no-repeat,
+    linear-gradient(var(--brass),var(--brass)) right top/18px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) right top/1px 18px no-repeat,
+    linear-gradient(var(--brass),var(--brass)) left bottom/18px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) left bottom/1px 18px no-repeat,
+    linear-gradient(var(--brass),var(--brass)) right bottom/18px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) right bottom/1px 18px no-repeat,var(--panel)}
+.vote-main{padding:30px 30px 28px;min-width:0}
+.vote-side{padding:30px 26px 28px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:24px;background-color:rgba(10,11,13,.35)}
+.vote-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.vote-tag{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border:1px solid var(--brass-soft);padding:3px 8px}
+.vote-q{font-family:var(--display);font-weight:400;font-size:clamp(24px,2.6vw,32px);line-height:1.2;letter-spacing:.02em;margin:14px 0 8px;text-wrap:balance}
+.vote-use{margin:0 0 22px;color:var(--dim);font-style:italic}
+.vote-opts{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.vote-use + .vote-opts{margin-top:0}
+.vote-opt{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:12px;width:100%;text-align:left;background:var(--ground);border:1px solid var(--line);border-radius:0;color:var(--bone);font-family:var(--serif);font-size:17px;line-height:1.35;padding:14px 16px;min-height:54px;overflow:hidden}
+button.vote-opt{cursor:pointer;transition:border-color .2s,background-color .2s}
+button.vote-opt:hover{border-color:var(--brass);background-color:#14161A}
+button.vote-opt:disabled{cursor:wait;opacity:.6}
+.vote-opt .n{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--brass);position:relative}
+.vote-opt .t{position:relative}
+.vote-opt .p{font-family:var(--mono);font-size:13px;color:var(--dim);position:relative;white-space:nowrap}
+.vote-opt .barre{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(196,162,101,.11);transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.vote-opt.ferme{color:#CFC9BB}
+.vote-opt.gagne .p{color:var(--gold)}
+.vote-opt.gagne .barre{background:rgba(233,207,120,.16)}
+.vote-opt.mien{border-color:var(--gold)}
+.vote-opt.mien .n{color:var(--gold)}
+.vote-msg{margin-top:18px;font-size:15px;color:var(--dim);display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center}
+.vote-msg .btn{padding:11px 18px}
+.vote-msg .erreur{color:#D27A6D}
+.vote-clock b{display:block;font-family:var(--mono);font-weight:400;font-size:26px;letter-spacing:.06em;color:var(--gold);margin-top:6px}
+.vote-prev-q{margin:6px 0 6px;font-family:var(--display);font-size:17px;line-height:1.3}
+.vote-prev-r{margin:0;font-size:15px;color:#CFC9BB}
+.vote-rule{margin:auto 0 0;font-size:14px;color:var(--dim)}
+.vote-registre{grid-column:1/-1;border-top:1px solid var(--line);padding:24px 30px 26px}
+.vote-registre-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.vote-registre-n{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--dim)}
+.vote-registre-txt{margin:10px 0 0;color:var(--dim);font-size:15px}
+.decisions{list-style:none;margin:12px 0 0;padding:0}
+.decisions:empty{display:none}
+.decisions li{display:grid;grid-template-columns:96px minmax(0,1fr) minmax(0,auto);gap:4px 22px;align-items:center;padding:13px 0;border-top:1px solid var(--line)}
+.decisions .d{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--dim)}
+.decisions .c{display:block;font-family:var(--display);font-size:18px;line-height:1.3}
+.decisions .q{display:block;font-size:14px;line-height:1.4;color:var(--dim)}
+.etat{justify-self:end;text-align:right;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;line-height:1.5;padding:4px 9px;border:1px solid var(--brass-soft);color:var(--brass);max-width:260px}
+.etat.fait{background:var(--gold);border-color:var(--gold);color:#16130C}
+.etat.neutre{border-color:var(--line);color:var(--dim)}
+#vote-tout{margin-top:14px;background:none;border:0;padding:6px 0;cursor:pointer}
+@media (max-width:860px){.vote{grid-template-columns:1fr}.vote-side{border-left:0;border-top:1px solid var(--line)}.vote-main,.vote-side,.vote-registre{padding:24px 20px}}
+@media (max-width:620px){.decisions li{grid-template-columns:1fr}.etat{justify-self:start;text-align:left}}
+@media (prefers-reduced-motion:reduce){.vote-opt .barre{transition:none}}
+
 /* Salle de projection */
 .reels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .reel{display:flex;flex-direction:column;gap:14px}
@@ -551,6 +603,30 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
         <div class="do rv"><span class="n">II</span><b>Il regarde</b><span>Il suit les candidats sur leurs streams, choisit ses favoris, repère ceux qui mentent.</span></div>
         <div class="do rv"><span class="n">III</span><b>Il enquête</b><span>Il cherche ce qu'Osiris cache, dans ses messages, sur ce site et ailleurs.</span></div>
         <div class="do rv"><span class="n">IV</span><b>Il débat</b><span>Théories, paris et soutiens se partagent dans les salons réservés aux Mécènes.</span></div>
+      </div>
+      <div class="vote rv" id="vote" hidden>
+        <div class="vote-main">
+          <div class="vote-top"><span class="label">Le vote du jour</span><span class="vote-tag" id="vote-tag" hidden></span></div>
+          <h3 class="vote-q" id="vote-q">La question du soir arrive…</h3>
+          <p class="vote-use" id="vote-use" hidden></p>
+          <div class="vote-opts" id="vote-opts" role="group" aria-label="Les choix du vote"></div>
+          <div class="vote-msg" id="vote-msg" aria-live="polite" hidden></div>
+        </div>
+        <aside class="vote-side">
+          <div class="vote-clock"><span class="label" id="vote-clock-label">Se ferme dans</span><b id="vote-clock">—</b></div>
+          <div class="vote-prev" id="vote-prev" hidden>
+            <span class="label">Dernier vote</span>
+            <p class="vote-prev-q" id="vote-prev-q"></p>
+            <p class="vote-prev-r" id="vote-prev-r"></p>
+          </div>
+          <p class="vote-rule">Une question chaque soir à 21 h, et son résultat sert vraiment. Seuls les Mécènes votent, et seuls les Mécènes voient le résultat.</p>
+        </aside>
+        <div class="vote-registre" id="vote-registre" hidden>
+          <div class="vote-registre-top"><span class="label">Le registre des décisions</span><span class="vote-registre-n" id="vote-registre-n"></span></div>
+          <p class="vote-registre-txt" id="vote-registre-txt" hidden></p>
+          <ol class="decisions" id="vote-decisions"></ol>
+          <button class="link" id="vote-tout" type="button" hidden>Voir toutes les décisions <span class="ar">→</span></button>
+        </div>
       </div>
       <div class="split">
         <div class="card rv">
@@ -1096,6 +1172,195 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
       }catch(err){ tracking = true; root.classList.remove("intro"); mask(null) }
     })();
   }
+})();
+</script>
+<script>
+/* Le vote du jour (section Mécènes) : /api/rangs?vote=1 */
+(function(){
+  var box = document.getElementById("vote");
+  if(!box) return;
+  var $ = function(id){ return document.getElementById(id) };
+  var ROMAINS = ["I","II","III","IV"];
+  var DISCORD = "https://discord.gg/YMdPEYeam7";
+  var etat = null, cible = 0, ecart = 0, minuterie = null, envoi = false;
+
+  function el(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e }
+  function maintenant(){ return Date.now() + ecart }
+  function duree(ms){
+    if(ms <= 0) return "0 min";
+    var m = Math.ceil(ms / 60000), h = Math.floor(m / 60), j = Math.floor(h / 24);
+    if(j >= 2) return j + " jours";
+    return h ? h + " h " + String(m % 60).padStart(2, "0") : m + " min";
+  }
+  function jourFr(iso){ return new Date(iso).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Paris" }) }
+  function horloge(){
+    if(!cible){ $("vote-clock").textContent = "—"; return }
+    var reste = cible - maintenant();
+    $("vote-clock").textContent = duree(reste);
+    if(reste <= 0){ clearInterval(minuterie); minuterie = null; setTimeout(charger, 3000) }
+  }
+  function message(noeuds){
+    var m = $("vote-msg"); m.textContent = "";
+    if(!noeuds || !noeuds.length){ m.hidden = true; return }
+    noeuds.forEach(function(n){ m.appendChild(typeof n === "string" ? el("span", null, n) : n) });
+    m.hidden = false;
+  }
+  function lien(texte, href, ghost, externe){
+    var a = el("a", "btn" + (ghost ? " ghost" : ""), texte); a.href = href;
+    if(externe){ a.target = "_blank"; a.rel = "noopener" }
+    return a;
+  }
+
+  // Les choix : boutons (Mécène qui n'a pas voté), résultats (après le vote) ou simple liste (les autres).
+  function choix(q, mode){
+    var zone = $("vote-opts"); zone.textContent = "";
+    var res = q.resultats, barres = [];
+    q.options.forEach(function(texte, i){
+      var o = mode === "voter" ? el("button", "vote-opt") : el("div", "vote-opt ferme");
+      if(mode === "voter"){ o.type = "button"; o.addEventListener("click", function(){ voter(i + 1) }) }
+      var barre = el("i", "barre"); barre.setAttribute("aria-hidden", "true");
+      o.appendChild(barre);
+      o.appendChild(el("span", "n", ROMAINS[i]));
+      o.appendChild(el("span", "t", texte));
+      if(mode === "resultats" && res){
+        var r = res.options[i];
+        o.appendChild(el("span", "p", r.pourcent + " %"));
+        if(r.gagnant) o.classList.add("gagne");
+        barres.push([barre, r.pourcent]);
+      } else o.appendChild(el("span", "p", ""));
+      if(q.monChoix === i + 1){ o.classList.add("mien"); o.setAttribute("aria-label", texte + " (ton vote)") }
+      zone.appendChild(o);
+    });
+    if(barres.length) requestAnimationFrame(function(){ requestAnimationFrame(function(){ barres.forEach(function(b){ b[0].style.width = b[1] + "%" }) }) });
+  }
+
+  function rendre(d){
+    etat = d;
+    if(d.maintenant) ecart = Date.parse(d.maintenant) - Date.now();
+    box.hidden = d.lance === false; // rien avant la première question (le soir d'Halloween)
+    if(box.hidden) return;
+    var q = d.question, tag = $("vote-tag");
+    tag.hidden = true;
+
+    if(!q){
+      $("vote-q").textContent = "Pas de vote ce soir.";
+      $("vote-use").hidden = true;
+      $("vote-opts").textContent = "";
+      message(d.prochaine ? ["La prochaine question arrive " + jourFr(d.prochaine) + ", à 21 h."] : ["Les prochaines questions arrivent bientôt."]);
+      $("vote-clock-label").textContent = "Prochaine question dans";
+      cible = d.prochaine ? Date.parse(d.prochaine) : 0;
+    } else {
+      $("vote-q").textContent = q.texte;
+      $("vote-use").textContent = q.usage ? "Ce que ça change : " + q.usage : "";
+      $("vote-use").hidden = !q.usage;
+      if(q.apercu){ tag.textContent = "Aperçu · testeur"; tag.hidden = false }
+      else if(q.avance){ tag.textContent = "Canal 17 · avant les autres"; tag.hidden = false }
+      $("vote-clock-label").textContent = q.apercu ? "Ouvre dans" : "Se ferme dans";
+      cible = Date.parse(q.apercu ? q.ouverture : q.fermeture);
+
+      if(q.resultats){
+        choix(q, "resultats");
+        var n = q.resultats.total;
+        message([q.apercu ? "Aperçu : ce vote n'est pas noté." : "Ton vote est noté. Le résultat final tombe demain à 21 h, ici et dans la Loge.",
+          el("span", "label", n + " Mécène" + (n > 1 ? "s ont" : " a") + " voté")]);
+      } else if(q.monChoix){
+        choix(q, "liste");
+        message(["Ton vote est noté."]);
+      } else if(d.mecene || q.apercu){
+        choix(q, "voter");
+        message(["Un seul vote par question, sans retour en arrière."]);
+      } else if(!d.connecte){
+        choix(q, "liste");
+        message(["Le vote est réservé aux Mécènes.", lien("Se connecter avec Discord", "/api/auth/login?retour=vote")]);
+      } else {
+        choix(q, "liste");
+        message(["Seuls les Mécènes votent. Prends le rôle Mécène sur le Discord, puis reviens ici.", lien("Ouvrir le Discord", DISCORD, true, true)]);
+      }
+    }
+
+    var v = d.veille;
+    $("vote-prev").hidden = !v;
+    if(v){
+      $("vote-prev-q").textContent = v.texte;
+      var t;
+      if(!v.resultats) t = "Le résultat reste entre Mécènes.";
+      else if(!v.resultats.total) t = "Aucun Mécène n'a voté.";
+      else {
+        var g = v.resultats.options.filter(function(o){ return o.gagnant });
+        t = g.length > 1 ? "Égalité : " + g.map(function(o){ return o.texte }).join(" ou ") + ". La régie tranchera."
+          : "Les Mécènes ont choisi : " + g[0].texte + " (" + g[0].pourcent + " %).";
+      }
+      $("vote-prev-r").textContent = t;
+    }
+
+    registre(d);
+    horloge();
+    if(!minuterie && cible) minuterie = setInterval(horloge, 20000);
+  }
+
+  // Le registre des décisions : la preuve que chaque vote a servi (en entier pour les Mécènes, un compteur pour les autres).
+  var toutVoir = false;
+  function registre(d){
+    var zone = $("vote-registre"), liste = $("vote-decisions"), txt = $("vote-registre-txt"), tout = $("vote-tout");
+    liste.textContent = ""; txt.hidden = true; tout.hidden = true;
+    var n = d.decisionsPrises || 0;
+    if(!d.decisions){
+      zone.hidden = !n;
+      $("vote-registre-n").textContent = "";
+      if(n){ txt.textContent = "Les Mécènes ont déjà pris " + n + " décision" + (n > 1 ? "s" : "") + ". Le registre leur est réservé."; txt.hidden = false }
+      return;
+    }
+    var ds = d.decisions;
+    zone.hidden = !ds.length;
+    if(!ds.length) return;
+    var faites = ds.filter(function(x){ return x.realise }).length;
+    $("vote-registre-n").textContent = n + " décision" + (n > 1 ? "s" : "") + " · " + faites + " réalisée" + (faites > 1 ? "s" : "");
+    (toutVoir ? ds : ds.slice(0, 5)).forEach(function(x){
+      var li = el("li"), milieu = el("div");
+      li.appendChild(el("span", "d", x.date));
+      milieu.appendChild(el("span", "c", x.aucun ? "Aucun vote" : x.choix.length > 1 ? "Égalité : " + x.choix.join(" ou ") : x.choix[0]));
+      milieu.appendChild(el("span", "q", x.question));
+      li.appendChild(milieu);
+      li.appendChild(x.realise ? el("span", "etat fait", "Réalisée · " + x.realise)
+        : x.aucun ? el("span", "etat neutre", "Sans suite")
+        : x.choix.length > 1 ? el("span", "etat", "À trancher par la régie")
+        : el("span", "etat", "À venir" + (x.quand ? " · " + x.quand : "")));
+      liste.appendChild(li);
+    });
+    tout.hidden = toutVoir || ds.length <= 5;
+  }
+  $("vote-tout").addEventListener("click", function(){ toutVoir = true; if(etat) registre(etat) });
+
+  function voter(n){
+    if(envoi || !etat || !etat.question) return;
+    envoi = true;
+    Array.prototype.forEach.call(document.querySelectorAll("#vote-opts button"), function(b){ b.disabled = true });
+    fetch("/api/rangs?vote=1", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jour: etat.question.jour, choix: n }) })
+      .then(function(r){ return r.json() })
+      .then(function(res){
+        envoi = false;
+        if(res.ok){ etat.question.monChoix = res.monChoix; etat.question.resultats = res.resultats; rendre(etat); return }
+        if(res.connexion){ location.href = "/api/auth/login?retour=vote"; return }
+        if(res.recharger){ charger(); return }
+        rendre(etat);
+        message([el("span", "erreur", res.erreur || "Le vote n'a pas pu être noté.")]);
+      })
+      .catch(function(){
+        envoi = false; rendre(etat);
+        message([el("span", "erreur", "Le signal est coupé. Réessaie dans un instant.")]);
+      });
+  }
+
+  function charger(){
+    fetch("/api/rangs?vote=1", { credentials: "same-origin", cache: "no-store" })
+      .then(function(r){ if(!r.ok) throw 0; return r.json() })
+      .then(rendre)
+      .catch(function(){
+        $("vote-q").textContent = "Le signal du vote est coupé.";
+        message(["Reviens un peu plus tard."]);
+      });
+  }
+  charger();
 })();
 </script>
 <script src="son.js" defer></script>

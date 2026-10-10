@@ -5,6 +5,10 @@
     {
       "path": "/api/rangs",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/rangs?vote=tick",
+      "schedule": "2 20 * * *"
     }
   ],
   "functions": {
@@ -28,6 +32,11 @@
     },
     {
       "source": "/api/_archives/:chemin*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/api/_vote/:chemin*",
       "destination": "/",
       "permanent": false
     },
