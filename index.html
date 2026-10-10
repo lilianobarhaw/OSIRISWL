@@ -233,6 +233,8 @@ main section.block{padding-block:120px 20px}
 @media (max-width:960px){.does{grid-template-columns:1fr 1fr}.split{grid-template-columns:1fr}.rules{grid-template-columns:1fr}}
 @media (max-width:480px){.does{grid-template-columns:1fr}}
 
+/* La Régie : l'appel vers le jeu, sous les écrans */
+
 /* Le vote du jour : cadré aux coins, comme une image de caméra */
 .vote{margin-top:56px;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);border:1px solid var(--line);
   background:linear-gradient(var(--brass),var(--brass)) left top/18px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) left top/1px 18px no-repeat,
@@ -423,6 +425,13 @@ button.vote-opt:disabled{cursor:wait;opacity:.6}
 @media (max-width:860px){.paths{grid-template-columns:1fr}.about{grid-template-columns:1fr}}
 
 /* Pied de page */
+.jeu-cta{margin-top:18px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"l a" "t a" "p a";gap:6px 28px;align-items:center;padding:24px 26px;border:1px solid var(--line);background:var(--panel, #111317);color:inherit;text-decoration:none;transition:border-color .2s}
+.jeu-cta:hover{border-color:var(--brass)}
+.jeu-cta .label{grid-area:l}
+.jeu-cta b{grid-area:t;font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:.02em}
+.jeu-cta > span:not(.label):not(.link){grid-area:p;color:var(--dim);font-size:16px}
+.jeu-cta .link{grid-area:a}
+@media (max-width:720px){.jeu-cta{grid-template-columns:1fr;grid-template-areas:"l" "t" "p" "a"}}
 footer{margin-top:120px;border-top:1px solid var(--line);padding-block:44px 34px}
 footer .in-wrap{display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,2fr);gap:36px 56px;align-items:start}
 .foot-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 24px}
@@ -435,7 +444,7 @@ footer .legal .clock{font-variant-numeric:tabular-nums}
 footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
 @media (max-width:860px){footer .in-wrap{grid-template-columns:1fr}}
 @media (max-width:480px){.foot-cols{grid-template-columns:1fr 1fr}}
-@media (max-width:720px){footer{padding-bottom:88px}} /* place pour le bouton « Ambiance », fixé en bas à gauche */
+footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas à gauche */
 
 /* Apparition au défilement */
 .rv{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
@@ -695,6 +704,12 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
         <p class="consent">Le lecteur vient de Twitch : il ne se charge que lorsque tu choisis un écran, et Twitch peut alors utiliser ses propres cookies.</p>
       </div>
       <div class="screens" id="screens"></div>
+      <a class="jeu-cta rv" href="/mot" data-apres-lancement hidden>
+        <span class="label">Chaque soir à 21 h</span>
+        <b>Le mot du jour.</b>
+        <span>Un mot de cinq lettres, six essais pour le trouver. Un classement chaque soir, un podium chaque semaine.</span>
+        <span class="link">Jouer <span class="ar">→</span></span>
+      </a>
     </div>
   </section>
 
@@ -805,6 +820,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
         <a href="/casting">Casting</a>
         <a href="/casting#terminal">Accès candidat</a>
         <a href="/archives">Archives</a>
+        <a href="/mot" data-apres-lancement hidden>Le mot du jour</a>
         <a href="#calendrier">Calendrier</a>
       </div>
       <div>
@@ -1252,6 +1268,7 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
     etat = d;
     if(d.maintenant) ecart = Date.parse(d.maintenant) - Date.now();
     box.hidden = d.lance === false; // rien avant la première question (le soir d'Halloween)
+    Array.prototype.forEach.call(document.querySelectorAll("[data-apres-lancement]"), function(x){ x.hidden = d.lance === false }); // le mot du jour aussi
     if(box.hidden) return;
     var q = d.question, tag = $("vote-tag");
     tag.hidden = true;

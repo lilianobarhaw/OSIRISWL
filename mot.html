@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Le mot du jour · Osiris RP</title>
+<meta name="description" content="Un mot de cinq lettres, six essais pour le trouver. Un nouveau chaque soir à 21 h, et un classement chaque semaine.">
+<meta name="theme-color" content="#0A0B0D">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png?v=2">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Osiris RP">
+<meta property="og:title" content="Le mot du jour · Osiris">
+<meta property="og:description" content="Un mot de cinq lettres, six essais. Un nouveau chaque soir à 21 h.">
+<meta property="og:image" content="https://osiriswl.vercel.app/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="fonts/polices.css">
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#0A0B0D; --panel:#111317; --panel-2:#16191E; --line:#23262C; --bone:#E6E0D3; --dim:#8B877D; --faint:#55534D;
+  --brass:#C4A265; --brass-soft:#8E7747; --gold:#E9CF78; --alarm:#B5564A; --alarm-clair:#D27A6D;
+  --display:"Marcellus", Georgia, serif; --serif:"Source Serif 4", Georgia, serif; --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --case:clamp(46px,13vw,60px);
+}
+*{box-sizing:border-box}
+html,body{background:var(--ground)}
+body{margin:0;color:var(--bone);font-family:var(--serif);font-size:17px;line-height:1.6;padding:0 16px 64px;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);z-index:30}
+[hidden]{display:none!important}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+header.bar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:22px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+header.bar .mark{font-family:var(--display);font-size:18px;letter-spacing:.32em;color:var(--bone);display:flex;align-items:center;gap:12px;white-space:nowrap;text-decoration:none}
+header.bar .mark img{width:36px;height:36px;mix-blend-mode:screen}
+.compte{text-align:right}
+.compte a{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-soft)}
+.hero{display:flex;flex-direction:column;gap:12px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,7vw,64px);line-height:1.05;margin:0;letter-spacing:.02em}
+.hero p{margin:0;color:var(--dim);max-width:62ch}
+
+.poste{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
+@media (max-width:980px){.poste{grid-template-columns:1fr}}
+
+/* Le jeu, cadré aux coins comme les écrans du site */
+.jeu{position:relative;border:1px solid var(--line);background:#07080A;padding:18px 18px 22px;display:flex;flex-direction:column;align-items:center;gap:18px;
+  background-image:linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass));
+  background-repeat:no-repeat;background-size:18px 1px,1px 18px,18px 1px,1px 18px,18px 1px,1px 18px,18px 1px,1px 18px;
+  background-position:left top,left top,right top,right top,left bottom,left bottom,right bottom,right bottom}
+.haut{align-self:stretch;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.haut b{font-weight:400;color:var(--bone)}
+.haut .rec{display:inline-flex;align-items:center;gap:8px}
+.haut .rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--alarm);box-shadow:0 0 10px rgba(181,86,74,.9)}
+.haut .test{color:var(--gold)}
+.haut .chrono{font-variant-numeric:tabular-nums}
+
+.grille{display:grid;grid-template-rows:repeat(6,var(--case));gap:7px;position:relative}
+.rang{display:grid;grid-template-columns:repeat(5,var(--case));gap:7px}
+.t{width:var(--case);height:var(--case);display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#0c0d10;font-family:var(--mono);font-size:calc(var(--case) * .46);line-height:1;color:var(--bone);text-transform:uppercase;user-select:none}
+.t.plein{border-color:#6f6b62;animation:pose .12s ease-out}
+.t.m2{background:var(--alarm);border-color:var(--alarm);color:#fff6ea}
+.t.m1{background:#0c0d10 radial-gradient(circle closest-side,var(--brass) 0 90%,transparent 93%);border-color:#2b2a26;color:#16130C}
+.t.m0{background:#14161a;border-color:#14161a;color:var(--faint)}
+.t.revele{animation:retourne .5s ease-in-out both}
+.rang.secoue{animation:secoue .42s}
+.rang.gagne .t{animation:saute .5s ease-out both}
+@keyframes pose{from{transform:scale(1.08)}to{transform:scale(1)}}
+@keyframes retourne{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
+@keyframes secoue{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes saute{0%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}}
+.bulle{position:absolute;left:50%;top:-6px;transform:translate(-50%,-100%);z-index:5;background:var(--bone);color:#121212;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:8px 12px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s}
+.bulle.vue{opacity:1}
+
+/* Le bas du jeu : le clavier, ou ce qui le remplace */
+.bas{align-self:stretch;display:flex;flex-direction:column;align-items:center}
+.clavier{width:100%;max-width:560px;display:flex;flex-direction:column;gap:7px;touch-action:manipulation}
+.clavier .ligne{display:flex;gap:6px}
+.touche{all:unset;box-sizing:border-box;flex:1 1 0;min-width:0;height:54px;display:flex;align-items:center;justify-content:center;background:#1a1d22;border:1px solid #262a31;color:var(--bone);font-family:var(--mono);font-size:15px;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.touche:hover{border-color:var(--brass-soft)}
+.touche:active{transform:translateY(1px)}
+.touche.large{flex:1.6 1 0;font-size:11px;letter-spacing:.12em}
+.touche[data-k="Backspace"]{font-size:20px;letter-spacing:0}
+.touche.m2{background:var(--alarm);border-color:var(--alarm);color:#fff6ea}
+.touche.m1{background:var(--brass);border-color:var(--brass);color:#16130C}
+.touche.m0{background:#0d0e11;border-color:#0d0e11;color:#3d3c39}
+.touche:focus-visible{outline:1px solid var(--bone);outline-offset:2px}
+@media (max-width:420px){.clavier .ligne{gap:4px}.touche{height:50px;font-size:14px}.touche.large{font-size:10px;letter-spacing:.06em}}
+
+.carton{width:100%;max-width:560px;border-top:1px solid var(--line);padding-top:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
+.carton h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,4vw,34px);line-height:1.15;margin:0;letter-spacing:.03em}
+.carton p{margin:0;color:var(--dim);max-width:46ch}
+.carton .note{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.carton .note.or{color:var(--gold)}
+.carton .grand{font-family:var(--mono);font-size:clamp(30px,6vw,46px);color:var(--gold);line-height:1;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);width:100%}
+.stats div{background:#0b0c0f;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+.stats b{font-family:var(--mono);font-weight:400;font-size:20px;color:var(--bone);font-variant-numeric:tabular-nums}
+.stats span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{background:var(--brass);color:#16130C;border:1px solid var(--brass);border-radius:0;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;padding:13px 22px;min-height:46px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--gold);border-color:var(--brass-soft)}
+.btn:focus-visible{outline:1px solid var(--bone);outline-offset:3px}
+
+/* Le classement */
+.classement{border:1px solid var(--line);background:var(--panel);padding:22px 20px;display:flex;flex-direction:column;gap:14px}
+.classement h2{font-family:var(--display);font-weight:400;font-size:22px;margin:4px 0 0;letter-spacing:.03em}
+.onglets{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line)}
+.onglets button{all:unset;box-sizing:border-box;text-align:center;padding:10px 6px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);cursor:pointer}
+.onglets button[aria-selected="true"]{background:var(--panel-2);color:var(--gold);box-shadow:inset 0 -1px 0 var(--brass)}
+.onglets button:focus-visible{outline:1px solid var(--bone);outline-offset:-3px}
+.classement .sous{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.classement ol{list-style:none;margin:0;padding:0}
+.classement li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid var(--line)}
+.classement li .r{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.classement li .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.classement li .s{font-family:var(--mono);font-size:13px;color:var(--bone);font-variant-numeric:tabular-nums;white-space:nowrap}
+.classement li .s small{color:var(--dim);font-size:11px;margin-left:6px}
+.classement li.p1 .r,.classement li.p1 .s{color:var(--gold)}
+.classement li.p2 .r,.classement li.p3 .r{color:var(--brass)}
+.classement li.moi{background:rgba(196,162,101,.08);box-shadow:inset 2px 0 0 var(--gold);padding-left:8px;margin-left:-8px}
+.classement li.sep{display:block;padding:2px 0;border-top:1px dashed var(--line);font-family:var(--mono);color:var(--faint);font-size:12px}
+.classement .vide{color:var(--dim);font-size:15px;margin:0}
+.classement .avant{border-top:1px solid var(--line);padding-top:12px;font-size:14px;color:var(--dim);display:flex;flex-direction:column;gap:6px}
+.classement .avant b{font-weight:400;color:var(--bone)}
+.classement .avant .mot{font-family:var(--mono);letter-spacing:.14em;color:var(--gold)}
+
+.regles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.regles div{background:var(--ground);padding:18px 18px 20px;font-size:15px;color:var(--dim)}
+.regles b{display:block;color:var(--bone);font-weight:400;font-family:var(--display);font-size:18px;margin-bottom:4px}
+.legende{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.legende span{display:flex;align-items:center;gap:10px}
+.legende .t{--case:30px;font-size:14px;flex:none}
+@media (max-width:900px){.regles{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.regles{grid-template-columns:1fr}}
+footer{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line);padding-top:20px}
+footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
+@media (max-width:560px){.jeu{padding:14px 10px 18px}.grille,.rang{gap:6px}}
+/* Sur téléphone, la grille et le clavier doivent tenir dans le premier écran : l'intro se resserre (les règles sont plus bas). */
+@media (max-width:640px){
+  .wrap{gap:20px} header.bar{padding-block:12px} header.bar .mark{font-size:15px} header.bar .mark img{width:30px;height:30px}
+  .hero{gap:4px} .hero p{display:none} h1{font-size:34px}
+  .haut{font-size:11px;letter-spacing:.1em;flex-wrap:nowrap} .haut .chrono{white-space:nowrap}
+  :root{--case:clamp(42px,11.5vw,54px)} .jeu{gap:14px}
+  .touche{height:50px}
+}
+@media (prefers-reduced-motion:reduce){.t.plein,.t.revele,.rang.secoue,.rang.gagne .t{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <a class="mark" href="/"><img src="img/oeil.webp" alt="" width="36" height="36">OSIRIS</a>
+    <span class="compte" id="compte">…</span>
+  </header>
+
+  <section class="hero">
+    <span class="eyebrow">Chaque soir à 21 h</span>
+    <h1>Le mot du jour</h1>
+    <p>Un mot de cinq lettres, six essais pour le trouver. Une case rouge : la lettre est à la bonne place. Un rond jaune : elle est dans le mot, mais ailleurs. Un nouveau mot chaque soir à 21 h.</p>
+  </section>
+
+  <div class="poste">
+    <section class="jeu" aria-label="Le mot du jour">
+      <div class="haut">
+        <span class="rec" id="h-num">…</span>
+        <span class="chrono" id="h-chrono"></span>
+      </div>
+
+      <div class="grille" id="grille" role="grid" aria-label="Tes essais">
+        <div class="bulle" id="bulle" role="status" aria-live="polite"></div>
+      </div>
+
+      <div class="bas">
+        <div class="clavier" id="clavier" hidden aria-label="Clavier"></div>
+
+        <div class="carton" id="c-attente" hidden>
+          <span class="eyebrow">Bientôt</span>
+          <h2>Le premier mot arrive le soir d'Halloween.</h2>
+          <p id="a-date"></p>
+          <div class="grand" id="a-compte">—</div>
+        </div>
+
+        <div class="carton" id="c-connexion" hidden>
+          <h2>Connecte-toi pour jouer.</h2>
+          <p>Une partie par personne et par soir, avec ton compte Discord. Ton pseudo apparaît au classement.</p>
+          <div class="actions"><a class="btn" href="/api/auth/login?retour=mot">Se connecter avec Discord</a></div>
+        </div>
+
+        <div class="carton" id="c-ailleurs" hidden>
+          <h2>Partie commencée ailleurs.</h2>
+          <p>Tu as commencé ce mot sur un autre appareil ou dans un autre navigateur. Termine-le là-bas : une seule partie par soir.</p>
+        </div>
+
+        <div class="carton" id="c-fin" hidden>
+          <span class="eyebrow" id="f-titre">Mot trouvé</span>
+          <h2 id="f-phrase"></h2>
+          <span class="note" id="f-note"></span>
+          <div class="stats" id="f-stats">
+            <div><b id="f-rang">—</b><span>Ce soir</span></div>
+            <div><b id="f-points">—</b><span>Points</span></div>
+            <div><b id="f-serie">—</b><span>Série</span></div>
+          </div>
+          <div class="actions">
+            <button class="btn" id="b-partager" type="button">Copier mon résultat</button>
+            <button class="btn ghost" id="b-nouveau" type="button" hidden>Autre mot d'entraînement</button>
+          </div>
+          <span class="note" id="f-prochain"></span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="classement" aria-labelledby="c-titre">
+      <span class="eyebrow">Classement</span>
+      <h2 id="c-titre">Les joueurs</h2>
+      <div class="onglets" role="tablist">
+        <button type="button" role="tab" id="o-soir" aria-selected="true">Ce soir</button>
+        <button type="button" role="tab" id="o-semaine" aria-selected="false">La semaine</button>
+      </div>
+      <span class="sous" id="c-sous"></span>
+      <ol id="c-liste"></ol>
+      <p class="vide" id="c-vide" hidden></p>
+      <div class="avant" id="c-avant" hidden></div>
+    </aside>
+  </div>
+
+  <section class="regles" aria-label="Règles">
+    <div><b>Devine</b>Tape un mot de cinq lettres, puis Entrée. Les accents ne comptent pas, et un mot qui n'existe pas ne te coûte pas d'essai.</div>
+    <div><b>Lis les cases</b>
+      <span class="legende">
+        <span><span class="t m2">R</span>bonne place</span>
+        <span><span class="t m1">O</span>dans le mot, ailleurs</span>
+        <span><span class="t m0">N</span>pas dans le mot</span>
+      </span>
+    </div>
+    <div><b>Marque</b>Trouvé en 1 essai : 6 points. En 6 essais : 1 point. Ce soir, le classement va au moins d'essais, puis au plus rapide.</div>
+    <div><b>Tiens la série</b>Un nouveau mot chaque soir à 21 h. Trouve-le tous les soirs pour faire grimper ta série. Le lundi à 21 h, le classement de la semaine repart de zéro.</div>
+  </section>
+
+  <footer>
+    <span>© Osiris RP · Tous les regards sont enregistrés</span>
+    <span><a href="/">Accueil</a> · <a href="/archives">Archives</a> · <a href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Discord</a> · <a href="legal">Mentions légales</a></span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id) };
+  var reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var RANGEES = ["AZERTYUIOP", "QSDFGHJKLM", "<WXCVBN>"];
+  var etat = null, ecart = 0, saisie = "", occupe = false, onglet = "soir", dernier = null, rechargement = 0;
+
+  var maintenant = function(){ return Date.now() + ecart };
+  var norm = function(s){ return String(s || "").replace(/œ/gi, "oe").replace(/æ/gi, "ae").normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/[^A-Z]/g, "") };
+  var deux = function(n){ return String(n).padStart(2, "0") };
+  function duree(ms){
+    ms = Math.max(0, ms); var s = Math.floor(ms / 1000), j = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+    return (j ? j + " j " : "") + deux(h) + ":" + deux(m) + ":" + deux(s % 60);
+  }
+  var heure = function(iso){ return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" }).replace(":", " h ") };
+  var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] }) };
+  var pluriel = function(n, mot){ return n + " " + mot + (n > 1 ? "s" : "") };
+
+  // ---------- Construction : la grille et le clavier ----------
+  var cases = [];
+  for (var r = 0; r < 6; r++) {
+    var rang = document.createElement("div"); rang.className = "rang"; rang.setAttribute("role", "row");
+    cases.push([]);
+    for (var c = 0; c < 5; c++) { var t = document.createElement("div"); t.className = "t"; t.setAttribute("role", "gridcell"); rang.appendChild(t); cases[r].push(t); }
+    $("grille").appendChild(rang);
+  }
+  var touches = {};
+  RANGEES.forEach(function(ligne){
+    var l = document.createElement("div"); l.className = "ligne";
+    ligne.split("").forEach(function(k){
+      var b = document.createElement("button"); b.type = "button"; b.className = "touche"; b.tabIndex = -1;
+      if (k === "<") { b.textContent = "Entrée"; b.className += " large"; b.dataset.k = "Enter"; }
+      else if (k === ">") { b.textContent = "⌫"; b.className += " large"; b.dataset.k = "Backspace"; b.setAttribute("aria-label", "Effacer"); }
+      else { b.textContent = k; b.dataset.k = k; touches[k] = b; }
+      b.addEventListener("mousedown", function(e){ e.preventDefault() }); // garde le focus ailleurs : Entrée au clavier ne rappuie pas la dernière touche
+      b.addEventListener("click", function(){ touche(b.dataset.k) });
+      l.appendChild(b);
+    });
+    $("clavier").appendChild(l);
+  });
+
+  // ---------- Lecture du serveur ----------
+  function charger(){
+    return fetch("/api/rangs?mot=1", { cache: "no-store", credentials: "same-origin" })
+      .then(function(r){ return r.json() })
+      .then(function(d){ etat = d; ecart = Date.parse(d.maintenant) - Date.now(); rendre(); })
+      .catch(function(){ $("h-num").textContent = "Hors ligne"; bulle("Le serveur ne répond pas. Recharge la page.", 4000); });
+  }
+
+  var essais = function(){ return (etat && etat.partie && etat.partie.essais) || [] };
+  var jouable = function(){ return !!etat && !!etat.connecte && (etat.lance || etat.entrainement) && !etat.ailleurs && !(etat.partie && etat.partie.fini) };
+
+  function rendre(){
+    var d = etat;
+    $("compte").innerHTML = d.connecte ? "Connecté · " + esc(d.connecte.name) : '<a href="/api/auth/login?retour=mot">Se connecter</a>';
+    $("h-num").innerHTML = d.entrainement ? '<span class="test">Mode test · rien n\'est noté</span>' : d.jour ? "Mot <b>n° " + d.jour.numero + "</b>" + (d.jour.avance ? " · canal 17" : "") : "Bientôt";
+    peindre();
+    var fini = !!(d.partie && d.partie.fini);
+    $("c-attente").hidden = d.lance || d.entrainement;
+    $("c-connexion").hidden = !(d.lance && !d.connecte);
+    $("c-ailleurs").hidden = !(d.lance && d.connecte && d.ailleurs);
+    $("c-fin").hidden = !fini;
+    $("clavier").hidden = !jouable();
+    if (!d.lance && !d.entrainement) $("a-date").textContent = "Samedi 31 octobre, à 21 h. Reviens chaque soir pour un nouveau mot.";
+    if (fini) carton();
+    classement();
+    tic();
+  }
+
+  // La grille et le clavier, à partir des essais déjà joués et de la saisie en cours.
+  function peindre(){
+    var e = essais(), meilleur = {};
+    for (var r = 0; r < 6; r++) for (var c = 0; c < 5; c++) {
+      var t = cases[r][c], lettre = "", cl = "t";
+      if (r < e.length) { lettre = e[r].mot[c]; cl += " m" + e[r].marques[c]; }
+      else if (r === e.length && jouable() && c < saisie.length) { lettre = saisie[c]; cl += " plein"; }
+      if (t.textContent !== lettre) t.textContent = lettre;
+      if (t.className.replace(" revele", "") !== cl) t.className = cl;
+      t.setAttribute("aria-label", lettre ? lettre + (r < e.length ? [" absente", " ailleurs", " bien placée"][+e[r].marques[c]] : "") : "vide");
+    }
+    e.forEach(function(x){ for (var c = 0; c < 5; c++) { var k = x.mot[c], m = +x.marques[c]; if (!(k in meilleur) || m > meilleur[k]) meilleur[k] = m; } });
+    Object.keys(touches).forEach(function(k){ touches[k].className = "touche" + (k in meilleur ? " m" + meilleur[k] : "") });
+  }
+
+  function carton(){
+    var d = etat, p = d.partie, n = p.essais.length;
+    $("f-titre").textContent = d.entrainement ? "Entraînement" : p.trouve ? "Mot trouvé" : "Perdu";
+    $("f-phrase").textContent = p.trouve ? "Trouvé en " + pluriel(n, "essai") + "." : "Le mot était " + p.mot + ".";
+    var moi = d.soir && d.soir.moi;
+    var rang = dernier && dernier.rang ? dernier.rang : moi ? moi.rang : 0;
+    var trouves = dernier && dernier.trouves ? dernier.trouves : d.soir ? d.soir.trouves : 0;
+    var serie = dernier && dernier.serie !== undefined ? dernier.serie : d.serie;
+    $("f-note").className = "note" + (p.trouve ? " or" : "");
+    $("f-note").textContent = d.entrainement ? "Mode test : rien n'est noté." : p.trouve ? (p.mot + (rang === 1 ? " · premier ce soir" : "")) : "Revanche demain à 21 h.";
+    $("f-stats").hidden = !!d.entrainement;
+    $("f-rang").textContent = p.trouve && rang ? rang + "e" + (trouves ? " / " + trouves : "") : "—";
+    if (rang === 1) $("f-rang").textContent = "1er" + (trouves ? " / " + trouves : "");
+    $("f-points").textContent = p.trouve ? "+" + (7 - n) : "0";
+    $("f-serie").textContent = serie || 0;
+    $("b-nouveau").hidden = !d.entrainement;
+    $("b-partager").hidden = !!d.entrainement;
+  }
+
+  function classement(){
+    var d = etat, soir = onglet === "soir";
+    $("o-soir").setAttribute("aria-selected", soir); $("o-semaine").setAttribute("aria-selected", !soir);
+    var bloc = soir ? d.soir : d.semaine, liste = bloc ? bloc.liste : [];
+    if (soir) $("c-sous").textContent = d.soir ? "Mot n° " + d.jour.numero + " · " + d.soir.trouves + " trouvé" + (d.soir.trouves > 1 ? "s" : "") + " sur " + d.soir.joueurs : "Le premier mot arrive le 31 octobre";
+    else $("c-sous").textContent = "Se termine dans " + duree(Date.parse(d.semaine.fin) - maintenant()).replace(/:\d\d$/, "").replace(/(\d\d):(\d\d)$/, "$1 h $2") + " · " + pluriel(d.semaine.joueurs, "joueur");
+    var html = liste.map(function(x){
+      var s = soir ? pluriel(x.essais, "essai") + "<small>" + heure(x.heure) + "</small>" : x.points + " pts<small>" + pluriel(x.mots, "mot") + "</small>";
+      return '<li class="' + (x.rang <= 3 ? "p" + x.rang : "") + (x.moi ? " moi" : "") + '"><span class="r">' + x.rang + '</span><span class="n">' + esc(x.nom) + (x.moi ? " · toi" : "") + '</span><span class="s">' + s + "</span></li>";
+    }).join("");
+    var moi = bloc && bloc.moi;
+    if (moi && !liste.some(function(x){ return x.moi })) {
+      html += '<li class="sep">…</li><li class="moi"><span class="r">' + moi.rang + '</span><span class="n">Toi</span><span class="s">' + (soir ? pluriel(moi.essais, "essai") : moi.points + " pts") + "</span></li>";
+    }
+    $("c-liste").innerHTML = html;
+    $("c-vide").hidden = liste.length > 0;
+    $("c-vide").textContent = soir ? (d.lance ? "Personne ne l'a encore trouvé ce soir. À toi." : "Le classement s'ouvre avec le premier mot.") : "Personne n'a encore marqué de points cette semaine.";
+    var avant = [];
+    if (d.hier) avant.push("Hier, le mot n° " + d.hier.numero + ' était <span class="mot">' + esc(d.hier.mot) + "</span>. " + (d.hier.joueurs ? d.hier.trouves + " sur " + d.hier.joueurs + " l'ont trouvé" + (d.hier.premier ? ", <b>" + esc(d.hier.premier.nom) + "</b> le premier." : ".") : "Personne ne l'a tenté."));
+    if (d.podiumPrecedent && d.podiumPrecedent.length) avant.push("La semaine dernière : " + d.podiumPrecedent.map(function(x, i){ return (i ? (i + 1) + "e " : "1er ") + "<b>" + esc(x.nom) + "</b> (" + x.points + " pts)" }).join(" · "));
+    $("c-avant").innerHTML = avant.map(function(x){ return "<span>" + x + "</span>" }).join("");
+    $("c-avant").hidden = !avant.length;
+  }
+  $("o-soir").addEventListener("click", function(){ onglet = "soir"; classement() });
+  $("o-semaine").addEventListener("click", function(){ onglet = "semaine"; classement() });
+
+  // ---------- Les comptes à rebours ----------
+  function tic(){
+    if (!etat) return;
+    var d = etat, cible = d.jour ? Date.parse(d.jour.fin) : Date.parse(d.lancement), reste = cible - maintenant();
+    $("h-chrono").textContent = d.entrainement ? "" : (d.jour ? "Prochain mot dans " : "Ouverture dans ") + duree(reste);
+    $("a-compte").textContent = duree(reste);
+    $("f-prochain").textContent = d.entrainement ? "" : "Prochain mot dans " + duree(reste);
+    if (reste <= 0 && !d.entrainement && Date.now() - rechargement > 5000) { rechargement = Date.now(); saisie = ""; dernier = null; setTimeout(charger, 1200); }
+  }
+  setInterval(tic, 1000);
+
+  // ---------- Jouer ----------
+  var minuterieBulle = 0;
+  function bulle(texte, ms){
+    var b = $("bulle"); b.textContent = texte; b.classList.add("vue");
+    clearTimeout(minuterieBulle); minuterieBulle = setTimeout(function(){ b.classList.remove("vue") }, ms || 1800);
+  }
+  function secouer(){
+    var r = cases[essais().length] && cases[essais().length][0].parentNode; if (!r || reduit) return;
+    r.classList.remove("secoue"); void r.offsetWidth; r.classList.add("secoue");
+  }
+
+  function touche(k){
+    if (!jouable() || occupe) return;
+    if (k === "Enter") return valider();
+    if (k === "Backspace") { saisie = saisie.slice(0, -1); peindre(); return; }
+    var l = norm(k); if (l.length !== 1 || saisie.length >= 5) return;
+    saisie += l; peindre();
+  }
+  document.addEventListener("keydown", function(e){
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.key === "Enter" || e.key === "Backspace") { if (jouable()) { e.preventDefault(); touche(e.key); } return; }
+    if (e.key.length === 1 && norm(e.key).length === 1) touche(e.key);
+  });
+
+  function envoyer(corps, essaiNo){
+    return fetch("/api/rangs?mot=1", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) })
+      .then(function(r){ return r.json().then(function(j){ j.statut = r.status; return j }) })
+      .then(function(j){
+        if (j.statut === 503 && j.reessayer && essaiNo < 2) return new Promise(function(ok){ setTimeout(ok, 1500) }).then(function(){ return envoyer(corps, essaiNo + 1) });
+        return j;
+      });
+  }
+
+  function valider(){
+    if (saisie.length < 5) { secouer(); bulle("Il faut 5 lettres."); return; }
+    occupe = true;
+    var ligne = essais().length;
+    envoyer({ essai: saisie, jour: etat.jour ? etat.jour.cle : undefined }, 0).then(function(j){
+      if (j.ok) {
+        saisie = ""; etat.partie = j.partie; if (j.partie.fini) dernier = j;
+        reveler(ligne, function(){
+          occupe = false;
+          if (j.partie.fini) {
+            if (j.partie.trouve && !reduit) { var r = cases[ligne][0].parentNode; r.classList.add("gagne"); Array.prototype.forEach.call(r.children, function(t, i){ t.style.animationDelay = i * 80 + "ms" }); }
+            bulle(j.partie.trouve ? ["Du premier coup !", "Magnifique.", "Bien joué.", "Bien joué.", "Trouvé.", "De justesse."][ligne] : j.partie.mot, 2200);
+            rendre();
+            if (!etat.entrainement) setTimeout(charger, 900);
+          }
+        });
+        return;
+      }
+      occupe = false;
+      if (j.inconnu) { secouer(); bulle("Pas dans le dictionnaire."); return; }
+      if (j.connexion) { charger(); return; }
+      bulle(j.erreur || "Ça n'a pas marché. Réessaie.", 3200);
+      if (j.recharger) { saisie = ""; charger(); }
+    }).catch(function(){ occupe = false; bulle("Pas de réseau. Réessaie.", 3000); });
+  }
+
+  // Les cases se retournent une à une, puis la ligne prend ses couleurs.
+  function reveler(ligne, fini){
+    var e = essais()[ligne];
+    if (reduit) { peindre(); fini(); return; }
+    cases[ligne].forEach(function(t, i){
+      setTimeout(function(){
+        t.classList.add("revele");
+        setTimeout(function(){ t.className = "t revele m" + e.marques[i]; t.textContent = e.mot[i]; }, 250);
+      }, i * 230);
+    });
+    setTimeout(function(){ peindre(); cases[ligne].forEach(function(t){ t.classList.remove("revele") }); fini(); }, 4 * 230 + 520);
+  }
+
+  $("b-nouveau").addEventListener("click", function(){
+    envoyer({ action: "nouveau" }, 0).then(function(j){ if (j.ok) { etat.partie = j.partie; saisie = ""; dernier = null; rendre(); } });
+  });
+
+  // Le résultat à coller sur Discord, façon Motus : 🟥 bien placée, 🟡 ailleurs, ⬛ absente.
+  $("b-partager").addEventListener("click", function(){
+    var p = etat.partie, n = p.essais.length;
+    var texte = "👁 Le mot du jour · n° " + etat.jour.numero + " · " + (p.trouve ? n : "X") + "/6\n" +
+      p.essais.map(function(x){ return x.marques.split("").map(function(m){ return ["⬛", "🟡", "🟥"][+m] }).join("") }).join("\n") +
+      "\n" + location.origin + "/mot";
+    var ok = function(){ var b = $("b-partager"); b.textContent = "Copié"; setTimeout(function(){ b.textContent = "Copier mon résultat" }, 1800) };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texte).then(ok, function(){ secours(texte); ok(); });
+    else { secours(texte); ok(); }
+  });
+  function secours(texte){
+    var z = document.createElement("textarea"); z.value = texte; z.setAttribute("readonly", ""); z.style.position = "fixed"; z.style.opacity = "0";
+    document.body.appendChild(z); z.select(); try { document.execCommand("copy") } catch (e) {} z.remove();
+  }
+
+  // Revenir sur l'onglet après un moment : le mot a peut-être changé.
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && !occupe) charger(); });
+  charger();
+})();
+</script>
+</body>
+</html>

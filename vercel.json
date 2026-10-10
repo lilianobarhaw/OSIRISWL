@@ -41,6 +41,11 @@
       "permanent": false
     },
     {
+      "source": "/api/_mot/:chemin*",
+      "destination": "/",
+      "permanent": false
+    },
+    {
       "source": "/package.json",
       "destination": "/",
       "permanent": false

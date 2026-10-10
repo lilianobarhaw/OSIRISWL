@@ -14,6 +14,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `video/osiris-rp.mp4` : le générique (animation de l'Œil), lu dans la salle de projection.
 - `archives.html` (adresse `/archives`) + `api/archives.js` + `api/_archives/` : les Archives d'Osiris, une enquête tous les 15 jours (voir « Archives »).
 - `convocation.html` (adresse `/convocation#…`) : la convocation personnelle d'un élu. L'enveloppe à son nom, l'œil qui s'ouvre, la lettre de Cassius Vale (avec un P.-S. facultatif), le compte à rebours du casting, et un bouton pour enregistrer sa convocation en image (format story). Le prénom, le numéro et le P.-S. sont écrits dans le lien, après le `#` : cette partie n'est jamais envoyée au serveur, rien n'est enregistré. Les liens se créent avec le générateur privé « Convocations Osiris ». Aperçu Discord : `img/convocation.png`. Page non référencée par les moteurs de recherche.
+- `mot.html` (adresse `/mot`) + `lib/mot.js` + `api/_mot/` : le mot du jour, un jeu avec classement (voir « Le mot du jour »).
 - `legal.html` (adresse `/legal`) : mentions légales, mention de fiction, données personnelles (RGPD), cookies, conditions d'utilisation, crédits. Liée en bas de toutes les pages et sous le formulaire de candidature. Mettre à jour la date en haut de la page à chaque changement.
 - `fonts/` : les polices du site (Marcellus, IBM Plex Mono, Source Serif 4), hébergées sur le site pour ne rien envoyer à Google. Licences OFL dans le dossier.
 - `son.js` + `audio/ambiance.mp3` : l'ambiance sonore (composition originale, libre de droits, boucle de 96 s). Elle démarre au premier clic du visiteur (les navigateurs interdisent le son automatique), à volume bas, avec un bouton « Ambiance » en bas à gauche pour la couper ; le choix est retenu. Pour changer de musique : remplacer `audio/ambiance.mp3` et mettre sa durée dans `BOUCLE` (son.js). Volume : `VOLUME` dans son.js.
@@ -83,6 +84,10 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_VOTES_ANNONCE_ID` | Vote du jour : salon des Mécènes où le bot publie chaque soir la question et le résultat de la veille |
 | `DISCORD_VOTES_ROLE_ID` | Facultatif. Rôle notifié à chaque nouvelle question du jour |
 | `DISCORD_VOTES_STAFF_ID` | Vote du jour : salon **privé du staff** `#decisions-mecenes`, où le bot poste un « À faire » pour chaque résultat. Le site y lit aussi l'état des décisions |
+| `DISCORD_MOT_REGISTRE_ID` | Mot du jour : salon **privé** `#registre-mots`, où le bot note chaque partie (obligatoire pour jouer) |
+| `DISCORD_MOT_ANNONCE_ID` | Facultatif. Mot du jour : salon où le bot donne chaque soir le mot de la veille, et le lundi le podium de la semaine |
+| `DISCORD_MOT_ROLE_ID` | Facultatif. Rôle donné au premier de la semaine (et retiré au premier de la semaine d'avant) |
+| `MOT_PREMIER_JOUR` | Facultatif. Pour déplacer le premier mot, au format `2026-10-31` (il s'ouvre ce jour-là à 21 h) |
 
 Redéployer après chaque modification des variables. Vérification : ouvrir `https://<ton-domaine>/api/candidature` → doit afficher « toutes les variables sont configurées ».
 
@@ -141,6 +146,19 @@ Pour ne jamais oublier une promesse faite aux Mécènes, et leur prouver que leu
 3. Sur le site, les Mécènes voient le registre complet sous le vote du jour : « À venir · le 3 avril », puis « Réalisée ». Les autres voient seulement le nombre de décisions prises.
 4. Quand c'est fait : `/decision-realisee jour:2026-10-10` (la date est écrite dans le « À faire »), avec `choix:` en cas d'égalité et `note:` si tu veux dire où ça s'est vu. Le message du staff passe en « Réalisée », le site aussi, et le bot annonce dans la Loge « La décision du 10 octobre s'est réalisée ».
 5. Ce salon sert de mémoire au site : ne pas supprimer les messages du bot qui commencent par 📌.
+
+## Le mot du jour (page /mot)
+
+Un mot de 5 lettres à trouver en 6 essais, comme Motus : case rouge = bonne place, rond jaune = dans le mot mais ailleurs. Un nouveau mot chaque soir à 21 h (heure de Paris), à partir du soir d'Halloween. Le canal 17 a chaque mot 17 minutes avant.
+
+1. Sur Discord : créer un salon **privé** `#registre-mots` (le bot doit le voir, y écrire et lire l'historique). Facultatif : un salon pour l'annonce du soir (par exemple `#annonce`), et un rôle « Mot du jour : premier de la semaine », sous le rôle du bot.
+2. Sur Vercel : `DISCORD_MOT_REGISTRE_ID` (et si besoin `DISCORD_MOT_ANNONCE_ID`, `DISCORD_MOT_ROLE_ID`), puis redéployer.
+3. Il faut être connecté avec Discord pour jouer, et on ne joue qu'une fois par mot. Le mot ne quitte jamais le serveur : la page envoie chaque essai et reçoit seulement les couleurs. Un mot qui n'existe pas ne coûte pas d'essai (dictionnaire : `api/_mot/_dico.js`).
+4. Classement du soir : le moins d'essais, puis le plus rapide. Classement de la semaine : trouvé en 1 essai = 6 points, … en 6 essais = 1 point ; il repart de zéro le lundi à 21 h. La semaine d'Halloween (deux mots) compte avec la suivante. La série compte les soirs d'affilée où le mot a été trouvé.
+5. Chaque soir vers 21 h (cron de `vercel.json`, et à défaut la première visite de /mot), si `DISCORD_MOT_ANNONCE_ID` est rempli, le bot annonce le mot de la veille, combien l'ont trouvé et qui a été le premier ; le lundi, il ajoute le podium de la semaine et donne le rôle au premier.
+6. Les mots : `api/_mot/_mots.js`, dans l'ordre (n° 1 le 31 octobre 2026). La liste tient jusqu'en septembre 2027 ; ajouter des mots à la fin, sans changer l'ordre des mots déjà passés.
+7. Tester avant la date : les comptes de `CASTING_TESTEURS` jouent sur des mots d'entraînement (rien n'est noté). Après l'ouverture, ils jouent comme tout le monde.
+8. Le registre sert de mémoire au jeu : une ligne `🔤 mot …` par joueur et par soir, et une marque `📣 mot …` par annonce. Pour retirer une partie suspecte, supprimer sa ligne.
 
 ## Casting : dates et verrouillage
 
