@@ -424,14 +424,18 @@ button.vote-opt:disabled{cursor:wait;opacity:.6}
 
 /* Pied de page */
 footer{margin-top:120px;border-top:1px solid var(--line);padding-block:44px 34px}
-footer .in-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:start}
-footer .links{display:flex;gap:22px;flex-wrap:wrap;justify-content:flex-end}
-footer .links a{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none}
-footer .links a:hover{color:var(--bone)}
+footer .in-wrap{display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,2fr);gap:36px 56px;align-items:start}
+.foot-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 24px}
+.foot-cols div{display:flex;flex-direction:column;align-items:flex-start;gap:11px}
+.foot-cols .label{margin-bottom:4px}
+.foot-cols a{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none;padding:2px 0}
+.foot-cols a:hover{color:var(--bone)}
 footer .legal{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);border-top:1px solid var(--line);padding-top:20px}
 footer .legal .clock{font-variant-numeric:tabular-nums}
 footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
-@media (max-width:720px){footer .in-wrap{grid-template-columns:1fr}footer .links{justify-content:flex-start}}
+@media (max-width:860px){footer .in-wrap{grid-template-columns:1fr}}
+@media (max-width:480px){.foot-cols{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){footer{padding-bottom:88px}} /* place pour le bouton « Ambiance », fixé en bas à gauche */
 
 /* Apparition au défilement */
 .rv{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
@@ -791,21 +795,31 @@ footer .tag{font-style:italic;color:var(--dim);margin:10px 0 0}
 
 <footer>
   <div class="in-wrap">
-    <div>
+    <div class="foot-brand">
       <a class="mark" href="#accueil"><img src="img/apple-touch-icon.png" alt="" width="36" height="36">OSIRIS RP</a>
-      <p class="tag">Les candidats vivent le Programme. Les Mécènes l'écrivent.</p>
+      <p class="tag">Les candidats vivent le Programme.<br>Les Mécènes l'écrivent.</p>
     </div>
-    <nav class="links" aria-label="Liens">
-      <a href="/casting">Casting</a>
-      <a href="/archives">Archives</a>
-      <a data-link="discord" href="#">Discord</a>
-      <a data-link="twitch" href="#">Twitch</a>
-      <a data-link="tiktok" href="#">TikTok</a>
-      <a href="#ecrans">Écrans</a>
-      <a href="#partenaires">Partenaires</a>
-      <a href="/casting#terminal">Accès candidat</a>
-      <a href="legal#mentions">Mentions légales</a>
-      <a href="legal#donnees">Confidentialité</a>
+    <nav class="foot-cols" aria-label="Liens">
+      <div>
+        <span class="label">Le Programme</span>
+        <a href="/casting">Casting</a>
+        <a href="/casting#terminal">Accès candidat</a>
+        <a href="/archives">Archives</a>
+        <a href="#calendrier">Calendrier</a>
+      </div>
+      <div>
+        <span class="label">Suivre</span>
+        <a data-link="discord" href="#">Discord</a>
+        <a data-link="twitch" href="#">Twitch</a>
+        <a data-link="tiktok" href="#">TikTok</a>
+        <a href="#ecrans">Les écrans</a>
+      </div>
+      <div>
+        <span class="label">Osiris</span>
+        <a href="#partenaires">Partenaires</a>
+        <a href="legal#mentions">Mentions légales</a>
+        <a href="legal#donnees">Confidentialité</a>
+      </div>
     </nav>
     <div class="legal">
       <span>© Osiris RP · Tous les regards sont enregistrés</span>
