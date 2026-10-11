@@ -100,11 +100,11 @@ Le soir d'Halloween à 21 h, c'est l'ouverture officielle du projet : le Discord
 1. Les comptes de `CASTING_TESTEURS` voient tout le site. Pour se connecter : le lien « Équipe » en bas du décompte (ou `/api/auth/login?retour=accueil`). La connexion dure 6 heures.
    Le bouton « Filtre », en bas à droite, n'apparaît que pour les testeurs : un appui montre le site comme le voit le public (le décompte), un autre ramène au mode testeur (`filtre.js`, cookie `osiris_vue`). Pour un visiteur qui n'est pas testeur, il n'existe pas.
 2. Restent ouverts à tous : les mentions légales (`/legal`, obligatoires), les images, les polices, les sons, et les adresses `/api/…`.
-3. À 21 h pile (heure du serveur), le décompte affiche « C'est l'heure. » et recharge la page : le site apparaît. Le canal 17 n'a pas d'avance sur ce décompte-là.
+3. À 21 h pile (heure du serveur), le décompte affiche « C'est l'heure. » et recharge la page : le site apparaît. Le canal 17 n'a pas d'avance sur l'ouverture officielle (ni sur le décompte de l'accueil, ni sur le teaser) : il la retrouve pour le casting et les étapes suivantes.
 4. Sur l'accueil, un grand décompte (quatre cases) remplace la ligne « prochaine étape » : l'ouverture officielle, puis « C'est officiel. » pendant 24 h, puis tout seul l'ouverture du casting (20 février, 23 h 30), la fin du casting (14 mars), l'annonce des 35 (27 mars) et l'ouverture du Programme 01 (3 avril, 20 h 30). Pendant le Programme, la petite ligne reprend. Les étapes sont dans `GRAND` (`index.html`).
 5. Après l'ouverture, `middleware.js` ne fait plus rien (on peut le supprimer). Pour changer la date : `OUVERTURE` dans `middleware.js`, `bientot.html`, `index.html` et `lib/decompte.js`.
 
-**La cinématique.** Le teaser est dans `FILMS` (`index.html`), verrouillé jusqu'à 21 h. Coller son identifiant YouTube dans `youtube`, et programmer la vidéo sur YouTube pour 20 h 43 (le canal 17 la voit 17 minutes avant) : avant cette heure, même avec l'identifiant dans la page, personne ne peut la regarder. Le titre « On vous regarde » est provisoire.
+**La cinématique.** Le teaser est dans `FILMS` (`index.html`), verrouillé jusqu'à 21 h. Coller son identifiant YouTube dans `youtube`, et programmer la vidéo sur YouTube pour 21 h : avant cette heure, même avec l'identifiant dans la page, personne ne peut la regarder. Le titre « On vous regarde » est provisoire.
 
 **Discord.**
 1. Créer un salon **vocal** en haut du serveur (personne ne peut s'y connecter : @everyone sans « Se connecter »). Le bot doit avoir « Gérer les salons » dessus.

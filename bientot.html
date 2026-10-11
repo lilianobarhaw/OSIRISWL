@@ -46,11 +46,15 @@ main{flex:1;position:relative;display:flex;flex-direction:column;align-items:cen
 .compte span{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
 .date{margin:0;font-family:var(--display);font-size:clamp(20px,2.6vw,26px);letter-spacing:.04em}
 .heure{font-family:var(--display);font-size:clamp(34px,6vw,58px);line-height:1.1;letter-spacing:.04em;color:var(--gold)}
+.discord{display:inline-flex;align-items:center;justify-content:center;margin-top:2px;background:var(--brass);color:#16130C;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;padding:14px 26px;text-decoration:none;transition:filter .2s}
+.discord:hover{filter:brightness(1.1)}
+.discord:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 footer{position:relative;display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:18px 16px 26px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
 @media (max-width:640px){body.a-filtre footer{padding-bottom:72px}}
 @keyframes apparait{to{opacity:1}}
 @keyframes pouls{50%{opacity:.25}}
+@media (max-height:820px) and (min-width:481px){main{padding-top:28px;gap:16px}.oeil{width:min(320px,62vw,calc(30svh * 1.2))}}
 @media (max-width:480px){.compte div{min-width:0;padding:12px 4px 10px}.titre{font-size:11px;letter-spacing:.14em}main{gap:18px}}
 @media (prefers-reduced-motion:reduce){.oeil{animation:none;opacity:1}.titre i{animation:none}}
 </style>
@@ -68,6 +72,7 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
   </div>
   <div class="heure" id="heure" hidden>C'est l'heure.</div>
   <p class="date">Samedi 31 octobre 2026 · 21 h</p>
+  <a class="discord" href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Rejoindre le Discord</a>
 </main>
 <footer>
   <span>© Osiris RP</span>
