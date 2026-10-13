@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- La page de la saison 2. Jusqu'au mercredi 1er septembre 2027, 20 h, seuls les testeurs la voient (middleware.js).
+     Ensuite, elle est publique et sert de page d'annonce et de casting du Programme 02. -->
+<title>Eye School · Programme 02 · Osiris RP</title>
+<meta name="description" content="Programme 02 d'Osiris : Eye School. L'Institut d'Abydos fait sa rentrée le samedi 16 octobre 2027. Casting du 1er septembre au 1er octobre.">
+<meta name="theme-color" content="#0A0B0D">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png?v=2">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Osiris RP">
+<meta property="og:title" content="Eye School · Programme 02 d'Osiris">
+<meta property="og:description" content="Cent ans. Trente-six élèves. Un ciel trop clair. Rentrée le 16 octobre 2027.">
+<meta property="og:image" content="https://osiriswl.vercel.app/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="/fonts/polices.css">
+<link rel="preload" as="font" type="font/woff" href="/fonts/marcellus.woff" crossorigin>
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#0A0B0D; --panel:#111317; --line:#23262C;
+  --bone:#E6E0D3; --dim:#8B877D; --faint:#55534D;
+  --brass:#C4A265; --brass-soft:#8E7747; --gold:#E9CF78; --alarm:#B5564A;
+  --jaune:#D9B44A; --rouge:#B5483F; --bleue:#5B7FB8; --verte:#5E9470;
+  --display:"Marcellus", Georgia, serif;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --max:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+html,body{background:var(--ground)}
+body{margin:0;color:var(--bone);font-family:var(--serif);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);z-index:5}
+[hidden]{display:none!important}
+a{color:inherit}
+.in-wrap{max-width:var(--max);margin:0 auto;padding-inline:20px}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+.gold-text{background:linear-gradient(180deg,#fbf0b8 0%,#e9cf78 45%,#a9853f 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* Boutons */
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--brass);color:#16130C;border:0;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;padding:13px 22px;cursor:pointer;text-decoration:none;transition:filter .2s,background .2s,color .2s}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--brass);border:1px solid var(--brass-soft)}
+.btn.ghost:hover{background:rgba(196,162,101,.08);filter:none}
+.btn.attente{background:transparent;color:var(--dim);border:1px dashed var(--line);cursor:default}
+.btn.attente:hover{filter:none}
+.btn:focus-visible,a:focus-visible,button:focus-visible{outline:1px solid var(--bone);outline-offset:3px}
+
+/* En-tête */
+.top{position:fixed;inset:0 0 auto;z-index:7;background:rgba(10,11,13,.92);border-bottom:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.top .in-wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
+.mark{display:flex;align-items:center;gap:12px;font-family:var(--display);font-size:17px;letter-spacing:.32em;color:var(--bone);text-decoration:none;white-space:nowrap}
+.mark img{width:36px;height:36px;mix-blend-mode:screen}
+.nav{display:flex;align-items:center;gap:26px}
+.nav a{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-decoration:none;padding-block:6px;transition:color .2s}
+.nav a:hover{color:var(--bone)}
+.nav .btn{padding:10px 16px;color:#16130C}
+.nav .btn.attente{color:var(--dim)}
+@media (max-width:900px){.nav a:not(.btn){display:none}}
+@media (max-width:560px){.nav .btn{display:none}}
+
+/* Accueil */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:104px 20px 72px;gap:18px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(ellipse 60% 45% at 50% 38%,rgba(196,162,101,.07),transparent 70%),
+  radial-gradient(1.2px 1.2px at 12% 22%,rgba(230,224,211,.7),transparent 60%),
+  radial-gradient(1px 1px at 27% 64%,rgba(230,224,211,.45),transparent 60%),
+  radial-gradient(1.4px 1.4px at 38% 14%,rgba(230,224,211,.55),transparent 60%),
+  radial-gradient(1px 1px at 61% 78%,rgba(230,224,211,.4),transparent 60%),
+  radial-gradient(1.2px 1.2px at 88% 58%,rgba(230,224,211,.5),transparent 60%),
+  radial-gradient(1px 1px at 7% 84%,rgba(230,224,211,.35),transparent 60%),
+  radial-gradient(1px 1px at 93% 12%,rgba(230,224,211,.4),transparent 60%)}
+.ceinture{position:absolute;right:9%;top:17%;width:120px;height:44px;pointer-events:none;transform:rotate(-18deg)}
+.ceinture i{position:absolute;width:3px;height:3px;border-radius:50%;background:#F3EEDF;box-shadow:0 0 10px 2px rgba(243,238,223,.5);animation:scintille 5s ease-in-out infinite}
+.ceinture i:nth-child(1){left:0;top:30px}
+.ceinture i:nth-child(2){left:56px;top:18px;animation-delay:1.6s}
+.ceinture i:nth-child(3){left:112px;top:6px;animation-delay:3.1s}
+@keyframes scintille{50%{opacity:.45}}
+.apercu{position:relative;z-index:1;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#D27A6D;border:1px solid rgba(181,86,74,.55);padding:7px 12px;background:rgba(10,11,13,.7)}
+.blason{position:relative;z-index:1;width:min(150px,30vw);height:auto}
+.prog-num{position:relative;z-index:1;font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+.titre{position:relative;z-index:1;margin:0;font-family:var(--display);font-weight:400;font-size:clamp(44px,8vw,92px);line-height:1;letter-spacing:.18em;margin-right:-.18em;white-space:nowrap}
+.trait{position:relative;z-index:1;width:min(520px,70vw);height:1px;background:linear-gradient(90deg,rgba(233,207,120,0),rgba(233,207,120,.85),rgba(233,207,120,0))}
+.trait::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;background:var(--gold);transform:translate(-50%,-50%) rotate(45deg)}
+.accroche{position:relative;z-index:1;margin:4px 0 0;font-style:italic;font-size:clamp(19px,2.2vw,24px);line-height:1.45;max-width:30em}
+.lead{position:relative;z-index:1;margin:0;color:var(--dim);max-width:36em}
+.etape{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:6px}
+.etape .live{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone);display:inline-flex;align-items:center;gap:8px}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--alarm);box-shadow:0 0 8px var(--alarm);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.compte{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.compte div{background:rgba(10,11,13,.82);padding:12px 6px 10px;min-width:clamp(68px,10vw,104px);display:flex;flex-direction:column;align-items:center;gap:4px}
+.compte b{font-family:var(--mono);font-weight:400;font-size:clamp(28px,4.2vw,44px);line-height:1;color:var(--gold);font-variant-numeric:tabular-nums}
+.compte span{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.etape .gros{font-family:var(--display);font-size:clamp(28px,4vw,40px);line-height:1.1;letter-spacing:.04em}
+.cta{position:relative;z-index:1;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+@media (max-height:940px) and (min-width:521px){
+  .hero{padding-top:92px;padding-bottom:40px;gap:12px}
+  .blason{width:min(120px,13svh)}
+  .titre{font-size:clamp(40px,min(7vw,9svh),84px)}
+  .accroche{font-size:clamp(18px,2vw,22px)}
+  .compte div{padding:9px 6px 8px}
+  .compte b{font-size:clamp(26px,min(3.6vw,4.6svh),40px)}
+}
+@media (max-height:800px) and (min-width:521px){.lead{display:none}.prog-num{display:none}}
+
+/* Le signal */
+.signal{position:relative;z-index:1;display:flex;align-items:center;gap:14px;margin-top:4px;background:none;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:10px 14px;cursor:pointer;transition:border-color .2s,color .2s}
+.signal:hover{border-color:var(--brass-soft);color:var(--bone)}
+.signal .onde{display:flex;align-items:center;gap:5px}
+.signal .onde i{display:block;height:2px;background:var(--faint);border-radius:2px;transition:background .08s,box-shadow .08s}
+.signal .onde .l{width:26px}
+.signal .onde .c{width:5px}
+.signal .onde .esp{width:6px;background:transparent}
+.signal .onde i.on{background:var(--gold);box-shadow:0 0 8px rgba(233,207,120,.8)}
+
+/* Sections */
+main section.block{padding-block:110px 10px}
+.head{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 56px;align-items:end;margin-bottom:46px}
+.head .num{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--faint);display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.head .num::after{content:"";height:1px;width:56px;background:var(--brass-soft)}
+.head h2{font-family:var(--display);font-weight:400;font-size:clamp(32px,4.4vw,52px);line-height:1.08;letter-spacing:.03em;margin:0;text-wrap:balance}
+.head p{margin:0;color:var(--dim);font-size:18px;max-width:40em}
+@media (max-width:860px){.head{grid-template-columns:1fr;align-items:start}}
+
+/* L'Institut */
+.institut{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:18px}
+.lettre{background:var(--panel);border:1px solid var(--line);padding:32px 30px;position:relative;overflow:hidden}
+.lettre::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,var(--brass),transparent 70%);opacity:.5}
+.lettre p{margin:0 0 14px;color:#CFC9BB}
+.lettre p:last-child{margin-bottom:0}
+.lettre .devise{font-family:var(--display);font-size:22px;letter-spacing:.06em;color:var(--bone)}
+.lettre .devise span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+.chiffres{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);align-self:start}
+.chiffres div{background:var(--ground);padding:20px 18px;display:flex;flex-direction:column;gap:2px}
+.chiffres b{font-family:var(--display);font-weight:400;font-size:38px;line-height:1.05;color:var(--bone)}
+.chiffres span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+@media (max-width:860px){.institut{grid-template-columns:1fr}}
+
+/* Les classes */
+.classes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.classe{background:var(--panel);border:1px solid var(--line);padding:0 0 22px;display:flex;flex-direction:column;gap:10px;overflow:hidden;transition:border-color .3s,transform .3s}
+.classe:hover{transform:translateY(-2px);border-color:var(--brass-soft)}
+.classe .cravate{height:10px;background:repeating-linear-gradient(135deg,var(--c) 0 12px,rgba(10,11,13,.55) 12px 16px)}
+.classe .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--c);padding:12px 20px 0}
+.classe h3{font-family:var(--display);font-weight:400;font-size:28px;letter-spacing:.04em;margin:0;padding-inline:20px}
+.classe p{margin:0;padding-inline:20px;color:var(--dim);font-size:15.5px}
+.note{margin:18px 0 0;color:var(--dim);font-style:italic}
+@media (max-width:960px){.classes{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.classes{grid-template-columns:1fr}}
+
+/* Les rôles */
+.roles{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.roles li{background:var(--ground);padding:22px 22px 20px;display:grid;grid-template-columns:56px 1fr;gap:4px 16px}
+.roles .pl{grid-row:span 2;font-family:var(--mono);font-size:30px;line-height:1;color:var(--gold);text-align:right;padding-top:2px;font-variant-numeric:tabular-nums}
+.roles b{font-family:var(--display);font-weight:400;font-size:21px;letter-spacing:.03em}
+.roles span{color:var(--dim);font-size:15.5px}
+.roles li.large{grid-column:1/-1;background:var(--panel)}
+@media (max-width:760px){.roles{grid-template-columns:1fr}}
+
+/* Ce qui change */
+.change{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.change div{border-top:1px solid var(--brass-soft);padding-top:18px}
+.change .n{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--brass);display:block;margin-bottom:10px}
+.change b{display:block;font-family:var(--display);font-weight:400;font-size:22px;margin-bottom:6px}
+.change span{color:var(--dim);font-size:16px}
+@media (max-width:960px){.change{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.change{grid-template-columns:1fr}}
+
+/* Calendrier */
+.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));position:relative}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:9px;height:1px;background:var(--line)}
+.timeline li{position:relative;padding:34px 14px 0 0}
+.timeline li::before{content:"";position:absolute;left:0;top:4px;width:11px;height:11px;border:1px solid var(--brass-soft);background:var(--ground);transform:rotate(45deg)}
+.timeline li.done::before{background:var(--brass-soft)}
+.timeline li.soon::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(233,207,120,.6)}
+.timeline .d{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass)}
+.timeline b{display:block;font-family:var(--display);font-weight:400;font-size:19px;line-height:1.25;margin:6px 0 4px}
+.timeline span{font-size:14px;color:var(--dim)}
+.timeline li.done b,.timeline li.done span{opacity:.55}
+.soirs{margin-top:46px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.soirs div{background:var(--ground);padding:18px 16px}
+.soirs b{display:block;font-family:var(--mono);font-weight:500;font-size:20px;color:var(--bone)}
+.soirs span{font-size:14px;color:var(--dim)}
+@media (max-width:1000px){
+  .timeline{grid-template-columns:1fr;padding-left:30px}
+  .timeline::before{left:5px;right:auto;top:0;bottom:0;width:1px;height:auto}
+  .timeline li{padding:0 0 26px}
+  .timeline li::before{left:-30px;top:5px}
+  .soirs{grid-template-columns:1fr}
+}
+
+/* Rejoindre */
+.paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.path{background:var(--panel);border:1px solid var(--line);padding:30px 26px 26px;display:flex;flex-direction:column;gap:12px;transition:border-color .3s}
+.path:hover{border-color:var(--brass-soft)}
+.path .who{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.path h3{font-family:var(--display);font-weight:400;font-size:28px;margin:0;letter-spacing:.03em}
+.path p{margin:0;color:var(--dim);flex:1}
+.path .btn{align-self:flex-start;margin-top:8px}
+@media (max-width:860px){.paths{grid-template-columns:1fr}}
+
+/* Pied de page */
+footer{margin-top:110px;border-top:1px solid var(--line);padding-block:36px 34px}
+footer .in-wrap{display:flex;justify-content:space-between;gap:16px 28px;flex-wrap:wrap;align-items:center}
+footer .liens{display:flex;gap:22px;flex-wrap:wrap}
+footer a,footer span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-decoration:none}
+footer a:hover{color:var(--bone)}
+@media (max-width:640px){body.a-filtre footer{padding-bottom:84px}}
+
+.rv{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .live i,.ceinture i{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="in-wrap">
+    <a class="mark" href="/"><img src="/img/apple-touch-icon.png" alt="" width="36" height="36">OSIRIS RP</a>
+    <nav class="nav" aria-label="Navigation de la saison 2">
+      <a href="#institut">L'Institut</a>
+      <a href="#classes">Les classes</a>
+      <a href="#roles">Les rôles</a>
+      <a href="#calendrier">Calendrier</a>
+      <a class="btn" href="/casting" data-casting>Casting</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="titre">
+    <div class="ceinture" aria-hidden="true"><i></i><i></i><i></i></div>
+    <p class="apercu" id="apercu" hidden>Aperçu testeur · public le mercredi 1er septembre 2027 à 20 h</p>
+    <svg class="blason" viewBox="0 0 120 140" role="img" aria-label="L'écusson de l'Institut d'Abydos : un pilier djed doré">
+      <defs>
+        <linearGradient id="or" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fbf0b8"/><stop offset=".45" stop-color="#e9cf78"/><stop offset="1" stop-color="#a9853f"/>
+        </linearGradient>
+      </defs>
+      <path d="M60 4 L110 18 V66 C110 100 88 122 60 136 C32 122 10 100 10 66 V18 Z" fill="none" stroke="url(#or)" stroke-width="2"/>
+      <path d="M60 12 L102 24 V66 C102 95 84 114 60 127 C36 114 18 95 18 66 V24 Z" fill="none" stroke="#8E7747" stroke-width=".8" opacity=".7"/>
+      <g fill="url(#or)">
+        <path d="M45 30 H75 L78 35 H42 Z"/>
+        <rect x="40" y="39" width="40" height="5" rx="1.5"/>
+        <rect x="40" y="48" width="40" height="5" rx="1.5"/>
+        <rect x="40" y="57" width="40" height="5" rx="1.5"/>
+        <rect x="40" y="66" width="40" height="5" rx="1.5"/>
+        <path d="M53 75 H67 L69 104 H51 Z"/>
+        <path d="M44 104 H76 L81 112 H39 Z"/>
+      </g>
+    </svg>
+    <span class="prog-num">Programme 02</span>
+    <h1 class="titre gold-text" id="titre">EYE SCHOOL</h1>
+    <div class="trait" aria-hidden="true"></div>
+    <p class="accroche">Cent ans. Trente-six élèves. Un ciel trop clair.</p>
+    <p class="lead">L'Institut d'Abydos fait sa rentrée le samedi 16 octobre 2027. Osiris aussi.</p>
+
+    <div class="etape" id="etape">
+      <span class="live"><i></i><span id="e-titre">Ouverture du casting</span></span>
+      <div class="compte" id="compte" role="timer" aria-label="Temps avant la prochaine étape">
+        <div><b id="c-j">—</b><span>jours</span></div>
+        <div><b id="c-h">—</b><span>heures</span></div>
+        <div><b id="c-m">—</b><span>minutes</span></div>
+        <div><b id="c-s">—</b><span>secondes</span></div>
+      </div>
+      <b class="gros" id="e-gros" hidden></b>
+    </div>
+
+    <div class="cta">
+      <a class="btn" href="/casting" data-casting>Casting</a>
+      <a class="btn ghost" href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Rejoindre le Discord</a>
+    </div>
+
+    <button class="signal" type="button" id="signal" aria-label="Écouter le signal">
+      <span class="onde" aria-hidden="true">
+        <i class="l"></i><i class="esp"></i>
+        <i class="c"></i><i class="c"></i><i class="c"></i><i class="esp"></i>
+        <i class="c"></i><i class="c"></i><i class="c"></i><i class="esp"></i>
+        <i class="c"></i><i class="c"></i><i class="c"></i>
+      </span>
+      <span id="signal-txt">Vous l'entendez ?</span>
+    </button>
+  </section>
+
+  <!-- ========== L'Institut ========== -->
+  <section class="block" id="institut" aria-labelledby="t-institut">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">01 · L'Institut</span><h2 id="t-institut">Une école française au bout du monde</h2></div>
+        <p>Derrière une grille en fer forgé, un ancien campus transformé en internat à l'européenne. Uniforme obligatoire, colles le samedi, couvre-feu à minuit et demi, et pas de sortie sans autorisation.</p>
+      </div>
+      <div class="institut rv">
+        <div class="lettre">
+          <p>L'Institut d'Abydos a été fondé en 1927 par Émile Sarrazin, un égyptologue revenu des fouilles d'Abydos. Il ne propose qu'une seule formation : une année préparatoire très sélective, avec concours d'entrée et diplôme à la fin.</p>
+          <p>Tous les élèves sont boursiers. Logés, nourris, habillés : une fondation privée paie tout, à une condition. L'Institut réserve ses bourses à ceux qui n'ont personne pour les soutenir.</p>
+          <p>Cette année, l'Institut fête ses cent ans. Les élèves le surnomment « Eye School », à cause des caméras de sécurité dans tous les couloirs. On dit que le ciel, au-dessus du campus, est particulièrement clair en automne.</p>
+          <p class="devise">Qui videt, discit<span>Celui qui regarde apprend · devise de l'Institut</span></p>
+        </div>
+        <div class="chiffres">
+          <div><b>50</b><span>places</span></div>
+          <div><b>36</b><span>élèves de 18 à 22 ans</span></div>
+          <div><b>4</b><span>classes</span></div>
+          <div><b>14</b><span>membres du personnel</span></div>
+          <div><b>18</b><span>soirées</span></div>
+          <div><b>6</b><span>semaines</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Les classes ========== -->
+  <section class="block" id="classes" aria-labelledby="t-classes">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">02 · Les classes</span><h2 id="t-classes">Quatre classes, quatre étoiles</h2></div>
+        <p>Le premier soir, un concours d'entrée répartit les élèves en quatre classes de neuf. Chaque classe élit ses deux délégués et gagne ou perd des points toute l'année. À la remise des diplômes, la meilleure reçoit le prix du centenaire.</p>
+      </div>
+      <div class="classes rv">
+        <article class="classe" style="--c:var(--jaune)"><div class="cravate" aria-hidden="true"></div><span class="n">Classe Jaune</span><h3>Sirius</h3><p>L'étoile la plus brillante du ciel. On dit que les Jaunes ont toujours eu les meilleurs sportifs.</p></article>
+        <article class="classe" style="--c:var(--rouge)"><div class="cravate" aria-hidden="true"></div><span class="n">Classe Rouge</span><h3>Aldébaran</h3><p>L'œil rouge du Taureau. On dit que les Rouges ont toujours eu les plus fortes têtes, et le plus de colles.</p></article>
+        <article class="classe" style="--c:var(--bleue)"><div class="cravate" aria-hidden="true"></div><span class="n">Classe Bleue</span><h3>Véga</h3><p>L'étoile qui sert à mesurer toutes les autres. On dit que les Bleus ont toujours eu les meilleurs en sciences.</p></article>
+        <article class="classe" style="--c:var(--verte)"><div class="cravate" aria-hidden="true"></div><span class="n">Classe Verte</span><h3>Orion</h3><p>Le chasseur du ciel d'hiver. On dit que c'était la classe de Sarrazin lui-même.</p></article>
+      </div>
+      <p class="note rv">Tu ne choisis pas ta classe : c'est le concours qui décide.</p>
+    </div>
+  </section>
+
+  <!-- ========== Les rôles ========== -->
+  <section class="block" id="roles" aria-labelledby="t-roles">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">03 · Les rôles</span><h2 id="t-roles">Cinquante places</h2></div>
+        <p>Le rôle demandé n'est pas garanti : le staff compose une école équilibrée. Chaque personnage a deux uniformes (cours et sport, en version homme ou femme) et sa tenue de ville. Le directeur est joué par l'équipe d'Osiris.</p>
+      </div>
+      <ul class="roles rv">
+        <li class="large"><span class="pl">36</span><b>Les élèves</b><span>La promotion du centenaire : les cours, les notes, les couples, les rivalités entre classes et une année qui ne se passera pas comme prévu. Tous profils, débutants bienvenus.</span></li>
+        <li><span class="pl">8</span><b>Les professeurs</b><span>Sciences, maths et informatique, lettres et journalisme, histoire et droit, philosophie, langues, arts, sport. À l'aise devant une classe.</span></li>
+        <li><span class="pl">2</span><b>Les surveillants</b><span>L'étude, les rondes, l'appel du couvre-feu. Fermes, présents, et pas toujours bavards sur ce qu'ils voient la nuit.</span></li>
+        <li><span class="pl">1</span><b>Le CPE</b><span>La vie scolaire, les points, les sanctions, le conseil de classe. Organisé et juste.</span></li>
+        <li><span class="pl">1</span><b>Le directeur adjoint</b><span>Il tient l'école quand le directeur n'est pas là, c'est-à-dire souvent. Expérimenté, à l'aise devant toute l'école.</span></li>
+        <li><span class="pl">1</span><b>L'infirmière</b><span>Tout le monde passe un jour par l'infirmerie. Calme et à l'écoute.</span></li>
+        <li><span class="pl">1</span><b>Le concierge</b><span>Les clés de presque tout. Autonome, discret, il connaît chaque porte de l'Institut.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ========== Ce qui change ========== -->
+  <section class="block" id="change" aria-labelledby="t-change">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">04 · Après Ludendorff</span><h2 id="t-change">Ce qui change</h2></div>
+        <p>Après l'hiver de 1987, Osiris change de monde. Même émission, mêmes Mécènes, même règle : les candidats ne savent pas qu'on les regarde.</p>
+      </div>
+      <div class="change rv">
+        <div><span class="n">01</span><b>De nos jours</b><span>Un internat d'aujourd'hui : téléphones, fêtes, couples et rivalités.</span></div>
+        <div><span class="n">02</span><b>Sans horreur</b><span>Le mystère est bien là, mais la peur vient de l'inconnu, pas du sang.</span></div>
+        <div><span class="n">03</span><b>50 places</b><span>Quinze de plus qu'en saison 1, dont 36 élèves.</span></div>
+        <div><span class="n">04</span><b>Les anciens reviennent</b><span>Les joueurs de la saison 1 peuvent recandidater, et reprendre leur personnage dans une autre vie.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Calendrier ========== -->
+  <section class="block" id="calendrier" aria-labelledby="t-cal">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">05 · Calendrier</span><h2 id="t-cal">Programme 02</h2></div>
+        <p>Un mois de casting, une semaine d'entretiens, puis la rentrée. Les sessions ont lieu le samedi, le mercredi et le vendredi soir, de 20 h 30 à 1 h.</p>
+      </div>
+      <ol class="timeline rv" id="timeline">
+        <li data-t="2027-09-01T20:00:00+02:00"><span class="d">1er sept. · 20 h</span><b>Ouverture du casting</b><span>En direct sur LilianoBarhaw, avec la première cinématique.</span></li>
+        <li data-t="2027-10-01T23:59:00+02:00"><span class="d">1er oct. · 23 h 59</span><b>Fin du casting</b><span>Dernier délai pour déposer ton dossier.</span></li>
+        <li data-t="2027-10-02T00:00:00+02:00"><span class="d">2 au 7 oct.</span><b>Entretiens vocaux</b><span>Pour les dossiers retenus au premier tri.</span></li>
+        <li data-t="2027-10-08T20:30:00+02:00"><span class="d">8 oct. · 20 h 30</span><b>Les 50 candidats</b><span>Annonce sur le Discord, avec la deuxième cinématique.</span></li>
+        <li data-t="2027-10-13T20:30:00+02:00"><span class="d">13 oct.</span><b>Soirée test</b><span>Connexion, tenues, vocal. Sans histoire.</span></li>
+        <li data-t="2027-10-16T20:30:00+02:00"><span class="d">16 oct. · 20 h 30</span><b>La rentrée</b><span>Première soirée du Programme 02.</span></li>
+        <li data-t="2027-11-26T20:30:00+01:00"><span class="d">26 nov.</span><b>Dernière soirée</b><span>Fin du Programme 02.</span></li>
+      </ol>
+      <div class="soirs rv">
+        <div><b>Samedi</b><span>Le grand soir de la semaine.</span></div>
+        <div><b>Mercredi</b><span>La vie de l'internat, les cours, les conséquences.</span></div>
+        <div><b>Vendredi</b><span>La tension monte jusqu'au samedi suivant.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Rejoindre ========== -->
+  <section class="block" id="rejoindre" aria-labelledby="t-join">
+    <div class="in-wrap">
+      <div class="head rv">
+        <div><span class="num">06 · Rejoindre</span><h2 id="t-join">De quel côté de la grille ?</h2></div>
+        <p>Vous pouvez être choisi. Ou vous pouvez choisir.</p>
+      </div>
+      <div class="paths rv">
+        <div class="path">
+          <span class="who">Candidat</span>
+          <h3>Faire sa rentrée</h3>
+          <p>Dépose ton dossier pendant le casting : élève ou membre du personnel. Si tu as joué en saison 1, dis-le, et dis si tu veux reprendre ton personnage.</p>
+          <a class="btn" href="/casting" data-casting>Casting</a>
+        </div>
+        <div class="path">
+          <span class="who">Mécène</span>
+          <h3>Regarder et décider</h3>
+          <p>Pas choisi, ou pas envie de jouer ? Les Mécènes votent chaque soir sur le Discord, et ce qu'ils choisissent arrive en jeu.</p>
+          <a class="btn ghost" href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Entrer dans la Loge</a>
+        </div>
+        <div class="path">
+          <span class="who">Spectateur</span>
+          <h3>Suivre la régie</h3>
+          <p>Chaque soir de session, la régie d'Osiris est en direct sur Twitch, avec la voix de Cassius Vale.</p>
+          <a class="btn ghost" href="https://www.twitch.tv/lilianobarhaw" target="_blank" rel="noopener">LilianoBarhaw</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="in-wrap">
+    <span>© Osiris RP · Programme 02</span>
+    <nav class="liens" aria-label="Liens">
+      <a href="/">Le site</a>
+      <a href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Discord</a>
+      <a href="/legal#mentions">Mentions légales</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var SAISON2 = new Date("2027-09-01T20:00:00+02:00").getTime();
+  var ETAPES = [
+    { t: "2027-09-01T20:00:00+02:00", titre: "Ouverture du casting" },
+    { t: "2027-10-01T23:59:00+02:00", titre: "Fin du casting" },
+    { t: "2027-10-08T20:30:00+02:00", titre: "Annonce des 50 candidats" },
+    { t: "2027-10-16T20:30:00+02:00", titre: "La rentrée" }
+  ];
+  var FIN = new Date("2027-11-27T01:00:00+01:00").getTime();
+  var CAST_OUVRE = new Date("2027-09-01T20:00:00+02:00").getTime();
+  var CAST_FERME = new Date("2027-10-01T23:59:00+02:00").getTime();
+  var $ = function(id){ return document.getElementById(id) };
+  var deux = function(n){ return (n < 10 ? "0" : "") + n };
+  var ecart = 0;
+  var maintenant = function(){ return Date.now() + ecart };
+
+  // L'heure du serveur (en-tête Date), pour ne pas se fier à l'horloge de l'appareil.
+  fetch("/favicon.ico", { method: "HEAD", cache: "no-store" }).then(function(r){
+    var t = Date.parse(r.headers.get("date") || ""); if (t) ecart = t - Date.now(); maj(); tic();
+  }).catch(function(){});
+
+  function maj(){
+    var n = maintenant();
+    // Bandeau réservé aux testeurs, tant que la page n'est pas publique
+    $("apercu").hidden = n >= SAISON2;
+    // Boutons du casting
+    var label, actif;
+    if (n < CAST_OUVRE) { label = "Casting · 1er septembre"; actif = false }
+    else if (n < CAST_FERME) { label = "Passer le casting"; actif = true }
+    else { label = "Casting terminé"; actif = false }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-casting]"), function(a){
+      a.textContent = label;
+      if (actif) { a.href = "/casting"; a.classList.remove("attente"); a.removeAttribute("aria-disabled") }
+      else { a.href = "#calendrier"; a.classList.add("attente"); a.setAttribute("aria-disabled", "true") }
+    });
+    // Calendrier : étapes passées et prochaine étape
+    var items = document.querySelectorAll("#timeline li"), prochaine = false;
+    Array.prototype.forEach.call(items, function(li){
+      var t = Date.parse(li.getAttribute("data-t"));
+      li.classList.remove("done", "soon");
+      if (t <= n) li.classList.add("done");
+      else if (!prochaine) { li.classList.add("soon"); prochaine = true }
+    });
+  }
+
+  function tic(){
+    var n = maintenant(), cible = null;
+    for (var i = 0; i < ETAPES.length; i++) { var t = Date.parse(ETAPES[i].t); if (t > n) { cible = ETAPES[i]; break } }
+    if (!cible) {
+      $("compte").hidden = true; $("e-gros").hidden = false;
+      $("e-titre").textContent = n < FIN ? "En direct" : "Programme 02";
+      $("e-gros").textContent = n < FIN ? "L'année a commencé." : "Programme 02 terminé.";
+      return;
+    }
+    var reste = Math.max(0, Math.floor((Date.parse(cible.t) - n) / 1000));
+    $("e-titre").textContent = cible.titre + " dans";
+    $("c-j").textContent = Math.floor(reste / 86400);
+    $("c-h").textContent = deux(Math.floor(reste % 86400 / 3600));
+    $("c-m").textContent = deux(Math.floor(reste % 3600 / 60));
+    $("c-s").textContent = deux(reste % 60);
+    if (reste === 0) maj();
+  }
+  maj(); tic(); setInterval(tic, 1000);
+
+  // Le signal : une note longue, puis trois fois trois bips. Seulement si on clique.
+  var bouton = $("signal"), traits = bouton.querySelectorAll(".onde i:not(.esp)"), joue = false;
+  bouton.addEventListener("click", function(){
+    if (joue) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    joue = true;
+    var ctx = new AC(), t0 = ctx.currentTime + 0.05, plan = [], t = t0;
+    plan.push({ debut: t, duree: 1.1, freq: 620 }); t += 1.1 + 0.45;
+    for (var g = 0; g < 3; g++) {
+      for (var b = 0; b < 3; b++) { plan.push({ debut: t, duree: 0.09, freq: 880 }); t += 0.09 + 0.13 }
+      t += 0.4;
+    }
+    plan.forEach(function(p, i){
+      var o = ctx.createOscillator(), v = ctx.createGain();
+      o.type = "sine"; o.frequency.value = p.freq;
+      v.gain.setValueAtTime(0.0001, p.debut);
+      v.gain.exponentialRampToValueAtTime(0.18, p.debut + 0.015);
+      v.gain.setValueAtTime(0.18, p.debut + p.duree - 0.02);
+      v.gain.exponentialRampToValueAtTime(0.0001, p.debut + p.duree);
+      o.connect(v); v.connect(ctx.destination);
+      o.start(p.debut); o.stop(p.debut + p.duree + 0.02);
+      var trait = traits[i];
+      setTimeout(function(){ trait.classList.add("on") }, (p.debut - ctx.currentTime) * 1000);
+      setTimeout(function(){ trait.classList.remove("on") }, (p.debut - ctx.currentTime + p.duree) * 1000);
+    });
+    setTimeout(function(){
+      joue = false; ctx.close && ctx.close();
+      $("signal-txt").textContent = "Celui qui regarde apprend.";
+    }, (t - ctx.currentTime) * 1000 + 200);
+  });
+
+  // Apparition des sections au défilement
+  var rv = document.querySelectorAll(".rv");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) } }) }, { rootMargin: "0px 0px -8% 0px" });
+    Array.prototype.forEach.call(rv, function(el){ io.observe(el) });
+  } else Array.prototype.forEach.call(rv, function(el){ el.classList.add("in") });
+})();
+</script>
+<script src="/filtre.js" defer></script>
+</body>
+</html>
