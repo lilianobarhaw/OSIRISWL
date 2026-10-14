@@ -7,7 +7,7 @@
      OSIRIS — diffusion privée. Accès réservé aux Mécènes.
      ============================================================ -->
 <title>Casting · Osiris RP</title>
-<meta name="description" content="Osiris recherche 35 candidats. Programme 01 · ouverture le dimanche 16 mai 2027 à 20h30.">
+<meta name="description" content="Osiris recherche 35 candidats. Programme 01 · ouverture le samedi 15 mai 2027 à 20h30.">
 <meta name="theme-color" content="#0A0B0D">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png?v=2">
@@ -457,7 +457,7 @@ Entrez votre code d'accès.</div>
   if(q.get("login")==="serveur")gerr.textContent="Tu es connecté, mais tu n'as pas pu être ajouté au serveur Osiris. Rejoins-le avec l'invitation du Discord, puis reviens ici.";
   // ---------- Ouverture du casting ----------
   // Dates par défaut ; le serveur (/api/casting) donne les vraies dates et l'heure exacte.
-  var C={ouverture:Date.parse("2027-02-20T23:30:00+01:00"),fermeture:Date.parse("2027-03-20T23:59:59+01:00"),programme:Date.parse("2027-05-16T20:30:00+02:00"),testeur:false,decalage:0};
+  var C={ouverture:Date.parse("2027-02-20T23:30:00+01:00"),fermeture:Date.parse("2027-03-20T23:59:59+01:00"),programme:Date.parse("2027-05-15T20:30:00+02:00"),testeur:false,decalage:0};
   var lock=document.getElementById("lock"),heroCta=document.getElementById("hero-cta"),courant=null;
   function maintenant(){return Date.now()+C.decalage}
   function etat(){var n=maintenant();var e=n<C.ouverture?"bientot":n>C.fermeture?"ferme":"ouvert";return (e!=="ouvert"&&C.testeur)?"test":e}
@@ -467,7 +467,7 @@ Entrez votre code d'accès.</div>
   function appliquer(){
     var e=etat(), b=e==="test"?(maintenant()<C.ouverture?"bientot":maintenant()>C.fermeture?"ferme":"ouvert"):e;
     window.osirisCompte=b==="bientot"?{cible:C.ouverture,label:"Ouverture du casting dans",date:"Ouverture du casting · "+jour(C.ouverture),decalage:C.decalage}
-      :b==="ferme"?{cible:C.programme,label:"Ouverture du Programme 01 dans",date:"Ouverture du Programme 01 · dimanche 16 mai 2027 · 20h30",decalage:C.decalage}
+      :b==="ferme"?{cible:C.programme,label:"Ouverture du Programme 01 dans",date:"Ouverture du Programme 01 · samedi 15 mai 2027 · 20h30",decalage:C.decalage}
       :{cible:C.fermeture,label:"Fin du casting dans",date:"Fin du casting · "+jour(C.fermeture),decalage:C.decalage};
     if(e==="bientot")document.getElementById("lock-count").textContent=reste(C.ouverture);
     // Les 17 dernières minutes : le canal 17 peut s'identifier pour ouvrir son formulaire en avance (voir lib/canal17.js).
