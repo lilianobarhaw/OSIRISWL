@@ -187,7 +187,8 @@ footer a:hover{color:var(--bone)}
   // Cette partie du lien n'est jamais envoyée au serveur : rien n'est enregistré nulle part.
   var CLE = "OSIRIS·PROGRAMME-01";
   var OUVERTURE = new Date("2027-02-20T23:30:00+01:00").getTime();
-  var FERMETURE = new Date("2027-03-14T23:59:59+01:00").getTime();
+  var FERMETURE = new Date("2027-03-20T23:59:59+01:00").getTime();
+  var RESULTATS = new Date("2027-04-24T21:00:00+02:00").getTime();
 
   function octets(s){ return new TextEncoder().encode(s) }
   function melanger(b){ var k = octets(CLE), o = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) o[i] = b[i] ^ k[i % k.length] ^ ((i * 31) & 255); return o }
@@ -229,12 +230,12 @@ footer a:hover{color:var(--bone)}
       count.textContent = "Dans " + Math.floor(s / 86400) + " j " + pad(Math.floor(s % 86400 / 3600)) + " h " + pad(Math.floor(s % 3600 / 60)) + " min " + pad(s % 60) + " s";
     } else if (now <= FERMETURE) {
       $("#date-label").textContent = "Le casting est ouvert";
-      $("#date-text").textContent = "Jusqu'au dimanche 14 mars 2027 · 23 h 59";
+      $("#date-text").textContent = "Jusqu'au samedi 20 mars 2027 · 23 h 59";
       count.textContent = "Votre dossier est attendu.";
     } else {
       $("#date-label").textContent = "Casting du Programme 01";
       $("#date-text").textContent = "Le casting est terminé";
-      count.textContent = "Les 35 candidats ont été choisis.";
+      count.textContent = now < RESULTATS ? "Les 35 candidats seront annoncés le samedi 24 avril à 21 h." : "Les 35 candidats ont été choisis.";
     }
   }
   tick(); setInterval(tick, 1000);

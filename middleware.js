@@ -1,4 +1,4 @@
-// Avant l'ouverture officielle du projet (samedi 31 octobre 2026, 21 h, heure de Paris), le public ne voit que le décompte :
+// Avant l'ouverture officielle du projet (samedi 26 décembre 2026, 21 h, heure de Paris), le public ne voit que le décompte :
 // toutes les pages du site affichent bientot.html. Les comptes de CASTING_TESTEURS, connectés avec Discord, voient tout.
 // Pour se connecter en testeur : le lien « Équipe » en bas du décompte (ou /api/auth/login?retour=accueil).
 // Le bouton « Filtre » (filtre.js) permet à un testeur de voir le site comme le public : cookie osiris_vue=public.
@@ -14,7 +14,7 @@ export const config = {
   runtime: "nodejs",
 };
 
-const OUVERTURE = Date.parse("2026-10-31T21:00:00+01:00");
+const OUVERTURE = Date.parse("2026-12-26T21:00:00+01:00");
 const SAISON2 = Date.parse("2027-09-01T20:00:00+02:00");
 const OUVERTS = new Set(["/legal", "/legal.html", "/bientot", "/bientot.html"]);
 const PAGES_SAISON2 = new Set(["/saison2", "/saison2.html"]);

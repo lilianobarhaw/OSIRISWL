@@ -1,6 +1,6 @@
 /* Les boutons des testeurs, jusqu'à l'ouverture de la page Saison 2 au public (mercredi 1er septembre 2027, 20 h).
    Ils n'apparaissent que pour les comptes de CASTING_TESTEURS connectés avec Discord.
-   « Filtre : testeur » → un appui : le site comme le voit le public, « Filtre : public » (avant le 31 octobre 2026,
+   « Filtre : testeur » → un appui : le site comme le voit le public, « Filtre : public » (avant le 26 décembre 2026,
    c'est le décompte ; ensuite, la page Saison 2 redevient invisible). Un autre appui : retour au mode testeur.
    Le choix est gardé dans le cookie osiris_vue, lu par middleware.js. Pour un visiteur qui n'est pas testeur, ce cookie ne change rien.
    « Saison 2 » : le lien vers l'aperçu de la page du Programme 02 (sur cette page, il devient « Le site »).

@@ -82,7 +82,8 @@ a{color:inherit}
 .ceinture i:nth-child(3){left:112px;top:6px;animation-delay:3.1s}
 @keyframes scintille{50%{opacity:.45}}
 .apercu{position:relative;z-index:1;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#D27A6D;border:1px solid rgba(181,86,74,.55);padding:7px 12px;background:rgba(10,11,13,.7)}
-.blason{position:relative;z-index:1;width:min(150px,30vw);height:auto}
+.oeil{position:relative;z-index:1;width:min(360px,72vw,calc(28svh * 1.2));aspect-ratio:1051/877;mix-blend-mode:screen}
+.oeil img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
 .prog-num{position:relative;z-index:1;font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
 .titre{position:relative;z-index:1;margin:0;font-family:var(--display);font-weight:400;font-size:clamp(44px,8vw,92px);line-height:1;letter-spacing:.18em;margin-right:-.18em;white-space:nowrap}
 .trait{position:relative;z-index:1;width:min(520px,70vw);height:1px;background:linear-gradient(90deg,rgba(233,207,120,0),rgba(233,207,120,.85),rgba(233,207,120,0))}
@@ -101,7 +102,7 @@ a{color:inherit}
 .cta{position:relative;z-index:1;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 @media (max-height:940px) and (min-width:521px){
   .hero{padding-top:92px;padding-bottom:40px;gap:12px}
-  .blason{width:min(120px,13svh)}
+  .oeil{width:min(320px,calc(22svh * 1.2))}
   .titre{font-size:clamp(40px,min(7vw,9svh),84px)}
   .accroche{font-size:clamp(18px,2vw,22px)}
   .compte div{padding:9px 6px 8px}
@@ -132,6 +133,7 @@ main section.block{padding-block:110px 10px}
 .institut{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:18px}
 .lettre{background:var(--panel);border:1px solid var(--line);padding:32px 30px;position:relative;overflow:hidden}
 .lettre::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,var(--brass),transparent 70%);opacity:.5}
+.lettre .ecu{float:right;width:78px;height:auto;margin:0 0 12px 20px}
 .lettre p{margin:0 0 14px;color:#CFC9BB}
 .lettre p:last-child{margin-bottom:0}
 .lettre .devise{font-family:var(--display);font-size:22px;letter-spacing:.06em;color:var(--bone)}
@@ -141,6 +143,7 @@ main section.block{padding-block:110px 10px}
 .chiffres b{font-family:var(--display);font-weight:400;font-size:38px;line-height:1.05;color:var(--bone)}
 .chiffres span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 @media (max-width:860px){.institut{grid-template-columns:1fr}}
+@media (max-width:480px){.lettre .ecu{width:60px}}
 
 /* Les classes */
 .classes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
@@ -241,25 +244,10 @@ footer a:hover{color:var(--bone)}
   <section class="hero" aria-labelledby="titre">
     <div class="ceinture" aria-hidden="true"><i></i><i></i><i></i></div>
     <p class="apercu" id="apercu" hidden>Aperçu testeur · public le mercredi 1er septembre 2027 à 20 h</p>
-    <svg class="blason" viewBox="0 0 120 140" role="img" aria-label="L'écusson de l'Institut d'Abydos : un pilier djed doré">
-      <defs>
-        <linearGradient id="or" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#fbf0b8"/><stop offset=".45" stop-color="#e9cf78"/><stop offset="1" stop-color="#a9853f"/>
-        </linearGradient>
-      </defs>
-      <path d="M60 4 L110 18 V66 C110 100 88 122 60 136 C32 122 10 100 10 66 V18 Z" fill="none" stroke="url(#or)" stroke-width="2"/>
-      <path d="M60 12 L102 24 V66 C102 95 84 114 60 127 C36 114 18 95 18 66 V24 Z" fill="none" stroke="#8E7747" stroke-width=".8" opacity=".7"/>
-      <g fill="url(#or)">
-        <path d="M45 30 H75 L78 35 H42 Z"/>
-        <rect x="40" y="39" width="40" height="5" rx="1.5"/>
-        <rect x="40" y="48" width="40" height="5" rx="1.5"/>
-        <rect x="40" y="57" width="40" height="5" rx="1.5"/>
-        <rect x="40" y="66" width="40" height="5" rx="1.5"/>
-        <path d="M53 75 H67 L69 104 H51 Z"/>
-        <path d="M44 104 H76 L81 112 H39 Z"/>
-      </g>
-    </svg>
-    <span class="prog-num">Programme 02</span>
+    <div class="oeil" role="img" aria-label="L'Œil d'Osiris">
+      <picture><source srcset="/img/oeil.webp" type="image/webp"><img src="/img/oeil.png" alt="" width="1051" height="877" draggable="false" fetchpriority="high"></picture>
+    </div>
+    <span class="prog-num">Osiris RP · Programme 02</span>
     <h1 class="titre gold-text" id="titre">EYE SCHOOL</h1>
     <div class="trait" aria-hidden="true"></div>
     <p class="accroche">Cent ans. Trente-six élèves. Un ciel trop clair.</p>
@@ -301,6 +289,24 @@ footer a:hover{color:var(--bone)}
       </div>
       <div class="institut rv">
         <div class="lettre">
+          <svg class="ecu" viewBox="0 0 120 140" role="img" aria-label="L'écusson de l'Institut d'Abydos : un pilier djed doré">
+      <defs>
+        <linearGradient id="or-ecu" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fbf0b8"/><stop offset=".45" stop-color="#e9cf78"/><stop offset="1" stop-color="#a9853f"/>
+        </linearGradient>
+      </defs>
+      <path d="M60 4 L110 18 V66 C110 100 88 122 60 136 C32 122 10 100 10 66 V18 Z" fill="none" stroke="url(#or-ecu)" stroke-width="2"/>
+      <path d="M60 12 L102 24 V66 C102 95 84 114 60 127 C36 114 18 95 18 66 V24 Z" fill="none" stroke="#8E7747" stroke-width=".8" opacity=".7"/>
+      <g fill="url(#or-ecu)">
+        <path d="M45 30 H75 L78 35 H42 Z"/>
+        <rect x="40" y="39" width="40" height="5" rx="1.5"/>
+        <rect x="40" y="48" width="40" height="5" rx="1.5"/>
+        <rect x="40" y="57" width="40" height="5" rx="1.5"/>
+        <rect x="40" y="66" width="40" height="5" rx="1.5"/>
+        <path d="M53 75 H67 L69 104 H51 Z"/>
+        <path d="M44 104 H76 L81 112 H39 Z"/>
+      </g>
+    </svg>
           <p>L'Institut d'Abydos a été fondé en 1927 par Émile Sarrazin, un égyptologue revenu des fouilles d'Abydos. Il ne propose qu'une seule formation : une année préparatoire très sélective, avec concours d'entrée et diplôme à la fin.</p>
           <p>Tous les élèves sont boursiers. Logés, nourris, habillés : une fondation privée paie tout, à une condition. L'Institut réserve ses bourses à ceux qui n'ont personne pour les soutenir.</p>
           <p>Cette année, l'Institut fête ses cent ans. Les élèves le surnomment « Eye School », à cause des caméras de sécurité dans tous les couloirs. On dit que le ciel, au-dessus du campus, est particulièrement clair en automne.</p>

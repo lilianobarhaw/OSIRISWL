@@ -86,22 +86,22 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_MOT_REGISTRE_ID` | Mot du jour : salon **privé** `#registre-mots`, où le bot note chaque partie (obligatoire pour jouer) |
 | `DISCORD_MOT_ANNONCE_ID` | Facultatif. Mot du jour : salon où le bot donne chaque soir le mot de la veille, et le lundi le podium de la semaine |
 | `DISCORD_MOT_ROLE_ID` | Facultatif. Rôle donné au premier de la semaine (et retiré au premier de la semaine d'avant) |
-| `MOT_PREMIER_JOUR` | Facultatif. Pour déplacer le premier mot, au format `2026-10-31` (il s'ouvre ce jour-là à 21 h) |
+| `MOT_PREMIER_JOUR` | Facultatif. Pour déplacer le premier mot, au format `2026-12-26` (il s'ouvre ce jour-là à 21 h) |
 
 Redéployer après chaque modification des variables. Vérification : ouvrir `https://<ton-domaine>/api/candidature` → doit afficher « toutes les variables sont configurées ».
 
 L'ancienne variable `DISCORD_WEBHOOK` n'est plus utilisée.
 
-## Avant l'ouverture officielle (samedi 31 octobre 2026, 21 h)
+## Avant l'ouverture officielle (samedi 26 décembre 2026, 21 h)
 
-Le soir d'Halloween à 21 h, c'est l'ouverture officielle du projet : le Discord, le site et la première cinématique (le teaser).
+Le samedi 26 décembre à 21 h, c'est l'ouverture officielle du projet : le Discord, le site et la première cinématique (le teaser).
 
 **Le site.** Jusque-là, le public ne voit que le décompte (`bientot.html`), quelle que soit la page demandée. C'est `middleware.js` qui s'en charge, côté serveur : le reste du site n'est pas envoyé, même en fouillant le code de la page.
 1. Les comptes de `CASTING_TESTEURS` voient tout le site. Pour se connecter : le lien « Équipe » en bas du décompte (ou `/api/auth/login?retour=accueil`). La connexion dure 6 heures.
    Le bouton « Filtre », en bas à droite, n'apparaît que pour les testeurs : un appui montre le site comme le voit le public (le décompte), un autre ramène au mode testeur (`filtre.js`, cookie `osiris_vue`). Pour un visiteur qui n'est pas testeur, il n'existe pas.
 2. Restent ouverts à tous : les mentions légales (`/legal`, obligatoires), les images, les polices, les sons, et les adresses `/api/…`.
 3. À 21 h pile (heure du serveur), le décompte affiche « C'est l'heure. » et recharge la page : le site apparaît. Le canal 17 n'a pas d'avance sur l'ouverture officielle (ni sur le décompte de l'accueil, ni sur le teaser) : il la retrouve pour le casting et les étapes suivantes.
-4. Sur l'accueil, un grand décompte (quatre cases) remplace la ligne « prochaine étape » : l'ouverture officielle, puis « C'est officiel. » pendant 24 h, puis tout seul l'ouverture du casting (20 février, 23 h 30), la fin du casting (14 mars), l'annonce des 35 (27 mars) et l'ouverture du Programme 01 (3 avril, 20 h 30). Pendant le Programme, la petite ligne reprend. Les étapes sont dans `GRAND` (`index.html`).
+4. Sur l'accueil, un grand décompte (quatre cases) remplace la ligne « prochaine étape » : l'ouverture officielle, puis « C'est officiel. » pendant 24 h, puis tout seul l'ouverture du casting (20 février, 23 h 30), la fin du casting (20 mars), l'annonce des 35 (24 avril, 21 h) et l'ouverture du Programme 01 (dimanche 16 mai, 20 h 30). Pendant le Programme, la petite ligne reprend. Les étapes sont dans `GRAND` (`index.html`).
 5. Après l'ouverture, `middleware.js` ne fait plus rien (on peut le supprimer). Pour changer la date : `OUVERTURE` dans `middleware.js`, `bientot.html`, `index.html` et `lib/decompte.js`.
 
 **La cinématique.** Le teaser est dans `FILMS` (`index.html`), verrouillé jusqu'à 21 h. Coller son identifiant YouTube dans `youtube`, et programmer la vidéo sur YouTube pour 21 h : avant cette heure, même avec l'identifiant dans la page, personne ne peut la regarder. Le titre « On vous regarde » est provisoire.
@@ -148,14 +148,14 @@ Une enquête s'ouvre tous les 15 jours, le samedi à 21 h (heure de Paris), sur 
 
 ## Le mot du jour (page /mot)
 
-Un mot de 5 lettres à trouver en 6 essais, comme Motus : case rouge = bonne place, rond jaune = dans le mot mais ailleurs. Un nouveau mot chaque soir à 21 h (heure de Paris), à partir du soir d'Halloween. Le canal 17 a chaque mot 17 minutes avant.
+Un mot de 5 lettres à trouver en 6 essais, comme Motus : case rouge = bonne place, rond jaune = dans le mot mais ailleurs. Un nouveau mot chaque soir à 21 h (heure de Paris), à partir du soir de l'ouverture (26 décembre). Le canal 17 a chaque mot 17 minutes avant.
 
 1. Sur Discord : créer un salon **privé** `#registre-mots` (le bot doit le voir, y écrire et lire l'historique). Facultatif : un salon pour l'annonce du soir (par exemple `#annonce`), et un rôle « Mot du jour : premier de la semaine », sous le rôle du bot.
 2. Sur Vercel : `DISCORD_MOT_REGISTRE_ID` (et si besoin `DISCORD_MOT_ANNONCE_ID`, `DISCORD_MOT_ROLE_ID`), puis redéployer.
 3. Il faut être connecté avec Discord pour jouer, et on ne joue qu'une fois par mot. Le mot ne quitte jamais le serveur : la page envoie chaque essai et reçoit seulement les couleurs. Un mot qui n'existe pas ne coûte pas d'essai (dictionnaire : `api/_mot/_dico.js`).
-4. Classement du soir : le moins d'essais, puis le plus rapide. Classement de la semaine : trouvé en 1 essai = 6 points, … en 6 essais = 1 point ; il repart de zéro le lundi à 21 h. La semaine d'Halloween (deux mots) compte avec la suivante. La série compte les soirs d'affilée où le mot a été trouvé.
+4. Classement du soir : le moins d'essais, puis le plus rapide. Classement de la semaine : trouvé en 1 essai = 6 points, … en 6 essais = 1 point ; il repart de zéro le lundi à 21 h. La semaine de l'ouverture (deux mots) compte avec la suivante. La série compte les soirs d'affilée où le mot a été trouvé.
 5. Chaque soir vers 21 h (cron de `vercel.json`, et à défaut la première visite de /mot), si `DISCORD_MOT_ANNONCE_ID` est rempli, le bot annonce le mot de la veille, combien l'ont trouvé et qui a été le premier ; le lundi, il ajoute le podium de la semaine et donne le rôle au premier.
-6. Les mots : `api/_mot/_mots.js`, dans l'ordre (n° 1 le 31 octobre 2026). La liste tient jusqu'en septembre 2027 ; ajouter des mots à la fin, sans changer l'ordre des mots déjà passés.
+6. Les mots : `api/_mot/_mots.js`, dans l'ordre (n° 1 le 26 décembre 2026). La liste tient jusqu'en novembre 2027 ; ajouter des mots à la fin, sans changer l'ordre des mots déjà passés.
 7. Tester avant la date : les comptes de `CASTING_TESTEURS` jouent sur des mots d'entraînement (rien n'est noté). Après l'ouverture, ils jouent comme tout le monde.
 8. Le registre sert de mémoire au jeu : une ligne `🔤 mot …` par joueur et par soir, et une marque `📣 mot …` par annonce. Pour retirer une partie suspecte, supprimer sa ligne.
 
@@ -163,7 +163,7 @@ Un mot de 5 lettres à trouver en 6 essais, comme Motus : case rouge = bonne pla
 
 Le formulaire de `/casting` ne s'ouvre qu'entre l'ouverture et la fermeture du casting. Avant, la page affiche « Formulaire scellé » avec le compte à rebours ; après, « Casting terminé ». Le serveur refuse aussi tout dossier envoyé hors de ces dates (`api/candidature.js`), même si quelqu'un contourne la page.
 
-- Dates par défaut dans `lib/casting.js` : ouverture le samedi 20 février 2027 à 23h30 (finale du TOURNOI BARHAW), fermeture le 14 mars 2027 à 23h59 (heure de Paris).
+- Dates par défaut dans `lib/casting.js` : ouverture le samedi 20 février 2027 à 23h30 (finale du TOURNOI BARHAW), fermeture le samedi 20 mars 2027 à 23h59 (heure de Paris).
 - Pour les changer sans toucher au code, variables Vercel `CASTING_OUVERTURE` et `CASTING_FERMETURE`, au format `2027-02-20T23:30:00+01:00`. Penser à changer aussi les dates affichées sur l'accueil (`index.html`).
 - `CASTING_TESTEURS` : identifiants Discord (séparés par des virgules) qui peuvent tester le formulaire même quand le casting est fermé. La page leur affiche « Mode test ».
 - État actuel : `https://<ton-domaine>/api/casting` (ou la ligne `casting` de `/api/candidature`).

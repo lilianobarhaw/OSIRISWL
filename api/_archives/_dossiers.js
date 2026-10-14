@@ -15,7 +15,7 @@ export const DOSSIERS = [
   {
     num: "01",
     titre: "La bande de la CAM 12",
-    ouverture: "2026-10-31T21:00:00+01:00",
+    ouverture: "2026-12-26T21:00:00+01:00",
     intro: [
       "Nuit du jeudi 29 au vendredi 30 octobre. La caméra de la laverie a filmé le sujet 0217 entrer à 23 h 40.",
       "Puis trente-deux minutes de bande ont été effacées. Quelqu'un, chez Osiris, ne voulait pas qu'on voie la suite.",
@@ -31,11 +31,11 @@ export const DOSSIERS = [
     // La récompense : un fragment du lore d'Osiris, visible seulement par ceux qui ont résolu le dossier.
     recompense: { titre: "Fragment 01 · Ordre d'effacement", fichier: "01-fragment.jpg", texte: "Ce document n'aurait jamais dû sortir des archives d'Osiris." },
   },
-  { num: "02", ouverture: "2026-11-14T21:00:00+01:00" },
-  { num: "03", ouverture: "2026-11-28T21:00:00+01:00" },
-  { num: "04", ouverture: "2026-12-12T21:00:00+01:00" },
-  { num: "05", ouverture: "2026-12-26T21:00:00+01:00" },
-  { num: "06", ouverture: "2027-01-09T21:00:00+01:00" },
-  { num: "07", ouverture: "2027-01-23T21:00:00+01:00" },
-  { num: "08", ouverture: "2027-02-06T21:00:00+01:00" },
+  { num: "02", ouverture: "2027-01-09T21:00:00+01:00" },
+  { num: "03", ouverture: "2027-01-23T21:00:00+01:00" },
+  { num: "04", ouverture: "2027-02-06T21:00:00+01:00" },
+  { num: "05", ouverture: "2027-02-20T21:00:00+01:00" },
+  { num: "06", ouverture: "2027-03-06T21:00:00+01:00" },
+  { num: "07", ouverture: "2027-03-20T21:00:00+01:00" },
+  { num: "08", ouverture: "2027-04-03T21:00:00+02:00" },
 ];

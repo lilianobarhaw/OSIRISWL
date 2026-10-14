@@ -1,5 +1,5 @@
-// Le mot du jour : un mot par soir, dans l'ordre, à partir du n° 1 (le soir d'Halloween, 31 octobre 2026 à 21 h).
-// 318 mots : la liste tient jusqu'au 13 septembre 2027. Ensuite elle recommence au début : ajouter des mots à la fin.
+// Le mot du jour : un mot par soir, dans l'ordre, à partir du n° 1 (le soir de l'ouverture, 26 décembre 2026 à 21 h).
+// 318 mots : la liste tient jusqu'au 8 novembre 2027. Ensuite elle recommence au début : ajouter des mots à la fin.
 // Règles : 5 lettres, des mots connus de tous (pas de pluriel ni de verbe conjugué), et rien qui dévoile un secret du Programme.
 // Les accents sont permis (« forêt ») : on joue sans, et le mot s'affiche avec à la fin.
 // Ne pas changer l'ordre des mots déjà passés : le registre et les partages y font référence par leur numéro.
