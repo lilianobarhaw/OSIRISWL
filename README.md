@@ -140,7 +140,15 @@ Après chaque soirée, les Mécènes votent pour leurs **3 favoris** (bouton « 
 6. **Le final** : `/cote sortie candidat:…` → « cotation suspendue · Transfert en cours. » Ses parts sont gelées (ni achat ni vente) et gardées pour la suite.
 7. **Le dimanche soir** (cron), les 3 plus grandes fortunes sont publiées dans #la-cote ; la première propose un Choix d'Osiris.
 
-`/cote etat` résume tout (séance, votants, bandeau, salon).
+`/cote etat` résume tout (séance, votants, bandeau, salon). `/cote remise-a-zero` efface tout, seulement après des tests.
+
+### Tester avant la saison
+
+1. Mettre `DISCORD_COTE_CHANNEL_ID` sur un salon staff de test (puis redéployer), pour que les Mécènes ne voient rien.
+2. `/cote candidats` avec 5 faux noms, `/cote panneau`, `/cote ouvrir heures:1`, voter, `/cote notes`, `/cote calculer`, puis acheter et vendre avec le panneau. Recommencer une séance pour voir les cours bouger.
+3. Un compte avec le rôle Candidat doit être refusé partout ; un compte Mécène doit pouvoir tout faire.
+4. Le bandeau : `/cote bandeau actif:oui`, puis ouvrir `/bandeau` dans le navigateur (avant le 26 décembre, connecté en testeur avec le lien « Équipe »). `/cote bandeau actif:non` ensuite.
+5. Fin des tests : `/cote remise-a-zero confirmer:EFFACER` (efface candidats, votes, cours et portefeuilles ; la prochaine séance redevient la séance 1), supprimer les messages de test, puis mettre `DISCORD_COTE_CHANNEL_ID` sur le vrai `#la-cote`. Ne jamais l'utiliser pendant ou après une vraie saison.
 
 ### Le calcul
 
