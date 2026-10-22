@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Bourse d'Osiris · bandeau</title>
+<!--
+  Le bandeau de la Bourse d'Osiris, pour OBS (source « Navigateur », 1920 × 1080, fond transparent).
+  - Adresse : https://<site>/bandeau            → les vrais cours (lus sur /api/bourse toutes les 60 s)
+  - Essai    : https://<site>/bandeau?demo=1     → des cours inventés, pour régler la scène dans OBS
+  - Télés    : https://<site>/bandeau?tele=1     → le bandeau seul, en grand, pour les télés en jeu
+  Rien ne s'affiche tant que la régie n'a pas activé le bandeau (avant la révélation, la Bourse reste dans la Loge).
+-->
+<link rel="stylesheet" href="/fonts/polices.css">
+<style>
+  :root {
+    --ground: #0A0B0D; --panel: #111317; --line: #23262C;
+    --bone: #E6E0D3; --dim: #8B877D; --faint: #55534D;
+    --brass: #C4A265; --gold: #E9CF78; --alarm: #B5564A;
+    --display: "Marcellus", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --serif: "Source Serif 4", Georgia, serif;
+    --h: 92px;
+  }
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+  body.tele { background: var(--ground); display: grid; place-items: center; }
+
+  .bandeau {
+    position: fixed; left: 0; right: 0; bottom: 0; height: var(--h);
+    display: flex; align-items: stretch;
+    background: linear-gradient(180deg, rgba(17,19,23,.94), rgba(10,11,13,.97));
+    border-top: 1px solid var(--brass);
+    box-shadow: 0 -12px 40px rgba(0,0,0,.45);
+    color: var(--bone);
+    opacity: 0; transform: translateY(100%);
+    transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .bandeau.visible { opacity: 1; transform: none; }
+  body.tele .bandeau { position: relative; width: 100vw; --h: 18vh; }
+
+  .titre {
+    flex: none; display: flex; align-items: center; gap: 16px;
+    padding: 0 28px 0 22px; background: var(--ground);
+    border-right: 1px solid var(--line); position: relative; z-index: 2;
+  }
+  .titre img { height: 52px; width: auto; filter: drop-shadow(0 0 8px rgba(196,162,101,.35)); }
+  body.tele .titre img { height: 10vh; }
+  .titre .nom { font-family: var(--display); font-size: 27px; letter-spacing: .14em; color: var(--brass); line-height: 1; }
+  .titre .sous { font-family: var(--mono); font-size: 13px; letter-spacing: .18em; color: var(--dim); margin-top: 8px; text-transform: uppercase; }
+  body.tele .titre .nom { font-size: 4.2vh; }
+  body.tele .titre .sous { font-size: 2vh; }
+  .rec { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--alarm); margin-right: 8px; animation: clignote 1.6s steps(2, start) infinite; vertical-align: 1px; }
+  @keyframes clignote { to { visibility: hidden; } }
+
+  .defile { flex: 1; position: relative; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%); }
+  .piste { position: absolute; top: 0; bottom: 0; left: 0; display: flex; align-items: center; white-space: nowrap; will-change: transform; }
+  .cours { display: inline-flex; align-items: baseline; gap: 14px; padding: 0 34px; font-family: var(--mono); font-size: 30px; }
+  body.tele .cours { font-size: 5vh; }
+  .cours .n { font-family: var(--display); letter-spacing: .08em; color: var(--bone); font-size: 32px; }
+  body.tele .cours .n { font-size: 5.4vh; }
+  .cours .p { color: var(--dim); }
+  .cours.hausse .v { color: var(--gold); }
+  .cours.baisse .v { color: var(--alarm); }
+  .cours.stable .v { color: var(--faint); }
+  .cours.faillite .n { color: var(--faint); text-decoration: line-through; text-decoration-color: var(--alarm); }
+  .cours.faillite .v { color: var(--alarm); letter-spacing: .16em; }
+  .cours.suspendu .v { color: var(--brass); letter-spacing: .12em; font-size: .8em; }
+  .sep { color: var(--brass); opacity: .55; font-size: 18px; }
+
+  .devise {
+    flex: none; display: flex; align-items: center; padding: 0 26px;
+    font-family: var(--serif); font-style: italic; font-size: 24px; color: var(--brass);
+    background: var(--ground); border-left: 1px solid var(--line); z-index: 2;
+  }
+  body.tele .devise { font-size: 3.6vh; }
+</style>
+</head>
+<body>
+<div class="bandeau" id="bandeau" aria-live="off">
+  <div class="titre">
+    <img src="/img/oeil.png" alt="">
+    <div>
+      <div class="nom">BOURSE D'OSIRIS</div>
+      <div class="sous"><span class="rec"></span><span id="seance">Cours de la Cité</span></div>
+    </div>
+  </div>
+  <div class="defile"><div class="piste" id="piste"></div></div>
+  <div class="devise" id="devise">Le premier sortira.</div>
+</div>
+
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  const DEMO = params.has("demo");
+  if (params.has("tele")) document.body.classList.add("tele");
+  const VITESSE = Number(params.get("vitesse")) || 90; // pixels par seconde
+  const RAFRAICHIR_MS = 60_000;
+
+  // des cours inventés pour régler OBS (?demo=1)
+  const demo = () => ({
+    actif: true, seance: 14, devise: "Le premier sortira.",
+    cours: [
+      ["HALE", 182, 12.4], ["VOSS", 164, 3.1], ["BRENNAN", 151, -8.7], ["KESSLER", 143, 21.0],
+      ["NOVAK", 128, -2.2], ["HARPER", 117, 0], ["WHITLOCK", 96, -30.5], ["SLOANE", 88, 6.8],
+      ["ORTEGA", 74, -11.3], ["BARLOW", 0, -100, true],
+    ].map(([nom, prix, variation, faillite]) => ({ nom, prix, variation, faillite: !!faillite })),
+  });
+
+  const pourcent = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %";
+  const fleche = (v) => (v > 0 ? "▲" : v < 0 ? "▼" : "=");
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+  function element(c) {
+    const cls = c.faillite ? "faillite" : c.suspendu ? "suspendu" : c.variation > 0 ? "hausse" : c.variation < 0 ? "baisse" : "stable";
+    const valeur = c.faillite ? "FAILLITE" : c.suspendu ? "COTATION SUSPENDUE" : `${fleche(c.variation)} ${pourcent(c.variation)}`;
+    const prix = c.faillite ? "" : `<span class="p">${Math.round(c.prix)}</span>`;
+    return `<span class="cours ${cls}"><span class="n">${esc(c.nom)}</span>${prix}<span class="v">${valeur}</span></span><span class="sep">◆</span>`;
+  }
+
+  const piste = document.getElementById("piste");
+  const bandeau = document.getElementById("bandeau");
+  let x = 0, largeur = 0, precedent = 0, donnees = null;
+
+  function afficher(d) {
+    donnees = d;
+    bandeau.classList.toggle("visible", !!(d && d.actif && d.cours && d.cours.length));
+    if (!d || !d.cours || !d.cours.length) return;
+    document.getElementById("seance").textContent = d.seance ? `Cours de la Cité · séance ${d.seance}` : "Cours de la Cité";
+    if (d.devise) document.getElementById("devise").textContent = d.devise;
+    // le contenu est répété pour que le défilement ne laisse jamais de vide
+    const bloc = d.cours.map(element).join("");
+    piste.innerHTML = bloc;
+    largeur = piste.scrollWidth;
+    const fois = Math.max(2, Math.ceil((window.innerWidth * 2) / Math.max(largeur, 1)) + 1);
+    piste.innerHTML = bloc.repeat(fois);
+    if (x <= -largeur) x = 0;
+  }
+
+  function tic(t) {
+    const dt = precedent ? Math.min(0.1, (t - precedent) / 1000) : 0;
+    precedent = t;
+    if (largeur) {
+      x -= VITESSE * dt;
+      if (x <= -largeur) x += largeur;
+      piste.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
+    }
+    requestAnimationFrame(tic);
+  }
+  requestAnimationFrame(tic);
+
+  async function charger() {
+    if (DEMO) return afficher(demo());
+    try {
+      const r = await fetch("/api/bourse", { cache: "no-store" });
+      if (!r.ok) throw new Error(r.status);
+      afficher(await r.json());
+    } catch {
+      if (!donnees) afficher({ actif: false, cours: [] }); // rien à l'écran tant qu'il n'y a pas de cours
+    }
+  }
+  document.fonts?.ready.then(() => donnees && afficher(donnees));
+  charger();
+  setInterval(charger, RAFRAICHIR_MS);
+})();
+</script>
+</body>
+</html>

@@ -36,6 +36,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `lib/logs.js` : le journal des commandes (qui, quoi, où, quand).
 - `lib/canal17.js` : la récompense du jeu de piste (commandes `/canal17` et `/canal17-voix`, voir « Canal 17 »).
 - `lib/antispam.js` et `api/antispam.js` : les règles antispam (AutoMod de Discord) et leur installation.
+- `lib/cote.js` + `lib/redis.js` + `bandeau.html` (adresse `/bandeau`) : la Cote et la Bourse d'Osiris (voir « La Cote et la Bourse »).
 - `package.json` : `"type": "module"`.
 
 ## Parcours du candidat
@@ -87,6 +88,9 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_MOT_ANNONCE_ID` | Facultatif. Mot du jour : salon où le bot donne chaque soir le mot de la veille, et le lundi le podium de la semaine |
 | `DISCORD_MOT_ROLE_ID` | Facultatif. Rôle donné au premier de la semaine (et retiré au premier de la semaine d'avant) |
 | `MOT_PREMIER_JOUR` | Facultatif. Pour déplacer le premier mot, au format `2026-12-26` (il s'ouvre ce jour-là à 21 h) |
+| `DISCORD_COTE_CHANNEL_ID` | La Cote et la Bourse : le salon `#la-cote` de la Loge |
+| `KV_REST_API_URL`, `KV_REST_API_TOKEN` | La Cote et la Bourse : ajoutées toutes seules par Vercel quand on branche la base Upstash (Storage) |
+| `COTE_PROGRAMME` | Facultatif. Le numéro du Programme de la Cote (`01` par défaut) |
 
 Redéployer après chaque modification des variables. Vérification : ouvrir `https://<ton-domaine>/api/candidature` → doit afficher « toutes les variables sont configurées ».
 
@@ -112,6 +116,47 @@ Le samedi 26 décembre à 21 h, c'est l'ouverture officielle du projet : le Disc
 3. Taper `/decompte` dans le salon de l'annonce (option `ping` pour @everyone). Le bot publie l'annonce, avec un compte à rebours que Discord met à jour tout seul (« dans 21 jours », puis « dans 3 heures »…), et renomme tout de suite le salon : « ⏳ Ouverture du projet · J-21 ».
 4. Ensuite, le bot renomme le salon chaque nuit (J-20, J-19…, puis « ce soir 21 h » le jour même), et vers 21 h le 31 : « 👁 Osiris est ouvert » pendant 24 h. Puis il enchaîne tout seul : « ⏳ Casting · J-111 »…, « 📂 Casting ouvert · J-22 »…, « ⏳ Les 35 candidats · J-12 »…, « ⏳ Programme 01 · J-7 »…, et « 🔴 Programme 01 en cours » jusqu'à la dernière soirée. Le renommage se fait aussi à la première visite de l'accueil ou du casting après un changement. Les étapes sont dans `ETAPES` (`lib/decompte.js`).
 5. À 21 h, le bot ne publie rien : l'annonce de l'ouverture se fait à la main.
+
+## La Cote et la Bourse
+
+Après chaque soirée, les Mécènes votent pour leurs **3 favoris** (bouton « Voter » dans #la-cote), jusqu'au prochain midi. La régie ajoute une **note de spectacle** de 0 à 10. Le classement qui en sort, c'est **la Cote**. Avec, la **Bourse d'Osiris** : chaque Mécène a 10 000 crédits fictifs (jamais d'argent réel) pour acheter des parts des candidats, et le cours suit la Cote. Tout se passe avec les boutons de #la-cote : les candidats ne voient aucune commande. La régie a `/cote` (fondateurs et admins).
+
+### Mise en place (une fois)
+
+1. **La base de données** (gratuite) : Vercel → le projet → **Storage** → **Create Database** → **Upstash for Redis** (offre gratuite, région Europe) → **Connect** au projet. Vercel ajoute tout seul `KV_REST_API_URL` et `KV_REST_API_TOKEN` (ou `UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN`, les deux marchent).
+2. **Le salon** : `#la-cote` dans la catégorie 👁 LA LOGE (voir le guide de la Loge) : les Mécènes le voient sans pouvoir y écrire, le bot y écrit. Clic droit → Copier l'identifiant → variable `DISCORD_COTE_CHANNEL_ID`.
+3. `DISCORD_MECENE_ROLE_ID` et `DISCORD_CANDIDAT_ROLE_ID` doivent être remplies : seuls les Mécènes (tous les rangs) jouent, jamais un candidat.
+4. Redéployer, puis renvoyer les commandes : `/api/commands?key=<SETUP_KEY>`. Vérification : `/api/interactions` → `cote_et_bourse : OK`.
+5. Dans #la-cote : `/cote panneau` (le panneau de la Bourse : Cours, Mon portefeuille, Acheter, Vendre, Fortunes).
+6. Le soir de la Sélection : `/cote candidats`, coller les 35 noms (un par ligne ; `Nom | NOM COURT` pour choisir le nom du bandeau, sinon c'est le nom de famille).
+
+### Chaque soirée
+
+1. **Fin de soirée** : `/cote ouvrir` → le vote part dans #la-cote, jusqu'au prochain midi (heure de Paris). Option `heures` pour une autre durée.
+2. **Avant midi** : `/cote notes` → la fenêtre liste les candidats, mettre une note de 0 à 10 après chaque nom. Sans note, un candidat compte 5 ; sans aucune note pour la séance, seuls les votes comptent.
+3. **À midi passé**, la Cote se calcule toute seule et se publie dans #la-cote : au premier clic dans #la-cote, au premier passage du bandeau, ou au plus tard au cron du soir. `/cote calculer` la publie tout de suite, ou la refait après de nouvelles notes (seulement la dernière séance).
+4. **Une mort** : `/cote mort candidat:…` → faillite (cours à 0), annoncée dans #la-cote. `annuler:oui` répare une erreur.
+5. **La révélation** : `/cote bandeau actif:oui` → le bandeau apparaît dans OBS et sur les télés, et « Le premier sortira. » s'ajoute aux publications. Avant, rien ne sort de la Loge.
+6. **Le final** : `/cote sortie candidat:…` → « cotation suspendue · Transfert en cours. » Ses parts sont gelées (ni achat ni vente) et gardées pour la suite.
+7. **Le dimanche soir** (cron), les 3 plus grandes fortunes sont publiées dans #la-cote ; la première propose un Choix d'Osiris.
+
+`/cote etat` résume tout (séance, votants, bandeau, salon).
+
+### Le calcul
+
+- Score d'une séance = 5 × votes (le plus voté a 10, les autres en proportion) + 5 × note de spectacle : de 0 à 100.
+- Cote = moitié l'ancienne Cote, moitié le score de la séance (à la première séance : le score).
+- Prix d'une part = 20 + 2 × Cote, donc de 20 à 220 crédits. La variation du bandeau compare au prix d'avant le dernier calcul.
+- Achat : autant de parts entières que le montant le permet, au cours du jour. Vente au cours du jour. Acheter ne change pas la Cote.
+- Les crédits sont fictifs : rien ne s'achète ni ne se gagne en argent réel.
+
+### Le bandeau dans OBS
+
+Source **Navigateur**, adresse `https://osiriswl.vercel.app/bandeau`, 1920 × 1080 (fond transparent). `?demo=1` affiche des cours inventés pour régler la scène, `?tele=1` la version plein écran pour les télés en jeu, `?vitesse=120` change la vitesse de défilement. Il ne montre rien tant que `/cote bandeau actif:oui` n'a pas été fait. Les cours viennent de `/api/bourse`.
+
+### Saison 2
+
+`COTE_PROGRAMME=02` (variable Vercel) : nouvelle liste de candidats, nouveaux votes. Les parts du vainqueur du Programme 01 restent dans les portefeuilles, et sa ligne « cotation suspendue » continue de défiler.
 
 ## Tickets d'aide
 

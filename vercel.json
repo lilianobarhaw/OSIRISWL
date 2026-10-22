@@ -26,6 +26,11 @@
       "permanent": false
     },
     {
+      "source": "/api/bourse",
+      "destination": "/api/rangs?bourse=1",
+      "permanent": false
+    },
+    {
       "source": "/api/ecrans",
       "destination": "/api/rangs?ecrans=1",
       "permanent": false

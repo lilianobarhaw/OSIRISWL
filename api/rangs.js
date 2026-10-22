@@ -7,7 +7,9 @@
 //
 // Mot du jour (lib/mot.js) : /api/rangs?mot=1 (la page /mot).
 // Les écrans (lib/ecrans.js) : /api/rangs?ecrans=1&c=… (qui est en direct sur Twitch, pour l'accueil).
-// Cron de 21 h : /api/rangs?tick=1 → l'annonce du mot de la veille, et le salon du décompte (lib/decompte.js).
+// La Bourse (lib/cote.js) : /api/bourse → /api/rangs?bourse=1 (les cours du bandeau, rien avant /cote bandeau).
+// Cron de 21 h : /api/rangs?tick=1 → l'annonce du mot de la veille, le salon du décompte (lib/decompte.js),
+// et la Cote (vote fermé à l'heure → calcul ; le dimanche, les 3 plus grandes fortunes).
 // Le cron de la nuit renomme aussi le salon du décompte.
 // Ils passent par ici parce que le site est au maximum de 12 fonctions sur l'offre gratuite de Vercel.
 
@@ -16,15 +18,18 @@ import { mettreAJourRangs } from "../lib/rangs.js";
 import { motGET, motPOST, publierMot } from "../lib/mot.js";
 import { majSalon } from "../lib/decompte.js";
 import { ecransGET } from "../lib/ecrans.js";
+import { bourseGET, tick as coteTick } from "../lib/cote.js";
 
 export async function GET(req) {
   const url = new URL(req.url);
   if (url.searchParams.has("ecrans")) return ecransGET(req);
+  if (url.searchParams.has("bourse")) return bourseGET(req);
   if (url.searchParams.has("mot")) return motGET(req);
   if (url.searchParams.has("tick")) {
     const mot = await publierMot().catch((e) => ({ annonce: false, erreur: e.message }));
     const decompte = await majSalon().catch((e) => ({ erreur: e.message }));
-    return json({ ok: true, mot, decompte }, 200, { "Cache-Control": "no-store" });
+    const cote = await coteTick().catch((e) => ({ erreur: e.message }));
+    return json({ ok: true, mot, decompte, cote }, 200, { "Cache-Control": "no-store" });
   }
 
   const cron = optEnv("CRON_SECRET");
