@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>La Sélection · Osiris</title>
+<!--
+  L'écran de la Sélection, pour OBS (source « Navigateur », 1920 × 1080).
+  - https://<site>/selection                 → la cérémonie (fond noir), suit le bouton « Nom suivant » de la régie
+  - https://<site>/selection?transparent=1   → sans fond, à poser sur une autre scène
+  - https://<site>/selection?demo=1          → une démonstration avec des noms inventés, pour régler OBS
+  Les noms ne sont jamais dans la page à l'avance : elle ne reçoit que ceux déjà annoncés.
+-->
+<link rel="stylesheet" href="/fonts/polices.css">
+<style>
+  :root {
+    --ground: #0A0B0D; --panel: #111317; --line: #23262C;
+    --bone: #E6E0D3; --dim: #8B877D; --faint: #55534D;
+    --brass: #C4A265; --gold: #E9CF78;
+    --display: "Marcellus", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --serif: "Source Serif 4", Georgia, serif;
+  }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; color: var(--bone); }
+  body { background: radial-gradient(ellipse at 50% 42%, #15171c 0%, var(--ground) 62%, #050506 100%); }
+  body.transparent { background: transparent; }
+  body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
+  body.transparent::after { display: none; }
+
+  .haut { position: fixed; top: 44px; left: 60px; right: 60px; display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 18px; letter-spacing: .32em; color: var(--dim); text-transform: uppercase; }
+  .haut img { mix-blend-mode: lighten; height: 34px; vertical-align: middle; margin-right: 16px; opacity: .9; }
+
+  .scene { position: fixed; inset: 0; display: grid; place-items: center; }
+  .etat { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity .9s ease; pointer-events: none; }
+  .etat.on { opacity: 1; }
+
+  /* attente */
+  .attente { text-align: center; }
+  .attente .oeil { mix-blend-mode: lighten; width: 420px; filter: drop-shadow(0 0 40px rgba(196,162,101,.25)); animation: souffle 6s ease-in-out infinite; }
+  @keyframes souffle { 50% { transform: scale(1.04); filter: drop-shadow(0 0 70px rgba(196,162,101,.4)); } }
+  .attente h1 { font-family: var(--display); font-weight: 400; font-size: 118px; letter-spacing: .32em; margin: 36px 0 0 .32em; color: var(--bone); }
+  .attente p { font-family: var(--serif); font-style: italic; font-size: 36px; color: var(--brass); margin: 18px 0 0; }
+
+  /* un nom */
+  .carte { text-align: center; transform: translateY(-40px); }
+  .categorie { font-family: var(--mono); font-size: 26px; letter-spacing: .4em; text-transform: uppercase; color: var(--brass); margin-bottom: 40px; }
+  .avatar { width: 270px; height: 270px; border-radius: 50%; object-fit: cover; border: 3px solid var(--brass); box-shadow: 0 0 0 10px rgba(196,162,101,.08), 0 0 80px rgba(196,162,101,.28); background: var(--panel); }
+  .nom { font-family: var(--display); font-size: 124px; line-height: 1.05; margin: 44px 0 18px; letter-spacing: .04em; }
+  .numero { font-family: var(--mono); font-size: 32px; letter-spacing: .28em; color: var(--gold); }
+  .phrase { font-family: var(--serif); font-style: italic; font-size: 36px; color: var(--dim); margin-top: 26px; }
+  .anime .avatar { animation: apparait 1.4s cubic-bezier(.2,.8,.2,1) both; }
+  .anime .categorie { animation: monte .9s .15s ease both; }
+  .anime .nom { animation: net 1.3s .35s cubic-bezier(.2,.8,.2,1) both; }
+  .anime .numero { animation: monte .9s .9s ease both; }
+  .anime .phrase { animation: monte 1.1s 1.4s ease both; }
+  @keyframes apparait { from { opacity: 0; transform: scale(1.18); filter: blur(14px) grayscale(1); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes net { from { opacity: 0; letter-spacing: .4em; filter: blur(16px); } to { opacity: 1; letter-spacing: .04em; filter: none; } }
+  @keyframes monte { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  .eclair { position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(233,207,120,.22), transparent 60%); opacity: 0; pointer-events: none; }
+  .eclair.go { animation: eclair 1.2s ease-out; }
+  @keyframes eclair { 0% { opacity: 0; } 12% { opacity: 1; } 100% { opacity: 0; } }
+
+  /* la fin */
+  .fin { text-align: center; }
+  .fin h2 { font-family: var(--display); font-weight: 400; font-size: 92px; letter-spacing: .06em; margin: 0; }
+  .fin .bourse { font-family: var(--mono); font-size: 30px; letter-spacing: .2em; color: var(--gold); margin-top: 34px; opacity: 0; transition: opacity 1.2s ease; text-transform: uppercase; }
+  .fin .bourse.on { opacity: 1; }
+
+  /* les places, en bas */
+  .places { position: fixed; left: 0; right: 0; bottom: 70px; display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; padding: 0 140px; }
+  .place { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--faint); background: transparent center/cover no-repeat; transition: border-color .6s ease, transform .6s ease; }
+  .place.prise { border-color: var(--brass); }
+  .place.neuve { animation: pose .9s ease both; }
+  @keyframes pose { from { transform: scale(1.8); opacity: 0; } to { transform: none; opacity: 1; } }
+  .compteur { position: fixed; right: 60px; bottom: 140px; font-family: var(--mono); font-size: 22px; letter-spacing: .2em; color: var(--dim); }
+  .compteur b { color: var(--bone); font-weight: 500; }
+  body.fin-ceremonie .places { bottom: 150px; gap: 16px; }
+  body.fin-ceremonie .place { width: 64px; height: 64px; }
+</style>
+</head>
+<body>
+<div class="haut"><span><img src="/img/oeil.png" alt="">Osiris · La Sélection</span><span id="programme">Programme 01</span></div>
+
+<div class="scene">
+  <div class="etat attente on" id="attente">
+    <div>
+      <img class="oeil" src="/img/oeil.webp" alt="">
+      <h1>LA SÉLECTION</h1>
+      <p id="sousTitre">Ils vont être choisis.</p>
+    </div>
+  </div>
+  <div class="etat" id="enCours">
+    <div class="carte" id="carte">
+      <div class="categorie" id="categorie"></div>
+      <img class="avatar" id="avatar" alt="">
+      <div class="nom" id="nom"></div>
+      <div class="numero" id="numero"></div>
+      <div class="phrase">Vous avez été choisi.</div>
+    </div>
+  </div>
+  <div class="etat fin" id="fin">
+    <div>
+      <h2 id="finTitre">Ils sont choisis.</h2>
+      <div class="bourse" id="bourse"></div>
+    </div>
+  </div>
+</div>
+<div class="eclair" id="eclair"></div>
+<div class="places" id="places"></div>
+<div class="compteur" id="compteur"></div>
+
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  if (params.has("transparent")) document.body.classList.add("transparent");
+  const DEMO = params.has("demo");
+  const NOMBRES = { 35: "trente-cinq", 50: "cinquante", 30: "trente", 40: "quarante", 25: "vingt-cinq", 20: "vingt" };
+  const $ = (id) => document.getElementById(id);
+  let vu = -1, places = 0, finApres = 0;
+
+  // une démonstration : un nom toutes les 4 secondes
+  const debut = Date.now();
+  const demo = () => {
+    const total = 12, n = Math.min(total, Math.floor((Date.now() - debut) / 4000));
+    const cats = ["Les héritiers", "Le bureau du shérif", "Le cabinet médical", "Les mineurs survivants", "Les habitants", "Les étrangers"];
+    const annonces = Array.from({ length: n }, (_, k) => ({ pseudo: ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima"][k], avatar: `https://cdn.discordapp.com/embed/avatars/${k % 6}.png`, categorie: cats[Math.floor(k / 2)], numero: String(101 + k * 37) }));
+    return { etat: n === 0 ? "attente" : n < total ? "en_cours" : "fin", programme: "01", index: n, total, courant: annonces.at(-1), annonces, bourse: n === total && Date.now() - debut > total * 4000 + 5000, prix: 120 };
+  };
+
+  function montrer(id) { for (const e of ["attente", "enCours", "fin"]) $(e).classList.toggle("on", e === id); }
+
+  function dessinerPlaces(d) {
+    const box = $("places");
+    if (places !== d.total) { box.innerHTML = Array.from({ length: d.total }, () => '<div class="place"></div>').join(""); places = d.total; }
+    [...box.children].forEach((el, k) => {
+      const a = d.annonces[k];
+      if (a && !el.classList.contains("prise")) { el.classList.add("prise", "neuve"); el.style.backgroundImage = `url("${a.avatar}")`; }
+      if (!a && el.classList.contains("prise")) { el.classList.remove("prise", "neuve"); el.style.backgroundImage = ""; }
+    });
+  }
+
+  function afficher(d) {
+    if (!d || !d.total) { montrer("attente"); return; }
+    $("programme").textContent = `Programme ${d.programme || "01"}`;
+    const mot = NOMBRES[d.total] || String(d.total);
+    $("sousTitre").textContent = `${mot.charAt(0).toUpperCase() + mot.slice(1)} vont être choisis.`;
+    dessinerPlaces(d);
+    $("compteur").innerHTML = d.index ? `<b>${d.index}</b> / ${d.total}` : "";
+    document.body.classList.toggle("fin-ceremonie", d.etat === "fin" && d.index === vu && Date.now() >= finApres);
+    if (d.etat === "attente") { montrer("attente"); vu = 0; return; }
+    if (d.index !== vu && d.courant) return nouveauNom(d);
+    if (d.etat === "fin" && Date.now() >= finApres) {
+      montrer("fin");
+      $("finTitre").textContent = `Les ${mot} sont choisis.`;
+      $("bourse").textContent = d.bourse ? `La Bourse d'Osiris est ouverte · ${d.prix} cr la part` : "";
+      $("bourse").classList.toggle("on", !!d.bourse);
+    }
+  }
+
+  function nouveauNom(d) {
+    {
+      vu = d.index;
+      const c = d.courant;
+      $("categorie").textContent = c.categorie || "";
+      $("avatar").src = c.avatar;
+      $("nom").textContent = c.pseudo;
+      $("numero").textContent = `CANDIDAT N° ${c.numero}`;
+      const carte = $("carte");
+      carte.classList.remove("anime"); void carte.offsetWidth; carte.classList.add("anime");
+      const e = $("eclair"); e.classList.remove("go"); void e.offsetWidth; e.classList.add("go");
+      montrer("enCours");
+      // le dernier nom reste 7 secondes à l'écran, puis l'écran de fin
+      if (d.etat === "fin") finApres = Date.now() + 7000;
+    }
+  }
+
+  async function charger() {
+    if (DEMO) return afficher(demo());
+    try {
+      const r = await fetch("/api/selection", { cache: "no-store" });
+      if (r.ok) afficher(await r.json());
+    } catch {}
+  }
+  charger();
+  setInterval(charger, 1500);
+})();
+</script>
+</body>
+</html>

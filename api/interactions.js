@@ -9,6 +9,7 @@
 //   /canal17, /canal17-voix : la récompense du jeu de piste (lib/canal17.js)
 //   /decompte : l'annonce de l'ouverture officielle, avec son compte à rebours (lib/decompte.js)
 //   /cote : la Cote et la Bourse d'Osiris, pour la régie (lib/cote.js)
+//   /selection : la cérémonie de la Sélection, avec le bouton « Nom suivant » (lib/selection.js)
 // Et les boutons de la Cote et de la Bourse, pour les Mécènes (« Voter », panneau de #la-cote).
 //   /warn, /unwarn, /sanctions, /mute, /unmute, /kick, /ban, /unban, /clear, /slowmode (lib/moderation.js)
 
@@ -22,6 +23,7 @@ import { offrandeModal, publierOffrande } from "../lib/offrande.js";
 import * as canal17 from "../lib/canal17.js";
 import * as decompte from "../lib/decompte.js";
 import * as cote from "../lib/cote.js";
+import * as selection from "../lib/selection.js";
 import { baseConfiguree } from "../lib/redis.js";
 
 const VIEW = 1024n, SEND = 2048n, EMBED = 16384n, ATTACH = 32768n, HISTORY = 65536n;
@@ -122,9 +124,9 @@ async function command(i, user) {
     return json(canal17.voixModal(opt("mention"), opt("salon"), att ? i.id : ""));
   }
 
-  // La Cote et la Bourse : une fenêtre tout de suite, ou « Osiris réfléchit… » puis le résultat.
-  if (name === "cote") {
-    const r = await cote.commande(i, user);
+  // La Cote, la Bourse et la Sélection : une fenêtre tout de suite, ou « Osiris réfléchit… » puis le résultat.
+  if (name === "cote" || name === "selection") {
+    const r = name === "cote" ? await cote.commande(i, user) : await selection.commande(i, user);
     if (r.reponse) return r.reponse;
     const work = r.travail.catch((e) => "Erreur : " + (e?.message || "inconnue"));
     const fast = await Promise.race([work, sleep(RAPIDE).then(() => null)]);
@@ -209,6 +211,10 @@ export async function POST(req) {
       return await cote.composant(i, user);
     }
     if (i.type === 5 && (id.startsWith("cote_") || id.startsWith("bourse_"))) return await cote.fenetre(i, user);
+
+    // La Sélection : le panneau de la régie et la liste des retenus
+    if (i.type === 3 && id.startsWith("sel:")) return await selection.composant(i, user);
+    if (i.type === 5 && id.startsWith("selection_")) return await selection.fenetre(i, user);
 
     // Commandes slash
     if (i.type === 2) {
@@ -393,6 +399,7 @@ export function GET() {
     salon_des_sanctions: has("DISCORD_SANCTIONS_CHANNEL_ID") ? "OK" : "ATTENTION : DISCORD_SANCTIONS_CHANNEL_ID absent, les avertissements ne sont pas comptés",
     canal_17: canal17.manque().length ? "désactivé : il manque " + canal17.manque().join(", ") : `OK (${canal17.PLACES} places)`,
     salon_du_decompte: has("DISCORD_DECOMPTE_SALON_ID") ? "OK" : "désactivé : il manque DISCORD_DECOMPTE_SALON_ID",
+    selection: !baseConfiguree() ? "désactivée : base Upstash non branchée" : has("DISCORD_SELECTION_CHANNEL_ID") ? "OK" : "base OK, mais il manque DISCORD_SELECTION_CHANNEL_ID (le salon #la-sélection)",
     cote_et_bourse: !baseConfiguree() ? "désactivées : base Upstash non branchée (KV_REST_API_URL, KV_REST_API_TOKEN)" : has("DISCORD_COTE_CHANNEL_ID") ? "OK" : "base OK, mais il manque DISCORD_COTE_CHANNEL_ID (le salon #la-cote)",
     mot_du_jour: has("DISCORD_MOT_REGISTRE_ID") ? "OK" + (has("DISCORD_MOT_ANNONCE_ID") ? ", avec l'annonce du soir" : ", sans annonce du soir") : "désactivé : il manque DISCORD_MOT_REGISTRE_ID",
   });

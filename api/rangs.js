@@ -8,6 +8,7 @@
 // Mot du jour (lib/mot.js) : /api/rangs?mot=1 (la page /mot).
 // Les écrans (lib/ecrans.js) : /api/rangs?ecrans=1&c=… (qui est en direct sur Twitch, pour l'accueil).
 // La Bourse (lib/cote.js) : /api/bourse → /api/rangs?bourse=1 (les cours du bandeau, rien avant /cote bandeau).
+// La Sélection (lib/selection.js) : /api/selection → /api/rangs?selection=1 (les noms déjà annoncés, pour l'écran).
 // Cron de 21 h : /api/rangs?tick=1 → l'annonce du mot de la veille, le salon du décompte (lib/decompte.js),
 // et la Cote (vote fermé à l'heure → calcul ; le dimanche, les 3 plus grandes fortunes).
 // Le cron de la nuit renomme aussi le salon du décompte.
@@ -19,11 +20,13 @@ import { motGET, motPOST, publierMot } from "../lib/mot.js";
 import { majSalon } from "../lib/decompte.js";
 import { ecransGET } from "../lib/ecrans.js";
 import { bourseGET, tick as coteTick } from "../lib/cote.js";
+import { selectionGET } from "../lib/selection.js";
 
 export async function GET(req) {
   const url = new URL(req.url);
   if (url.searchParams.has("ecrans")) return ecransGET(req);
   if (url.searchParams.has("bourse")) return bourseGET(req);
+  if (url.searchParams.has("selection")) return selectionGET(req);
   if (url.searchParams.has("mot")) return motGET(req);
   if (url.searchParams.has("tick")) {
     const mot = await publierMot().catch((e) => ({ annonce: false, erreur: e.message }));

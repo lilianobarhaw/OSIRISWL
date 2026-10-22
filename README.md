@@ -37,6 +37,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `lib/canal17.js` : la récompense du jeu de piste (commandes `/canal17` et `/canal17-voix`, voir « Canal 17 »).
 - `lib/antispam.js` et `api/antispam.js` : les règles antispam (AutoMod de Discord) et leur installation.
 - `lib/cote.js` + `lib/redis.js` + `bandeau.html` (adresse `/bandeau`) : la Cote et la Bourse d'Osiris (voir « La Cote et la Bourse »).
+- `lib/selection.js` + `selection.html` (adresse `/selection`) : la cérémonie de la Sélection et l'introduction en Bourse (voir « La Sélection »).
 - `package.json` : `"type": "module"`.
 
 ## Parcours du candidat
@@ -91,6 +92,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `DISCORD_COTE_CHANNEL_ID` | La Cote et la Bourse : le salon `#la-cote` de la Loge |
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | La Cote et la Bourse : ajoutées toutes seules par Vercel quand on branche la base Upstash (Storage) |
 | `COTE_PROGRAMME` | Facultatif. Le numéro du Programme de la Cote (`01` par défaut) |
+| `DISCORD_SELECTION_CHANNEL_ID` | La Sélection : le salon public `#la-sélection` |
 
 Redéployer après chaque modification des variables. Vérification : ouvrir `https://<ton-domaine>/api/candidature` → doit afficher « toutes les variables sont configurées ».
 
@@ -165,6 +167,31 @@ Source **Navigateur**, adresse `https://osiriswl.vercel.app/bandeau`, 1920 × 10
 ### Saison 2
 
 `COTE_PROGRAMME=02` (variable Vercel) : nouvelle liste de candidats, nouveaux votes. Les parts du vainqueur du Programme 01 restent dans les portefeuilles, et sa ligne « cotation suspendue » continue de défiler.
+
+## La Sélection (samedi 24 avril 2027, 21 h)
+
+La cérémonie de l'annonce des retenus, en direct. La régie clique sur **Nom suivant** : le nom apparaît à l'écran (page `/selection` dans OBS) avec sa photo de profil et son numéro, il est publié dans **#la-sélection** avec une mention, et la personne reçoit le rôle Candidat (Mécène, rangs, Postulant et Aspirant lui sont retirés). À la fin, **Introduction en Bourse** : tous les retenus entrent dans la Cote au même prix (120 cr), et les Mécènes peuvent miser tout de suite.
+
+### Mise en place
+
+1. Le salon public **#la-sélection** (tout le monde le voit, personne n'y écrit, le bot y écrit) → `DISCORD_SELECTION_CHANNEL_ID`. La base Upstash et `DISCORD_COTE_CHANNEL_ID` doivent déjà être en place (voir « La Cote et la Bourse »).
+2. Le bot doit avoir l'intent **Server Members** (portail développeur → Bot → Privileged Gateway Intents) pour retrouver les pseudos, et son rôle au-dessus de Candidat et des rôles de Mécène.
+3. Redéployer, puis `/api/commands?key=<SETUP_KEY>`. Vérification : `/api/interactions` → `selection : OK`.
+4. Dans OBS, une scène « Sélection » avec une source **Navigateur** : `https://osiriswl.vercel.app/selection`, 1920 × 1080. `?demo=1` pour régler la scène avec des noms inventés, `?transparent=1` pour la poser sur une autre scène. La page n'affiche jamais un nom avant qu'il soit annoncé.
+
+### Avant la cérémonie
+
+`/selection preparer` → coller la liste **dans l'ordre de l'annonce**, une ligne par personne : `pseudo Discord ; catégorie ; nom du personnage` (le personnage est facultatif : sans lui, la Bourse affiche le pseudo). Le pseudo peut être le nom d'utilisateur, le nom affiché, le surnom sur le serveur, `@pseudo` ou l'identifiant Discord. Le bot dit qui il n'a pas trouvé (homonymes compris : mettre l'identifiant).
+
+**Répétition** : `/selection preparer test:oui` → rien n'est donné ni mentionné, les cartes partent dans le salon de la régie. Après : `/selection remise-a-zero confirmer:EFFACER` (et `/cote remise-a-zero` si l'introduction en Bourse a été essayée).
+
+### Pendant
+
+1. `/selection regie` dans un salon staff → le panneau : **Nom suivant**, **Liste**, **Introduction en Bourse**. Le panneau affiche le dernier annoncé et le **prochain**, pour préparer ta phrase.
+2. Un clic = un nom. Le bouton se bloque 2 secondes pour éviter les doubles clics.
+3. Après le dernier nom, l'écran affiche « Les trente-cinq sont choisis. » ; **Introduction en Bourse** quand tu veux : l'annonce part dans #la-cote et l'écran affiche « La Bourse d'Osiris est ouverte ».
+
+Ensuite, `/cote candidats` montre la liste avec des numéros (`#1 Thomas Hale`) : garder le `#n` en changeant un nom (pseudo → personnage) garde le même candidat et ses parts.
 
 ## Tickets d'aide
 

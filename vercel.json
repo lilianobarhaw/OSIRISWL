@@ -26,6 +26,11 @@
       "permanent": false
     },
     {
+      "source": "/api/selection",
+      "destination": "/api/rangs?selection=1",
+      "permanent": false
+    },
+    {
       "source": "/api/bourse",
       "destination": "/api/rangs?bourse=1",
       "permanent": false
