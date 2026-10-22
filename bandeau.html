@@ -43,7 +43,7 @@
     padding: 0 28px 0 22px; background: var(--ground);
     border-right: 1px solid var(--line); position: relative; z-index: 2;
   }
-  .titre img { height: 52px; width: auto; filter: drop-shadow(0 0 8px rgba(196,162,101,.35)); }
+  .titre img { height: 52px; width: auto; mix-blend-mode: lighten; }
   body.tele .titre img { height: 10vh; }
   .titre .nom { font-family: var(--display); font-size: 27px; letter-spacing: .14em; color: var(--brass); line-height: 1; }
   .titre .sous { font-family: var(--mono); font-size: 13px; letter-spacing: .18em; color: var(--dim); margin-top: 8px; text-transform: uppercase; }
@@ -78,7 +78,7 @@
 <body>
 <div class="bandeau" id="bandeau" aria-live="off">
   <div class="titre">
-    <img src="/img/oeil.png" alt="">
+    <img src="/img/oeil.webp" alt="">
     <div>
       <div class="nom">BOURSE D'OSIRIS</div>
       <div class="sous"><span class="rec"></span><span id="seance">Cours de la Cité</span></div>

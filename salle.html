@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Salle de contrôle · Osiris RP</title>
+<meta name="description" content="Tous les directs du Programme en même temps, comme les Mécènes qui observent Ludendorff. Un clic sur un écran pour le mettre en grand.">
+<meta name="theme-color" content="#0A0B0D">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png?v=2">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Osiris RP">
+<meta property="og:title" content="Salle de contrôle · Osiris">
+<meta property="og:description" content="Tous les directs du Programme en même temps.">
+<meta property="og:image" content="https://osiriswl.vercel.app/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="fonts/polices.css">
+<!--
+  La Salle de contrôle : tous les directs Twitch du Programme en mosaïque, comme les Mécènes qui observent l'île.
+  - Un clic sur un écran : il passe en grand, avec le son ; les autres restent sur le côté, sans le son.
+  - Touches : 1 à 9 pour choisir un écran, M ou Échap pour revenir à la mosaïque, F pour le plein écran.
+  - En bas, le bandeau de la Bourse (/bandeau), seulement quand la régie l'a activé (/cote bandeau actif:oui).
+  - La liste des streamers est la même que celle de la page d'accueil (bloc ECRANS) : à modifier aux deux endroits.
+  - Les lecteurs Twitch ne se chargent qu'après le bouton « Entrer » (Twitch peut alors utiliser ses propres cookies).
+-->
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#0A0B0D; --panel:#111317; --panel-2:#16191E; --line:#23262C; --bone:#E6E0D3; --dim:#8B877D; --faint:#55534D;
+  --brass:#C4A265; --brass-soft:#8E7747; --gold:#E9CF78; --alarm:#B5564A; --alarm-clair:#D27A6D;
+  --display:"Marcellus", Georgia, serif; --serif:"Source Serif 4", Georgia, serif; --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --haut:58px; --bas:0px; --marge:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#050506;color:var(--bone);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+body{overflow:hidden}
+body.defile{overflow:auto}
+[hidden]{display:none!important}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);z-index:40}
+
+/* La barre du haut */
+.barre{position:fixed;top:0;left:0;right:0;height:var(--haut);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 var(--marge);background:linear-gradient(180deg,#0b0c0f,#08090b);border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.barre .titre{display:flex;align-items:center;gap:12px;color:var(--bone);text-decoration:none;white-space:nowrap}
+.barre .titre img{width:30px;height:auto;mix-blend-mode:screen}
+.barre .titre b{font-family:var(--display);font-weight:400;letter-spacing:.3em;font-size:15px}
+.barre .titre span{color:var(--brass)}
+.barre .milieu{display:flex;align-items:center;gap:18px;white-space:nowrap}
+.barre .rec{display:inline-flex;align-items:center;gap:8px;color:var(--bone)}
+.barre .rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--alarm);box-shadow:0 0 10px rgba(181,86,74,.9);animation:clignote 1.6s steps(2,start) infinite}
+.barre .rec.eteint::before{background:var(--faint);box-shadow:none;animation:none}
+.barre .horloge{font-variant-numeric:tabular-nums;color:var(--bone)}
+.barre .actions{display:flex;align-items:center;gap:8px}
+.bt{all:unset;box-sizing:border-box;cursor:pointer;border:1px solid var(--line);padding:8px 12px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.bt:hover{border-color:var(--brass-soft);color:var(--bone)}
+.bt[aria-pressed="true"]{border-color:var(--brass);color:var(--gold)}
+.bt:focus-visible{outline:1px solid var(--bone);outline-offset:2px}
+@keyframes clignote{to{visibility:hidden}}
+@media (max-width:900px){.barre .milieu .horloge,.barre .titre span,.bt.large{display:none}}
+@media (max-width:560px){.barre .titre b{font-size:13px;letter-spacing:.2em}.barre .milieu{display:none}.barre{gap:10px}}
+
+/* Le mur d'écrans : chaque écran est placé par le script (positions absolues, sans jamais déplacer les lecteurs) */
+.mur{position:absolute;left:0;right:0;top:var(--haut);bottom:var(--bas)}
+body.defile .mur{bottom:auto}
+.ecran{position:absolute;background:#000;border:1px solid #1b1d22;overflow:hidden;transition:left .45s cubic-bezier(.2,.8,.2,1),top .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1),height .45s cubic-bezier(.2,.8,.2,1),border-color .3s}
+.ecran.sans-anim{transition:none}
+.ecran .video,.ecran .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.ecran .voile{position:absolute;inset:0;cursor:pointer;z-index:2}
+.ecran.grand .voile{display:none}
+.ecran:hover{border-color:var(--brass-soft)}
+.ecran.grand{border-color:var(--brass)}
+.ecran:focus-visible{outline:1px solid var(--bone);outline-offset:2px}
+/* coins dorés, comme les écrans du site */
+.ecran::before{content:"";position:absolute;inset:6px;z-index:3;pointer-events:none;opacity:.8;
+  background:linear-gradient(var(--brass),var(--brass)) left top/14px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) left top/1px 14px no-repeat,
+  linear-gradient(var(--brass),var(--brass)) right top/14px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) right top/1px 14px no-repeat,
+  linear-gradient(var(--brass),var(--brass)) left bottom/14px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) left bottom/1px 14px no-repeat,
+  linear-gradient(var(--brass),var(--brass)) right bottom/14px 1px no-repeat,linear-gradient(var(--brass),var(--brass)) right bottom/1px 14px no-repeat}
+.ecran.grand::before{opacity:0}
+.hud{position:absolute;left:0;right:0;top:0;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 14px;pointer-events:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--bone);text-shadow:0 1px 3px #000,0 0 8px #000;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent)}
+.hud .cam b{font-weight:400;color:var(--gold)}
+.hud .live{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.hud .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--alarm);box-shadow:0 0 8px rgba(181,86,74,.9);animation:clignote 1.6s steps(2,start) infinite}
+.hud .son{border:1px solid var(--gold);color:var(--gold);padding:1px 6px;margin-left:8px}
+.ecran.grand .hud{opacity:0;transition:opacity .3s}
+.ecran.grand:hover .hud{opacity:1}
+.pied{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:10px 14px;pointer-events:none;font-size:13px;color:var(--dim);text-shadow:0 1px 3px #000;background:linear-gradient(0deg,rgba(0,0,0,.6),transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:opacity .25s}
+.ecran:hover .pied{opacity:1}
+.ecran.grand .pied{display:none}
+.ecran.petit .hud{padding:7px 9px;font-size:9.5px;letter-spacing:.1em}
+.ecran.petit .hud .mot,.ecran.etroit .hud .mot{display:none}
+.hud .cam{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ecran.petit .pied{display:none}
+
+/* Hors antenne : de la neige, le nom, un lien vers la chaîne */
+.neige{position:absolute;inset:-50%;z-index:1;opacity:.13;background:repeating-radial-gradient(circle at 17% 32%,#fff 0 1px,transparent 1px 3px),repeating-radial-gradient(circle at 73% 61%,#fff 0 1px,transparent 1px 4px);animation:neige .5s steps(4) infinite}
+@keyframes neige{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(1%,3%)}}
+.horsjeu{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:16px}
+.horsjeu b{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+.horsjeu span{font-family:var(--display);font-size:clamp(18px,2.2vw,28px);letter-spacing:.06em;color:var(--bone)}
+.horsjeu a{pointer-events:auto;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-soft)}
+.ecran.eteint{cursor:default}
+.ecran.eteint .voile{display:none}
+.ecran.petit .horsjeu span{font-size:15px}
+.ecran.petit .horsjeu b,.ecran.petit .horsjeu a{font-size:9px}
+
+/* Le message quand personne n'est en direct */
+.annonce{position:fixed;left:50%;bottom:calc(var(--bas) + 18px);transform:translateX(-50%);z-index:15;background:rgba(10,11,13,.92);border:1px solid var(--line);padding:10px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis}
+body.defile .annonce{position:static;transform:none;margin:12px auto 24px;display:block;width:max-content;white-space:normal;text-align:center}
+
+/* Le bandeau de la Bourse */
+.bandeau{position:fixed;left:0;right:0;bottom:0;height:92px;z-index:18;border:0;width:100%;background:transparent}
+
+/* L'entrée */
+.entree{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 40%,#15171c 0%,#0A0B0D 60%,#050506 100%)}
+.entree > div{max-width:620px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.entree img{width:min(260px,52vw);mix-blend-mode:lighten;animation:souffle 6s ease-in-out infinite}
+@keyframes souffle{50%{transform:scale(1.04)}}
+.entree > div{position:relative}
+.entree > div::before{content:"";position:absolute;left:50%;top:min(110px,22vw);width:min(460px,90vw);height:min(460px,90vw);transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(196,162,101,.15),transparent 62%);pointer-events:none;z-index:-1}
+.entree .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--brass)}
+.entree h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,58px);letter-spacing:.14em;margin:0;line-height:1.1}
+.entree p{margin:0;color:var(--dim);font-size:17px;line-height:1.6}
+.entree .petit{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--faint);max-width:52ch}
+.entree .go{all:unset;box-sizing:border-box;cursor:pointer;background:var(--brass);color:#16130C;border:1px solid var(--brass);font-family:var(--mono);font-size:13px;letter-spacing:.24em;text-transform:uppercase;padding:15px 30px;min-height:48px}
+.entree .go:hover{filter:brightness(1.08)}
+.entree .go:focus-visible{outline:1px solid var(--bone);outline-offset:3px}
+.entree .retour{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none}
+.entree .retour:hover{color:var(--bone)}
+@media (prefers-reduced-motion:reduce){.ecran{transition:none}.neige,.entree img,.barre .rec::before,.hud .live::before{animation:none}}
+</style>
+</head>
+<body>
+<header class="barre">
+  <a class="titre" href="/"><img src="img/oeil.webp" alt="" width="30" height="25"><b>OSIRIS</b><span>· Salle de contrôle</span></a>
+  <div class="milieu">
+    <span class="rec eteint" id="compte-live">…</span>
+    <span class="horloge" id="horloge"></span>
+  </div>
+  <div class="actions">
+    <button class="bt" type="button" id="b-mosaique" aria-pressed="true" title="Touche M">Mosaïque</button>
+    <button class="bt large" type="button" id="b-plein" title="Touche F">Plein écran</button>
+    <a class="bt" href="/cote">La Cote</a>
+  </div>
+</header>
+
+<main class="mur" id="mur" aria-label="Les écrans du Programme"></main>
+<div class="annonce" id="annonce" hidden></div>
+<iframe class="bandeau" id="bandeau" title="Bandeau de la Bourse d'Osiris" hidden></iframe>
+
+<section class="entree" id="entree" aria-labelledby="e-titre">
+  <div>
+    <img src="img/oeil.webp" alt="">
+    <span class="eyebrow">Accès Mécènes</span>
+    <h1 id="e-titre">SALLE DE CONTRÔLE</h1>
+    <p>Tout ce qu'Osiris regarde, en même temps. Un clic sur un écran pour le mettre en grand, avec le son.</p>
+    <button class="go" type="button" id="b-entrer">Entrer</button>
+    <span class="petit">Les directs viennent de Twitch : en entrant, Twitch peut utiliser ses propres cookies.</span>
+    <a class="retour" href="/">← Retour au site</a>
+  </div>
+</section>
+
+<script>
+(function(){
+  // Les écrans : une ligne par streamer, la même liste que sur la page d'accueil (bloc ECRANS).
+  // « twitch » = le nom de la chaîne (ce qui suit twitch.tv/). La régie s'affiche en premier.
+  var ECRANS = [
+    { twitch: "lilianobarhaw", nom: "LilianoBarhaw", role: "Régie" },
+    { twitch: "veyzo_off" },
+    { twitch: "shoku_twitch" },
+    { twitch: "kikso06" },
+    { twitch: "ilhan_purpl" },
+    { twitch: "m_oo_de" }
+  ];
+
+  var $ = function(id){ return document.getElementById(id) };
+  var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] }) };
+  var nf = new Intl.NumberFormat("fr-FR");
+  var mur = $("mur");
+  var direct = { connu: false, live: {}, noms: {} };
+  var lecteurs = {};          // chaîne → { muet(bool), detruire() }
+  var tuiles = {};            // chaîne → élément
+  var grand = null;           // la chaîne en grand (mode focus), ou null (mosaïque)
+  var sonore = null;          // la chaîne qui a le son
+  var entre = false, bandeauActif = false, twitchPret = null;
+
+  // ---------- l'horloge ----------
+  function horloge(){ $("horloge").textContent = new Date().toLocaleTimeString("fr-FR", { timeZone: "Europe/Paris" }) + " · Ludendorff" }
+  horloge(); setInterval(horloge, 1000);
+
+  // ---------- les lecteurs Twitch ----------
+  function chargerTwitch(){
+    if (twitchPret) return twitchPret;
+    twitchPret = new Promise(function(ok){
+      var s = document.createElement("script");
+      s.src = "https://player.twitch.tv/js/embed/v1.js";
+      s.onload = function(){ ok(!!(window.Twitch && Twitch.Player)) };
+      s.onerror = function(){ ok(false) };
+      document.head.appendChild(s);
+      setTimeout(function(){ ok(!!(window.Twitch && Twitch.Player)) }, 8000);
+    });
+    return twitchPret;
+  }
+  // Avec la bibliothèque de Twitch, on coupe et remet le son sans recharger ; sans elle, un simple lecteur intégré.
+  function creerLecteur(chaine, boite, avecApi){
+    var id = "lecteur-" + chaine;
+    boite.innerHTML = '<div id="' + id + '" style="width:100%;height:100%"></div>';
+    var parent = location.hostname || "localhost";
+    if (avecApi){
+      var p = new Twitch.Player(id, { channel: chaine, parent: [parent], width: "100%", height: "100%", muted: true, autoplay: true });
+      var muet = true;
+      var appliquer = function(){ try { p.setMuted(muet); if (!muet) p.setVolume(Math.max(.5, p.getVolume() || 0)); } catch (e) {} };
+      try { p.addEventListener(Twitch.Player.READY, appliquer); p.addEventListener(Twitch.Player.PLAY, appliquer); } catch (e) {}
+      return { muet: function(b){ muet = b; appliquer() }, detruire: function(){ boite.innerHTML = "" } };
+    }
+    var url = function(m){ return "https://player.twitch.tv/?channel=" + encodeURIComponent(chaine) + "&parent=" + encodeURIComponent(parent) + "&autoplay=true&muted=" + m };
+    var etatMuet = true;
+    $(id).innerHTML = '<iframe src="' + url(true) + '" title="Direct Twitch de ' + esc(chaine) + '" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+    return {
+      muet: function(b){ if (b === etatMuet) return; etatMuet = b; var f = boite.querySelector("iframe"); if (f) f.src = url(b) },
+      detruire: function(){ boite.innerHTML = "" }
+    };
+  }
+
+  // ---------- les tuiles ----------
+  function nomDe(e){ return (direct.noms && direct.noms[e.twitch]) || e.nom || e.twitch }
+  function enDirect(e){ return !direct.connu || !!direct.live[e.twitch] }
+  function ordre(){
+    // la régie d'abord, puis ceux qui sont en direct, puis les autres (dans l'ordre de la liste)
+    return ECRANS.slice().sort(function(a, b){ return (b.role ? 2 : 0) + (enDirect(b) ? 1 : 0) - ((a.role ? 2 : 0) + (enDirect(a) ? 1 : 0)) || ECRANS.indexOf(a) - ECRANS.indexOf(b) });
+  }
+  function numeroCam(e){ var n = 0, k = 0; ECRANS.forEach(function(x){ if (!x.role){ n++; if (x === e) k = n } }); return k }
+
+  function construire(){
+    ECRANS.forEach(function(e){
+      var t = document.createElement("article");
+      t.className = "ecran sans-anim";
+      t.dataset.chaine = e.twitch;
+      t.tabIndex = 0;
+      t.setAttribute("role", "button");
+      t.innerHTML = '<div class="video"></div><div class="voile"></div>'
+        + '<div class="hud"><span class="cam"><b>' + (e.role ? esc(e.role) : "CAM " + String(numeroCam(e)).padStart(2, "0")) + "</b> · " + '<span class="nom"></span><span class="son" hidden>SON</span></span><span class="live" hidden></span></div>'
+        + '<div class="pied"></div>';
+      t.querySelector(".voile").addEventListener("click", function(){ choisir(e.twitch) });
+      t.addEventListener("keydown", function(ev){ if ((ev.key === "Enter" || ev.key === " ") && ev.target === t){ ev.preventDefault(); choisir(e.twitch) } });
+      mur.appendChild(t);
+      tuiles[e.twitch] = t;
+    });
+  }
+
+  function majTuiles(){
+    var avecApi = !!(window.Twitch && Twitch.Player);
+    ECRANS.forEach(function(e){
+      var t = tuiles[e.twitch], L = direct.live[e.twitch], vivant = enDirect(e);
+      t.querySelector(".nom").textContent = nomDe(e);
+      var live = t.querySelector(".live");
+      live.hidden = !L;
+      live.innerHTML = L ? '<span class="mot">En direct · </span>' + nf.format(L.spectateurs || 0) : "";
+      t.querySelector(".pied").textContent = L ? (L.titre || "") + (L.jeu ? " · " + L.jeu : "") : "";
+      t.setAttribute("aria-label", "Écran de " + nomDe(e) + (vivant ? ", en direct" : ", hors antenne"));
+      t.classList.toggle("eteint", !vivant);
+      var boite = t.querySelector(".video");
+      if (vivant && entre && !lecteurs[e.twitch]){
+        lecteurs[e.twitch] = creerLecteur(e.twitch, boite, avecApi);
+        lecteurs[e.twitch].muet(sonore !== e.twitch);
+      } else if (!vivant){
+        if (lecteurs[e.twitch]){ lecteurs[e.twitch].detruire(); delete lecteurs[e.twitch] }
+        if (!boite.querySelector(".horsjeu")) boite.innerHTML = '<div class="neige"></div><div class="horsjeu"><b>Hors antenne</b><span></span><a target="_blank" rel="noopener">Sa chaîne ↗</a></div>';
+        boite.querySelector(".horsjeu span").textContent = nomDe(e);
+        boite.querySelector(".horsjeu a").href = "https://www.twitch.tv/" + e.twitch;
+        if (grand === e.twitch) grand = null;
+        if (sonore === e.twitch) sonore = null;
+      }
+      t.querySelector(".son").hidden = sonore !== e.twitch;
+    });
+    var n = ECRANS.filter(function(e){ return direct.live[e.twitch] }).length;
+    var cl = $("compte-live");
+    cl.textContent = direct.connu ? (n ? n + " / " + ECRANS.length + " en direct" : "Aucun direct") : ECRANS.length + " écrans";
+    cl.classList.toggle("eteint", direct.connu && !n);
+    var a = $("annonce");
+    a.hidden = !(entre && direct.connu && !n);
+    a.textContent = "Aucun direct pour l'instant · les écrans s'allument pendant les soirées du Programme";
+    placer();
+  }
+
+  // ---------- la disposition ----------
+  var G = 8;
+  function placer(){
+    var W = window.innerWidth, haut = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--haut")) || 58;
+    var H = window.innerHeight - haut - (bandeauActif ? 92 : 0);
+    var mobile = W < 720;
+    document.body.classList.toggle("defile", mobile);
+    var liste = ordre(), pos = {};
+    var M = mobile ? 8 : 14, w0 = W - 2 * M, h0 = H - 2 * M;
+    if (grand && !tuiles[grand].classList.contains("eteint")){
+      var autres = liste.filter(function(e){ return e.twitch !== grand });
+      if (mobile){
+        var gw = w0, gh = gw * 9 / 16, cw = (w0 - G) / 2, ch = cw * 9 / 16;
+        pos[grand] = [M, M, gw, gh, false];
+        autres.forEach(function(e, k){ pos[e.twitch] = [M + (k % 2) * (cw + G), M + gh + G + Math.floor(k / 2) * (ch + G), cw, ch, true] });
+        mur.style.height = (M * 2 + gh + G + Math.ceil(autres.length / 2) * (ch + G) + (bandeauActif ? 92 : 0)) + "px";
+      } else {
+        // le rail à droite : des écrans de même taille, qui tiennent tous dans la hauteur
+        var k = autres.length || 1;
+        var rh = Math.min((h0 - (k - 1) * G) / k, (W * 0.2) * 9 / 16), rw = rh * 16 / 9;
+        var bw = Math.min(w0 - rw - G, h0 * 16 / 9), bh = bw * 9 / 16;
+        var x0 = M + (w0 - rw - G - bw) / 2, y0 = M + (h0 - bh) / 2;
+        pos[grand] = [x0, y0, bw, bh, false];
+        var railH = k * rh + (k - 1) * G, ry = M + (h0 - railH) / 2;
+        autres.forEach(function(e, i){ pos[e.twitch] = [x0 + bw + G, ry + i * (rh + G), rw, rh, rw < 300] });
+        mur.style.height = "";
+      }
+    } else {
+      grand = null;
+      var n = liste.length, meilleur = null;
+      if (mobile){
+        var tw = w0, th = tw * 9 / 16;
+        liste.forEach(function(e, i){ pos[e.twitch] = [M, M + i * (th + G), tw, th, false] });
+        mur.style.height = (M * 2 + n * (th + G) + (bandeauActif ? 92 : 0)) + "px";
+      } else {
+        // le nombre de colonnes qui donne les plus grands écrans sans dépasser
+        for (var c = 1; c <= n; c++){
+          var r = Math.ceil(n / c), w = Math.min((w0 - (c - 1) * G) / c, ((h0 - (r - 1) * G) / r) * 16 / 9);
+          if (!meilleur || w > meilleur.w) meilleur = { c: c, r: r, w: w };
+        }
+        var h = meilleur.w * 9 / 16, totalW = meilleur.c * meilleur.w + (meilleur.c - 1) * G, totalH = meilleur.r * h + (meilleur.r - 1) * G;
+        liste.forEach(function(e, i){
+          var ligne = Math.floor(i / meilleur.c), col = i % meilleur.c;
+          var dansLigne = Math.min(meilleur.c, n - ligne * meilleur.c);
+          var decal = (meilleur.c - dansLigne) * (meilleur.w + G) / 2; // la dernière ligne, centrée
+          pos[e.twitch] = [M + (w0 - totalW) / 2 + decal + col * (meilleur.w + G), M + (h0 - totalH) / 2 + ligne * (h + G), meilleur.w, h, meilleur.w < 300];
+        });
+        mur.style.height = "";
+      }
+    }
+    liste.forEach(function(e){
+      var t = tuiles[e.twitch], p = pos[e.twitch];
+      t.style.left = p[0] + "px"; t.style.top = p[1] + "px"; t.style.width = p[2] + "px"; t.style.height = p[3] + "px";
+      t.classList.toggle("grand", e.twitch === grand);
+      t.classList.toggle("petit", !!p[4]);
+      t.classList.toggle("etroit", p[2] < 420);
+    });
+    $("b-mosaique").setAttribute("aria-pressed", String(!grand));
+  }
+
+  // ---------- choisir un écran ----------
+  function donnerLeSon(chaine){
+    sonore = chaine;
+    Object.keys(lecteurs).forEach(function(c){ lecteurs[c].muet(c !== chaine) });
+    ECRANS.forEach(function(e){ tuiles[e.twitch].querySelector(".son").hidden = e.twitch !== chaine });
+  }
+  function choisir(chaine){
+    if (!entre || tuiles[chaine].classList.contains("eteint")) return;
+    grand = chaine;
+    donnerLeSon(chaine);
+    placer();
+  }
+  function mosaique(){ grand = null; placer() }
+
+  $("b-mosaique").addEventListener("click", mosaique);
+  $("b-plein").addEventListener("click", function(){
+    if (document.fullscreenElement) document.exitFullscreen().catch(function(){});
+    else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(function(){});
+  });
+  document.addEventListener("keydown", function(ev){
+    if (!entre || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+    var tag = (ev.target && ev.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (ev.key === "Escape" || ev.key === "m" || ev.key === "M") mosaique();
+    else if (ev.key === "f" || ev.key === "F") $("b-plein").click();
+    else if (/^[1-9]$/.test(ev.key)){ var e = ordre()[Number(ev.key) - 1]; if (e) choisir(e.twitch) }
+  });
+  var attente;
+  window.addEventListener("resize", function(){
+    ECRANS.forEach(function(e){ tuiles[e.twitch].classList.add("sans-anim") });
+    placer();
+    clearTimeout(attente); attente = setTimeout(function(){ ECRANS.forEach(function(e){ tuiles[e.twitch].classList.remove("sans-anim") }) }, 120);
+  });
+
+  // ---------- qui est en direct, et le bandeau ----------
+  function lireDirects(){
+    return fetch("/api/rangs?ecrans=1&c=" + ECRANS.map(function(e){ return e.twitch }).join(","), { cache: "no-store" })
+      .then(function(r){ return r.json() })
+      .then(function(d){ direct = { connu: !!d.configure && d.ok !== false, live: d.live || {}, noms: d.noms || {} } })
+      .catch(function(){})
+      .then(majTuiles);
+  }
+  function lireBandeau(){
+    return fetch("/api/bourse", { cache: "no-store" })
+      .then(function(r){ return r.json() })
+      .then(function(d){
+        var actif = !!(d && d.actif && d.cours && d.cours.length) && window.innerWidth >= 720;
+        if (actif === bandeauActif) return;
+        bandeauActif = actif;
+        var b = $("bandeau");
+        if (actif && !b.getAttribute("src")) b.setAttribute("src", "/bandeau");
+        b.hidden = !actif;
+        document.documentElement.style.setProperty("--bas", actif ? "92px" : "0px");
+        placer();
+      })
+      .catch(function(){});
+  }
+
+  // ---------- l'entrée ----------
+  construire();
+  lireDirects().then(function(){ ECRANS.forEach(function(e){ requestAnimationFrame(function(){ tuiles[e.twitch].classList.remove("sans-anim") }) }) });
+  lireBandeau();
+  setInterval(lireDirects, 60000);
+  setInterval(lireBandeau, 60000);
+
+  $("b-entrer").addEventListener("click", function(){
+    entre = true;
+    $("entree").hidden = true;
+    chargerTwitch().then(function(){ majTuiles() });
+  });
+  $("b-entrer").focus();
+})();
+</script>
+</body>
+</html>

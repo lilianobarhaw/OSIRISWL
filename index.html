@@ -75,8 +75,8 @@ img{max-width:100%}
 .top .in-wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
 .mark{display:flex;align-items:center;gap:12px;font-family:var(--display);font-size:17px;letter-spacing:.32em;color:var(--bone);text-decoration:none;white-space:nowrap}
 .mark img{width:36px;height:36px;mix-blend-mode:screen}
-.nav{display:flex;align-items:center;gap:26px}
-.nav a{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-decoration:none;position:relative;padding-block:6px;transition:color .2s}
+.nav{display:flex;align-items:center;gap:18px}
+.nav a{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);text-decoration:none;position:relative;padding-block:6px;transition:color .2s;white-space:nowrap}
 .nav a:hover,.nav a.on{color:var(--bone)}
 .nav a.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--brass)}
 .nav .btn{padding:10px 16px;color:#16130C}
@@ -428,6 +428,7 @@ footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas
       <a href="#emission">L'émission</a>
       <a href="#programmes">Programmes</a>
       <a href="#mecenes">Mécènes</a>
+      <a href="/cote">La Cote</a>
       <a href="#projection">Projection</a>
       <a href="#ecrans">Écrans</a>
       <a href="#calendrier">Calendrier</a>
@@ -627,6 +628,12 @@ footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas
         <div><b>Garder le secret des votes</b>L'Offrande doit surprendre les candidats.</div>
         <div><b>Respecter les joueurs</b>On peut détester un personnage, jamais le joueur.</div>
       </div>
+      <a class="jeu-cta rv" href="/cote">
+        <span class="label">La Cote et la Bourse d'Osiris</span>
+        <b>Mise sur tes favoris.</b>
+        <span>10 000 crédits fictifs par Mécène pour acheter des parts des candidats. Le cours suit la Cote, recalculée après chaque soirée avec vos votes.</span>
+        <span class="link">Ouvrir la Bourse <span class="ar">→</span></span>
+      </a>
     </div>
   </section>
 
@@ -657,6 +664,12 @@ footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas
         <p class="consent">Le lecteur vient de Twitch : il ne se charge que lorsque tu choisis un écran, et Twitch peut alors utiliser ses propres cookies.</p>
       </div>
       <div class="screens" id="screens"></div>
+      <a class="jeu-cta rv" href="/salle">
+        <span class="label">Tous les écrans à la fois</span>
+        <b>La Salle de contrôle.</b>
+        <span>Tous les directs du Programme en mosaïque, comme les Mécènes les regardent. Un clic sur un écran pour le mettre en grand, avec le son.</span>
+        <span class="link">Entrer <span class="ar">→</span></span>
+      </a>
       <a class="jeu-cta rv" href="/mot" data-apres-lancement hidden>
         <span class="label">Chaque soir à 21 h</span>
         <b>Le mot du jour.</b>
@@ -775,6 +788,7 @@ footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas
         <a href="/casting">Casting</a>
         <a href="/casting#terminal">Accès candidat</a>
         <a href="/archives">Archives</a>
+        <a href="/cote">La Cote</a>
         <a href="/mot" data-apres-lancement hidden>Le mot du jour</a>
         <a href="#calendrier">Calendrier</a>
       </div>
@@ -784,6 +798,7 @@ footer{padding-bottom:88px} /* place pour le bouton « Ambiance », fixé en bas
         <a data-link="twitch" href="#">Twitch</a>
         <a data-link="tiktok" href="#">TikTok</a>
         <a href="#ecrans">Les écrans</a>
+        <a href="/salle">Salle de contrôle</a>
       </div>
       <div>
         <span class="label">Osiris</span>

@@ -27,17 +27,21 @@
   body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
   body.transparent::after { display: none; }
 
-  .haut { position: fixed; top: 44px; left: 60px; right: 60px; display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 18px; letter-spacing: .32em; color: var(--dim); text-transform: uppercase; }
+  /* absolute et non fixed : un élément fixed isole l'Œil, et le noir de l'image redevient un carré */
+  .haut { position: absolute; top: 44px; left: 60px; right: 60px; display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 18px; letter-spacing: .32em; color: var(--dim); text-transform: uppercase; }
   .haut img { mix-blend-mode: lighten; height: 34px; vertical-align: middle; margin-right: 16px; opacity: .9; }
 
-  .scene { position: fixed; inset: 0; display: grid; place-items: center; }
+  .scene { position: absolute; inset: 0; display: grid; place-items: center; }
   .etat { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity .9s ease; pointer-events: none; }
   .etat.on { opacity: 1; }
 
   /* attente */
   .attente { text-align: center; }
-  .attente .oeil { mix-blend-mode: lighten; width: 420px; filter: drop-shadow(0 0 40px rgba(196,162,101,.25)); animation: souffle 6s ease-in-out infinite; }
-  @keyframes souffle { 50% { transform: scale(1.04); filter: drop-shadow(0 0 70px rgba(196,162,101,.4)); } }
+  .attente > div { position: relative; }
+  .attente > div::before { content: ""; position: absolute; left: 50%; top: 175px; width: 640px; height: 640px; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(196,162,101,.16), transparent 62%); pointer-events: none; z-index: -1; animation: halo 6s ease-in-out infinite; }
+  .attente .oeil { mix-blend-mode: lighten; width: 420px; animation: souffle 6s ease-in-out infinite; }
+  @keyframes souffle { 50% { transform: scale(1.04); } }
+  @keyframes halo { 50% { opacity: .6; } }
   .attente h1 { font-family: var(--display); font-weight: 400; font-size: 118px; letter-spacing: .32em; margin: 36px 0 0 .32em; color: var(--bone); }
   .attente p { font-family: var(--serif); font-style: italic; font-size: 36px; color: var(--brass); margin: 18px 0 0; }
 
@@ -79,7 +83,7 @@
 </style>
 </head>
 <body>
-<div class="haut"><span><img src="/img/oeil.png" alt="">Osiris · La Sélection</span><span id="programme">Programme 01</span></div>
+<div class="haut"><span><img src="/img/oeil.webp" alt="">Osiris · La Sélection</span><span id="programme">Programme 01</span></div>
 
 <div class="scene">
   <div class="etat attente on" id="attente">

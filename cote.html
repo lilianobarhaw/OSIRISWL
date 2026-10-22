@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>La Bourse d'Osiris · Osiris RP</title>
+<meta name="description" content="La Cote et la Bourse d'Osiris : les Mécènes misent des crédits fictifs sur les candidats du Programme. Le cours suit la Cote, recalculée après chaque soirée.">
+<meta name="theme-color" content="#0A0B0D">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png?v=2">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Osiris RP">
+<meta property="og:title" content="La Bourse d'Osiris">
+<meta property="og:description" content="Les Mécènes misent sur les candidats du Programme. Le cours suit la Cote.">
+<meta property="og:image" content="https://osiriswl.vercel.app/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="fonts/polices.css">
+<!--
+  L'onglet La Cote : la Bourse d'Osiris sur le site, avec les mêmes crédits et le même portefeuille que sur Discord.
+  - Lit /api/rangs?cote=1 (lib/cote.js → siteGET) ; acheter, vendre et voter passent par POST /api/rangs?cote=1.
+  - Connexion avec Discord (/api/auth/login?retour=cote) ; les rôles viennent du serveur Osiris : Mécènes seulement, jamais les Candidats.
+  - Avant la révélation (bandeau caché), rien n'est affiché sans connexion ; après /cote bandeau actif:oui, les cours sont publics.
+-->
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#0A0B0D; --panel:#111317; --panel-2:#16191E; --line:#23262C; --bone:#E6E0D3; --dim:#8B877D; --faint:#55534D;
+  --brass:#C4A265; --brass-soft:#8E7747; --gold:#E9CF78; --alarm:#B5564A; --alarm-clair:#D27A6D;
+  --display:"Marcellus", Georgia, serif; --serif:"Source Serif 4", Georgia, serif; --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ground)}
+body{margin:0;color:var(--bone);font-family:var(--serif);font-size:17px;line-height:1.6;padding:0 16px 64px;-webkit-font-smoothing:antialiased;overflow-x:clip}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);z-index:30}
+[hidden]{display:none!important}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+header.bar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:22px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+header.bar .mark{font-family:var(--display);font-size:18px;letter-spacing:.32em;color:var(--bone);display:flex;align-items:center;gap:12px;white-space:nowrap;text-decoration:none}
+header.bar .mark img{width:36px;height:36px;mix-blend-mode:screen}
+header.bar nav{display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+header.bar nav a{color:var(--dim);text-decoration:none}
+header.bar nav a:hover{color:var(--bone)}
+header.bar nav a[aria-current]{color:var(--gold)}
+.compte a{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-soft)}
+.compte b{font-weight:400;color:var(--bone)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end}
+.hero > div{display:flex;flex-direction:column;gap:12px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(38px,6.4vw,62px);line-height:1.05;margin:0;letter-spacing:.02em}
+.hero p{margin:0;color:var(--dim);max-width:60ch}
+.hero .fictif{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.seance{border:1px solid var(--line);padding:14px 18px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);display:flex;flex-direction:column;gap:6px;min-width:230px}
+.seance b{font-weight:400;color:var(--bone);font-size:15px;letter-spacing:.1em}
+.seance .rec{display:inline-flex;align-items:center;gap:8px}
+.seance .rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--alarm);box-shadow:0 0 10px rgba(181,86,74,.9);animation:clignote 1.6s steps(2,start) infinite}
+.seance .devise{font-family:var(--serif);font-style:italic;text-transform:none;letter-spacing:0;color:var(--brass);font-size:15px}
+@keyframes clignote{to{visibility:hidden}}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.seance{min-width:0}}
+
+/* Cartons (états sans tableau) */
+.carton{border:1px solid var(--line);background:var(--panel);padding:34px 28px;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.carton h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,3.6vw,34px);line-height:1.15;margin:0;letter-spacing:.02em}
+.carton p{margin:0;color:var(--dim);max-width:62ch}
+.btn{background:var(--brass);color:#16130C;border:1px solid var(--brass);border-radius:0;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;padding:12px 20px;min-height:44px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--gold);border-color:var(--brass-soft)}
+.btn.sm{padding:7px 12px;min-height:34px;font-size:11px;letter-spacing:.14em}
+.btn.rouge{background:transparent;color:var(--alarm-clair);border-color:rgba(181,86,74,.55)}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.btn:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible{outline:1px solid var(--bone);outline-offset:3px}
+
+/* Le vote */
+.vote{border:1px solid var(--brass-soft);background:linear-gradient(180deg,rgba(196,162,101,.07),rgba(196,162,101,.02));padding:24px 24px 22px;display:flex;flex-direction:column;gap:16px}
+.vote .tete{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.vote h2{font-family:var(--display);font-weight:400;font-size:26px;margin:0;letter-spacing:.02em}
+.vote .fin{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.vote p{margin:0;color:var(--dim)}
+.puces{display:flex;flex-wrap:wrap;gap:8px}
+.puce{all:unset;box-sizing:border-box;cursor:pointer;border:1px solid var(--line);background:#0c0d10;padding:8px 14px;font-size:15px;color:var(--bone);display:inline-flex;align-items:center;gap:8px}
+.puce small{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.puce:hover{border-color:var(--brass-soft)}
+.puce[aria-pressed="true"]{border-color:var(--gold);background:rgba(233,207,120,.12);color:var(--gold)}
+.puce[aria-pressed="true"] small{color:var(--brass)}
+.puce:focus-visible{outline:1px solid var(--bone);outline-offset:2px}
+.vote .pied{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.vote .compteur{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+/* Le tableau de bord */
+.bureau{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:28px;align-items:start}
+.bureau.seul{grid-template-columns:1fr}
+@media (max-width:1000px){
+  .bureau{grid-template-columns:1fr}
+  /* sur téléphone et tablette : le portefeuille d'abord, puis les cours, puis les fortunes */
+  .colonne{display:contents}
+  #pf{order:-1} #fort,#c-public{order:1}
+}
+.cadre{border:1px solid var(--line);background:var(--panel)}
+.cadre > .titre{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:18px 20px 14px;border-bottom:1px solid var(--line)}
+.cadre > .titre h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0;letter-spacing:.03em}
+.cadre > .titre span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+table.cours{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.cours th{font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);text-align:left;padding:12px 10px 10px;border-bottom:1px solid var(--line)}
+.cours th.n, .cours td.n{text-align:right}
+.cours td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.cours tr:last-child td{border-bottom:0}
+.cours tbody tr:hover td{background:rgba(255,255,255,.015)}
+.cours .rang{font-family:var(--mono);font-size:12px;color:var(--faint);width:34px;padding-left:20px}
+.cours .qui b{display:block;font-weight:400;font-size:17px;line-height:1.25}
+.cours .qui small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--faint)}
+.cours .prix{font-family:var(--mono);font-size:16px;color:var(--bone);white-space:nowrap}
+.cours .prix small{color:var(--dim);font-size:11px;margin-left:3px}
+.var{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.var.hausse{color:var(--gold)} .var.baisse{color:var(--alarm-clair)} .var.stable{color:var(--faint)}
+.cours .tenu{font-family:var(--mono);font-size:13px;color:var(--dim);white-space:nowrap}
+.cours .tenu b{font-weight:400;color:var(--bone)}
+.cours .act{text-align:right;white-space:nowrap;padding-right:20px}
+.cours .act .btn + .btn{margin-left:6px}
+.cours tr.mort .qui b{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--alarm)}
+.cours tr.mort .var{color:var(--alarm-clair);letter-spacing:.14em}
+.cours tr.sorti .var{color:var(--brass);letter-spacing:.1em;font-size:11px}
+.courbe{display:block;width:96px;height:28px}
+.vide{padding:22px 20px;color:var(--dim);margin:0}
+@media (max-width:760px){
+  .cours thead{display:none}
+  .cours, .cours tbody, .cours tr, .cours td{display:block;width:100%}
+  .cours tr{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"qui prix" "courbe var" "tenu act";gap:6px 14px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .cours td{padding:0;border:0}
+  .cours .rang{display:none}
+  .cours .qui{grid-area:qui} .cours .prix{grid-area:prix;text-align:right} .cours .ccourbe{grid-area:courbe}
+  .cours .cvar{grid-area:var;text-align:right} .cours .tenu{grid-area:tenu;align-self:center} .cours .act{grid-area:act;padding:0}
+}
+
+.pf{padding:20px;display:flex;flex-direction:column;gap:16px}
+.pf .total{display:flex;flex-direction:column;gap:2px}
+.pf .total span{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.pf .total b{font-family:var(--mono);font-weight:400;font-size:clamp(30px,4vw,40px);line-height:1.1;color:var(--gold);font-variant-numeric:tabular-nums}
+.pf .total small{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.chiffres{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+.chiffres div{background:#0b0c0f;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.chiffres b{font-family:var(--mono);font-weight:400;font-size:17px;color:var(--bone);font-variant-numeric:tabular-nums}
+.chiffres span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.lignes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.lignes li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.lignes li .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lignes li .v{font-family:var(--mono);font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.lignes li .d{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.06em}
+.lignes li .g{font-family:var(--mono);font-size:12px;text-align:right}
+.lignes li.mort .n{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--alarm)}
+.pf .rien{color:var(--dim);font-size:15px;margin:0}
+
+.fortunes{list-style:none;margin:0;padding:6px 20px 14px}
+.fortunes li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid var(--line)}
+.fortunes li:first-child{border-top:0}
+.fortunes .r{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.fortunes .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fortunes .s{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fortunes li.p1 .r,.fortunes li.p1 .s{color:var(--gold)}
+.fortunes li.p2 .r,.fortunes li.p3 .r{color:var(--brass)}
+.fortunes li.moi{background:rgba(196,162,101,.08);box-shadow:inset 2px 0 0 var(--gold);padding-left:8px;margin-left:-8px}
+.colonne{display:flex;flex-direction:column;gap:28px}
+
+/* La fenêtre d'achat et de vente */
+dialog{border:1px solid var(--brass-soft);background:var(--panel);color:var(--bone);padding:0;width:min(440px,calc(100vw - 32px));box-shadow:0 30px 80px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(5,5,6,.78)}
+dialog form{padding:24px;display:flex;flex-direction:column;gap:16px}
+dialog .eyebrow{display:block}
+dialog h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0;line-height:1.15}
+dialog .info{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--dim);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0}
+dialog .info b{font-weight:400;color:var(--bone)}
+dialog label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+dialog input{width:100%;background:#0b0c0f;border:1px solid var(--line);color:var(--bone);font-family:var(--mono);font-size:22px;padding:12px 14px;margin-top:8px;border-radius:0}
+dialog input:focus{border-color:var(--brass);outline:none}
+.raccourcis{display:flex;gap:6px;flex-wrap:wrap}
+.raccourcis button{all:unset;cursor:pointer;border:1px solid var(--line);padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.raccourcis button:hover{border-color:var(--brass-soft);color:var(--bone)}
+.raccourcis button:focus-visible{outline:1px solid var(--bone);outline-offset:2px}
+dialog .apercu{font-family:var(--mono);font-size:13px;color:var(--gold);min-height:20px}
+dialog .apercu.non{color:var(--alarm-clair)}
+dialog .boutons{display:flex;gap:10px;justify-content:flex-end}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:50;max-width:min(560px,calc(100vw - 32px));background:var(--bone);color:#121212;padding:12px 18px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.toast.vu{opacity:1;transform:translate(-50%,0)}
+.toast.non{background:#2a1513;color:#f3d6cf;border:1px solid var(--alarm)}
+
+.regles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.regles div{background:var(--ground);padding:18px 18px 20px;font-size:15px;color:var(--dim)}
+.regles b{display:block;color:var(--bone);font-weight:400;font-family:var(--display);font-size:18px;margin-bottom:4px}
+@media (max-width:900px){.regles{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.regles{grid-template-columns:1fr}}
+footer{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line);padding-top:20px}
+footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
+@media (max-width:640px){
+  header.bar{flex-wrap:wrap;padding-block:14px} header.bar nav{gap:14px;font-size:11px}
+  .wrap{gap:26px} .carton{padding:26px 20px}
+}
+@media (prefers-reduced-motion:reduce){.seance .rec::before{animation:none}.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <a class="mark" href="/"><img src="img/oeil.webp" alt="" width="36" height="36">OSIRIS</a>
+    <nav aria-label="Navigation">
+      <a href="/salle">Salle de contrôle</a>
+      <a href="/cote" aria-current="page">La Cote</a>
+      <span class="compte" id="compte">…</span>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <span class="eyebrow" id="h-prog">Programme 01 · La Cité</span>
+      <h1>La Bourse d'Osiris</h1>
+      <p>Chaque Mécène reçoit 10 000 crédits pour miser sur les candidats en qui il croit. Le cours suit la Cote, recalculée après chaque soirée avec vos votes. Un candidat mort, c'est une faillite.</p>
+      <span class="fictif">Crédits fictifs · rien ne s'achète ni ne se gagne en argent réel</span>
+    </div>
+    <div class="seance" id="seance" hidden>
+      <span class="rec">Cours de la Cité</span>
+      <b id="s-num"></b>
+      <span class="devise" id="s-devise" hidden></span>
+    </div>
+  </section>
+
+  <!-- États sans tableau -->
+  <section class="carton" id="c-charge"><p>Connexion à la Bourse…</p></section>
+
+  <section class="carton" id="c-connexion" hidden>
+    <span class="eyebrow">Loge des Mécènes</span>
+    <h2>La Bourse est réservée aux Mécènes.</h2>
+    <p>Connecte-toi avec ton compte Discord : tu retrouves ici le même portefeuille que sur le serveur Osiris, avec tes crédits, tes parts et ton rang.</p>
+    <a class="btn" href="/api/auth/login?retour=cote">Se connecter avec Discord</a>
+  </section>
+
+  <section class="carton" id="c-refus" hidden>
+    <span class="eyebrow">Accès refusé</span>
+    <h2>La Bourse est réservée aux Mécènes.</h2>
+    <p id="r-texte">Ton compte n'a pas accès à la Loge.</p>
+  </section>
+
+  <section class="carton" id="c-serveur" hidden>
+    <span class="eyebrow">Une étape avant</span>
+    <h2>Rejoins d'abord le Discord d'Osiris.</h2>
+    <p>La Bourse lit tes rôles sur le serveur Osiris. Rejoins-le, puis reviens ici.</p>
+    <a class="btn" href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Rejoindre le Discord</a>
+  </section>
+
+  <section class="carton" id="c-attente" hidden>
+    <span class="eyebrow">Bientôt</span>
+    <h2>La Bourse ouvre le soir de la Sélection.</h2>
+    <p>À la fin de la cérémonie, tous les candidats retenus sont introduits en Bourse au même prix de départ, <b id="a-prix">120</b> cr la part. Tes <b>10 000 crédits</b> t'attendent : tu pourras miser dès ce soir-là.</p>
+  </section>
+
+  <section class="carton" id="c-erreur" hidden>
+    <span class="eyebrow">Hors ligne</span>
+    <h2>La Bourse ne répond pas.</h2>
+    <p id="e-texte">Recharge la page dans un instant.</p>
+  </section>
+
+  <!-- Le vote de la séance -->
+  <section class="vote" id="vote" hidden aria-labelledby="v-titre">
+    <div class="tete">
+      <h2 id="v-titre">La Cote · séance</h2>
+      <span class="fin" id="v-fin"></span>
+    </div>
+    <p id="v-texte">Qui vous a le plus diverti ce soir ? Choisis jusqu'à trois favoris.</p>
+    <div class="puces" id="v-puces" role="group" aria-label="Tes favoris"></div>
+    <div class="pied">
+      <button class="btn" type="button" id="v-ok" disabled>Valider</button>
+      <span class="compteur" id="v-compte">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- Le tableau de bord -->
+  <div class="bureau" id="bureau" hidden>
+    <section class="cadre" aria-labelledby="t-cours">
+      <div class="titre"><h2 id="t-cours">Les cours</h2><span id="t-maj"></span></div>
+      <table class="cours">
+        <thead><tr><th>#</th><th>Candidat</th><th>Évolution</th><th class="n">Cours</th><th class="n">Variation</th><th class="c-moi">Tu as</th><th></th></tr></thead>
+        <tbody id="lignes-cours"></tbody>
+      </table>
+      <p class="vide" id="cours-vide" hidden>Aucun candidat coté pour l'instant.</p>
+    </section>
+
+    <div class="colonne" id="colonne">
+      <section class="cadre" aria-labelledby="t-pf" id="pf">
+        <div class="titre"><h2 id="t-pf">Ton portefeuille</h2><span id="pf-rang"></span></div>
+        <div class="pf">
+          <div class="total"><span>Fortune totale</span><b id="pf-total">—</b><small id="pf-gain"></small></div>
+          <div class="chiffres">
+            <div><b id="pf-credits">—</b><span>Crédits libres</span></div>
+            <div><b id="pf-parts">—</b><span>En parts</span></div>
+          </div>
+          <ul class="lignes" id="pf-lignes"></ul>
+          <p class="rien" id="pf-rien" hidden>Aucune part pour l'instant. Choisis un candidat dans les cours et mise.</p>
+        </div>
+      </section>
+
+      <section class="cadre" aria-labelledby="t-fort" id="fort">
+        <div class="titre"><h2 id="t-fort">Les fortunes</h2><span>Mécènes</span></div>
+        <ol class="fortunes" id="fort-liste"></ol>
+      </section>
+
+      <section class="carton" id="c-public" hidden>
+        <span class="eyebrow">Loge des Mécènes</span>
+        <h2>Tu veux miser ?</h2>
+        <p>Connecte-toi avec Discord pour retrouver ton portefeuille et acheter des parts.</p>
+        <a class="btn" href="/api/auth/login?retour=cote">Se connecter avec Discord</a>
+      </section>
+    </div>
+  </div>
+
+  <section class="regles" aria-label="Règles">
+    <div><b>Mise</b>10 000 crédits fictifs par Mécène, les mêmes sur Discord et ici. Achète des parts de ceux en qui tu crois.</div>
+    <div><b>Vote</b>Après chaque soirée, choisis tes trois favoris avant le lendemain midi. Avec la note de spectacle de la régie, ça fait la Cote.</div>
+    <div><b>Cours</b>Une part coûte 20 cr + 2 × la Cote. Les cours bougent une fois par séance, quand le vote se ferme.</div>
+    <div><b>Faillite</b>Un candidat mort, ses parts ne valent plus rien. Un candidat sorti : cotation suspendue, parts gelées.</div>
+  </section>
+
+  <footer>
+    <span>© Osiris RP · Tous les regards sont enregistrés</span>
+    <span><a href="/">Accueil</a> · <a href="/salle">Salle de contrôle</a> · <a href="https://discord.gg/YMdPEYeam7" target="_blank" rel="noopener">Discord</a> · <a href="legal">Mentions légales</a></span>
+  </footer>
+</div>
+
+<dialog id="fenetre" aria-labelledby="f-titre">
+  <form method="dialog" id="f-form">
+    <span class="eyebrow" id="f-quoi">Acheter</span>
+    <h2 id="f-titre"></h2>
+    <div class="info"><span>Cours <b id="f-prix"></b></span><span id="f-dispo"></span></div>
+    <label for="f-nombre" id="f-label">Crédits à miser</label>
+    <input id="f-nombre" type="text" inputmode="numeric" autocomplete="off" required>
+    <div class="raccourcis" id="f-raccourcis"></div>
+    <div class="apercu" id="f-apercu" aria-live="polite"></div>
+    <div class="boutons">
+      <button class="btn ghost" type="button" id="f-annuler">Annuler</button>
+      <button class="btn" type="submit" id="f-ok">Confirmer</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id) };
+  var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] }) };
+  var nf = new Intl.NumberFormat("fr-FR");
+  var cr = function(n){ return nf.format(Math.round(n)) + " cr" };
+  var pct = function(v){ return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %" };
+  var gras = function(s){ return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") };
+  var etat = null, choix = [], occupe = false, fenetre = null;
+
+  // ---------- petits outils ----------
+  var minuterie;
+  function toast(texte, non){
+    var t = $("toast"); t.innerHTML = gras(texte); t.classList.toggle("non", !!non); t.classList.add("vu");
+    clearTimeout(minuterie); minuterie = setTimeout(function(){ t.classList.remove("vu") }, 5200);
+  }
+  function variationHTML(c){
+    if (c.etat === "mort") return '<span class="var">FAILLITE</span>';
+    if (c.etat === "sorti") return '<span class="var">COTATION SUSPENDUE</span>';
+    var cls = c.variation > 0.05 ? "hausse" : c.variation < -0.05 ? "baisse" : "stable";
+    var fl = cls === "hausse" ? "▲" : cls === "baisse" ? "▼" : "=";
+    return '<span class="var ' + cls + '">' + fl + " " + pct(c.variation) + "</span>";
+  }
+  function courbe(pts, etatC){
+    if (!pts || pts.length < 2) pts = [pts && pts[0] || 0, pts && pts[0] || 0];
+    var w = 96, h = 28, min = Math.min.apply(null, pts), max = Math.max.apply(null, pts), d = max - min || 1;
+    var xy = pts.map(function(p, k){ return [(k / (pts.length - 1)) * (w - 4) + 2, h - 3 - ((p - min) / d) * (h - 6)] });
+    var coul = etatC === "mort" ? "#B5564A" : pts[pts.length - 1] >= pts[0] ? "#E9CF78" : "#D27A6D";
+    if (max === min) xy = xy.map(function(p){ return [p[0], h / 2] });
+    var der = xy[xy.length - 1];
+    return '<svg class="courbe" viewBox="0 0 ' + w + " " + h + '" aria-hidden="true"><polyline fill="none" stroke="' + coul + '" stroke-width="1.5" stroke-linejoin="round" points="' + xy.map(function(p){ return p[0].toFixed(1) + "," + p[1].toFixed(1) }).join(" ") + '"/><circle cx="' + der[0].toFixed(1) + '" cy="' + der[1].toFixed(1) + '" r="2.2" fill="' + coul + '"/></svg>';
+  }
+  function heure(t){ return new Date(t).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" }).replace(":", " h ") }
+  function jourHeure(t){
+    var d = new Date(t), auj = new Date();
+    var memeJour = d.toLocaleDateString("fr-FR", { timeZone: "Europe/Paris" }) === auj.toLocaleDateString("fr-FR", { timeZone: "Europe/Paris" });
+    return (memeJour ? "aujourd'hui" : d.toLocaleDateString("fr-FR", { weekday: "long", timeZone: "Europe/Paris" })) + " à " + heure(t);
+  }
+  function montrer(id){ ["c-charge", "c-connexion", "c-refus", "c-serveur", "c-attente", "c-erreur"].forEach(function(x){ $(x).hidden = x !== id }) }
+
+  // ---------- lecture ----------
+  function charger(){
+    return fetch("/api/rangs?cote=1", { cache: "no-store", credentials: "same-origin" })
+      .then(function(r){ return r.json() })
+      .then(function(d){ etat = d; rendre() })
+      .catch(function(){ if (!etat){ montrer("c-erreur") } });
+  }
+
+  function rendre(){
+    var d = etat;
+    if (!d || d.erreur){ montrer("c-erreur"); $("e-texte").textContent = (d && d.erreur) || "Recharge la page dans un instant."; $("bureau").hidden = true; $("vote").hidden = true; return }
+    if (!d.base){ montrer("c-erreur"); $("e-texte").textContent = "La Bourse n'est pas encore branchée."; return }
+    $("h-prog").textContent = "Programme " + d.programme + " · La Cité";
+    $("compte").innerHTML = d.connecte ? "Connecté · <b>" + esc(d.connecte.nom) + "</b>" : '<a href="/api/auth/login?retour=cote">Se connecter</a>';
+    $("a-prix").textContent = d.prixDepart;
+
+    // la séance
+    $("seance").hidden = !d.cours || !d.ouverte;
+    $("s-num").textContent = d.seance ? "Après la séance " + d.seance : "Cours d'introduction";
+    $("s-devise").hidden = !d.devise; $("s-devise").textContent = d.devise || "";
+
+    var mecene = d.acces === "mecene";
+    // les états sans tableau
+    if (!d.cours || !d.ouverte){
+      $("bureau").hidden = true; $("vote").hidden = true;
+      montrer(d.acces === "invite" ? "c-connexion" : d.acces === "hors_serveur" ? "c-serveur" : d.acces === "refuse" ? "c-refus" : "c-attente");
+      return;
+    }
+    montrer(d.acces === "refuse" ? "c-refus" : d.acces === "hors_serveur" ? "c-serveur" : null);
+    if (d.acces === "refuse") $("r-texte").textContent = "Les cours sont publics depuis la révélation, mais seuls les Mécènes peuvent miser.";
+
+    rendreVote(d);
+    rendreCours(d, mecene);
+    $("pf").hidden = !mecene; $("fort").hidden = !mecene;
+    $("c-public").hidden = d.acces !== "invite";
+    $("colonne").hidden = !mecene && d.acces !== "invite";
+    $("bureau").classList.toggle("seul", $("colonne").hidden);
+    if (mecene){ rendrePortefeuille(d); rendreFortunes(d) }
+    $("bureau").hidden = false;
+  }
+
+  function rendreCours(d, mecene){
+    var tenu = {};
+    if (d.portefeuille) d.portefeuille.lignes.forEach(function(l){ tenu[l.id] = l });
+    document.querySelectorAll(".c-moi").forEach(function(x){ x.hidden = !mecene });
+    $("t-maj").textContent = d.cours.length + " candidat" + (d.cours.length > 1 ? "s" : "");
+    $("cours-vide").hidden = d.cours.length > 0;
+    var rang = 0;
+    $("lignes-cours").innerHTML = d.cours.map(function(c){
+      var l = tenu[c.id], actif = c.etat === "actif";
+      if (actif) rang++;
+      var actions = "";
+      if (mecene){
+        if (actif) actions += '<button class="btn sm" type="button" data-achat="' + esc(c.id) + '">Miser</button>';
+        if (l && actif) actions += '<button class="btn sm rouge" type="button" data-vente="' + esc(c.id) + '">Vendre</button>';
+      }
+      return '<tr class="' + esc(c.etat) + '">'
+        + '<td class="rang">' + (actif ? rang : "") + "</td>"
+        + '<td class="qui"><b>' + esc(c.nom) + "</b><small>" + esc(c.court) + "</small></td>"
+        + '<td class="ccourbe">' + courbe(c.courbe, c.etat) + "</td>"
+        + '<td class="prix n">' + (c.etat === "mort" ? "—" : nf.format(c.prix) + "<small>cr</small>") + "</td>"
+        + '<td class="cvar n">' + variationHTML(c) + "</td>"
+        + (mecene ? '<td class="tenu">' + (l ? "<b>" + nf.format(l.parts) + "</b> part" + (l.parts > 1 ? "s" : "") : "") + "</td>" : "")
+        + '<td class="act">' + actions + "</td></tr>";
+    }).join("");
+  }
+
+  function rendrePortefeuille(d){
+    var p = d.portefeuille, enParts = p.total - p.credits, gain = p.total - d.depart;
+    $("pf-total").textContent = cr(p.total);
+    $("pf-gain").textContent = (gain >= 0 ? "+" : "−") + nf.format(Math.abs(Math.round(gain))) + " cr depuis le départ (" + pct(gain / d.depart * 100) + ")";
+    $("pf-credits").textContent = nf.format(p.credits);
+    $("pf-parts").textContent = nf.format(Math.round(enParts));
+    $("pf-rang").textContent = p.rang ? (p.rang === 1 ? "1re" : p.rang + "e") + " sur " + p.joueurs : "";
+    $("pf-rien").hidden = p.lignes.length > 0;
+    $("pf-lignes").innerHTML = p.lignes.map(function(l){
+      var info = l.etat === "mort" ? '<span class="var">faillite</span>' : l.etat === "sorti" ? '<span class="var stable">suspendue</span>'
+        : '<span class="var ' + (l.gain > 0.05 ? "hausse" : l.gain < -0.05 ? "baisse" : "stable") + '">' + pct(l.gain) + "</span>";
+      return '<li class="' + esc(l.etat) + '"><span class="n">' + esc(l.nom) + '</span><span class="v">' + cr(l.valeur) + "</span>"
+        + '<span class="d">' + nf.format(l.parts) + " part" + (l.parts > 1 ? "s" : "") + (l.etat === "mort" ? "" : " · " + nf.format(l.prix) + " cr") + '</span><span class="g">' + info + "</span></li>";
+    }).join("");
+  }
+
+  function rendreFortunes(d){
+    var med = ["🥇", "🥈", "🥉"];
+    $("fort-liste").innerHTML = d.fortunes.length ? d.fortunes.map(function(f){
+      return '<li class="p' + f.rang + (f.moi ? " moi" : "") + '"><span class="r">' + (med[f.rang - 1] || f.rang) + '</span><span class="nm">' + esc(f.moi ? f.nom + " (toi)" : f.nom) + '</span><span class="s">' + cr(f.total) + "</span></li>";
+    }).join("") : '<li><span></span><span class="nm">Personne n\'a encore misé.</span><span></span></li>';
+  }
+
+  // ---------- le vote ----------
+  function rendreVote(d){
+    var v = d.vote;
+    $("vote").hidden = !v;
+    if (!v) return;
+    if (!rendreVote.seance || rendreVote.seance !== v.seance){ choix = v.choix.slice(); rendreVote.seance = v.seance }
+    $("v-titre").textContent = "La Cote · séance " + v.seance;
+    $("v-fin").textContent = "Fermeture " + jourHeure(v.fin);
+    $("v-texte").textContent = v.choix.length ? "Ton vote est enregistré. Tu peux le changer jusqu'à la fermeture." : "Qui vous a le plus diverti ce soir ? Choisis jusqu'à trois favoris.";
+    $("v-puces").innerHTML = v.candidats.map(function(c){
+      return '<button class="puce" type="button" aria-pressed="' + (choix.indexOf(c.id) >= 0) + '" data-vote="' + esc(c.id) + '"><small>' + c.n + "</small>" + esc(c.nom) + "</button>";
+    }).join("");
+    majVote();
+  }
+  function majVote(){
+    var v = etat && etat.vote; if (!v) return;
+    $("v-compte").textContent = choix.length + " / 3";
+    var pareil = choix.length === v.choix.length && choix.every(function(x){ return v.choix.indexOf(x) >= 0 });
+    $("v-ok").disabled = !choix.length || pareil || occupe;
+    $("v-ok").textContent = v.choix.length ? "Changer mon vote" : "Valider";
+  }
+  $("v-puces").addEventListener("click", function(e){
+    var b = e.target.closest("[data-vote]"); if (!b) return;
+    var id = b.getAttribute("data-vote"), k = choix.indexOf(id);
+    if (k >= 0) choix.splice(k, 1);
+    else if (choix.length >= 3){ toast("Trois favoris au plus : retire quelqu'un avant d'en ajouter un autre.", true); return }
+    else choix.push(id);
+    b.setAttribute("aria-pressed", String(k < 0));
+    majVote();
+  });
+  $("v-ok").addEventListener("click", function(){ envoyer({ action: "vote", seance: etat.vote.seance, choix: choix }) });
+
+  // ---------- acheter, vendre ----------
+  function ouvrir(achat, id){
+    var c = etat.cours.filter(function(x){ return x.id === id })[0]; if (!c) return;
+    var l = (etat.portefeuille.lignes.filter(function(x){ return x.id === id })[0]) || null;
+    fenetre = { achat: achat, c: c, l: l };
+    $("f-quoi").textContent = achat ? "Miser" : "Vendre";
+    $("f-titre").textContent = c.nom;
+    $("f-prix").textContent = cr(c.prix);
+    $("f-dispo").innerHTML = achat ? "Tu as <b>" + cr(etat.portefeuille.credits) + "</b>" : "Tu as <b>" + nf.format(l ? l.parts : 0) + " parts</b>";
+    $("f-label").textContent = achat ? "Crédits à miser" : "Parts à vendre";
+    var base = achat ? etat.portefeuille.credits : (l ? l.parts : 0);
+    var choixR = achat ? [["10 %", .1], ["25 %", .25], ["50 %", .5], ["Tout", 1]] : [["Le quart", .25], ["La moitié", .5], ["Tout", 1]];
+    $("f-raccourcis").innerHTML = choixR.map(function(r){ return '<button type="button" data-part="' + r[1] + '">' + r[0] + "</button>" }).join("");
+    $("f-raccourcis").onclick = function(e){
+      var b = e.target.closest("[data-part]"); if (!b) return;
+      var n = Math.floor(base * Number(b.getAttribute("data-part")));
+      if (!achat && n < 1 && base > 0) n = 1;
+      $("f-nombre").value = String(n); apercu();
+    };
+    $("f-nombre").value = achat ? "" : String(l ? l.parts : "");
+    $("f-ok").textContent = achat ? "Acheter" : "Vendre";
+    $("f-ok").className = achat ? "btn" : "btn rouge";
+    apercu();
+    $("fenetre").showModal();
+    setTimeout(function(){ $("f-nombre").focus() }, 30);
+  }
+  function lireNombre(){ return Math.floor(Number(String($("f-nombre").value).replace(/[\s  .]/g, "").replace(",", "."))) }
+  function apercu(){
+    if (!fenetre) return;
+    var n = lireNombre(), p = fenetre.c.prix, a = $("f-apercu"), ok = true, txt = "";
+    if (!(n > 0)){ txt = ""; ok = false }
+    else if (fenetre.achat){
+      var parts = Math.floor(Math.min(n, etat.portefeuille.credits) / p);
+      if (parts < 1){ txt = "Il faut au moins " + cr(p) + " pour une part."; ok = false }
+      else txt = "→ " + nf.format(parts) + " part" + (parts > 1 ? "s" : "") + " pour " + cr(parts * p) + (n > etat.portefeuille.credits ? " (tout ce que tu as)" : "");
+    } else {
+      var tenues = fenetre.l ? fenetre.l.parts : 0, k = Math.min(n, tenues);
+      if (k < 1){ txt = "Tu n'as aucune part à vendre."; ok = false }
+      else txt = "→ " + nf.format(k) + " part" + (k > 1 ? "s" : "") + " vendue" + (k > 1 ? "s" : "") + " pour " + cr(k * p);
+    }
+    a.textContent = txt; a.classList.toggle("non", !ok && !!txt);
+    $("f-ok").disabled = !ok || occupe;
+  }
+  $("f-nombre").addEventListener("input", apercu);
+  $("f-annuler").addEventListener("click", function(){ $("fenetre").close() });
+  $("f-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    if (!fenetre) return;
+    var n = lireNombre(); if (!(n > 0)) return;
+    envoyer({ action: fenetre.achat ? "achat" : "vente", candidat: fenetre.c.id, nombre: n }).then(function(ok){ if (ok) $("fenetre").close() });
+  });
+  $("lignes-cours").addEventListener("click", function(e){
+    var b = e.target.closest("[data-achat],[data-vente]"); if (!b) return;
+    ouvrir(b.hasAttribute("data-achat"), b.getAttribute("data-achat") || b.getAttribute("data-vente"));
+  });
+
+  function envoyer(corps){
+    if (occupe) return Promise.resolve(false);
+    occupe = true; majVote(); apercu();
+    return fetch("/api/rangs?cote=1", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) })
+      .then(function(r){ return r.json() })
+      .then(function(d){
+        occupe = false;
+        if (d.etat){ etat = d.etat; if (corps.action === "vote" && d.ok) rendreVote.seance = null; rendre() }
+        if (d.erreur){ toast(d.erreur, true); return false }
+        toast(d.message, !d.ok);
+        return !!d.ok;
+      })
+      .catch(function(){ occupe = false; majVote(); apercu(); toast("La Bourse ne répond pas. Réessaie dans un instant.", true); return false });
+  }
+
+  // ---------- démarrage ----------
+  var q = new URLSearchParams(location.search);
+  if (q.get("login") === "erreur") toast("La connexion avec Discord a échoué. Réessaie.", true);
+  if (q.has("login")) history.replaceState(null, "", location.pathname);
+  charger();
+  setInterval(function(){ if (!document.hidden && !occupe && !$("fenetre").open) charger() }, 60000);
+  document.addEventListener("visibilitychange", function(){ if (!document.hidden && !occupe && !$("fenetre").open) charger() });
+})();
+</script>
+</body>
+</html>

@@ -38,6 +38,8 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `lib/antispam.js` et `api/antispam.js` : les règles antispam (AutoMod de Discord) et leur installation.
 - `lib/cote.js` + `lib/redis.js` + `bandeau.html` (adresse `/bandeau`) : la Cote et la Bourse d'Osiris (voir « La Cote et la Bourse »).
 - `lib/selection.js` + `selection.html` (adresse `/selection`) : la cérémonie de la Sélection et l'introduction en Bourse (voir « La Sélection »).
+- `cote.html` (adresse `/cote`) : l'onglet La Cote du site, la Bourse avec le même portefeuille que sur Discord (voir « La Bourse sur le site »).
+- `salle.html` (adresse `/salle`) : la Salle de contrôle, tous les directs en mosaïque (voir « La Salle de contrôle »).
 - `package.json` : `"type": "module"`.
 
 ## Parcours du candidat
@@ -163,6 +165,16 @@ Après chaque soirée, les Mécènes votent pour leurs **3 favoris** (bouton « 
 ### Le bandeau dans OBS
 
 Source **Navigateur**, adresse `https://osiriswl.vercel.app/bandeau`, 1920 × 1080 (fond transparent). `?demo=1` affiche des cours inventés pour régler la scène, `?tele=1` la version plein écran pour les télés en jeu, `?vitesse=120` change la vitesse de défilement. Il ne montre rien tant que `/cote bandeau actif:oui` n'a pas été fait. Les cours viennent de `/api/bourse`.
+
+### La Bourse sur le site (`/cote`)
+
+L'onglet **La Cote** du site (menu de l'accueil, ou `https://osiriswl.vercel.app/cote`). Le Mécène se connecte avec Discord et retrouve **le même portefeuille que sur Discord** (mêmes crédits, mêmes parts, même rang) : il voit les cours avec leur courbe, achète, vend, vote pour la séance ouverte et voit les fortunes. Rien à installer de plus : la page utilise la même base et les mêmes variables que la Cote sur Discord.
+
+- **Qui voit quoi** : les rôles sont lus sur le serveur Osiris (gardés 2 minutes). Un Mécène joue ; un Candidat est refusé, même s'il a encore un rôle Mécène ; quelqu'un qui n'est pas sur le serveur est invité à le rejoindre.
+- **Avant la révélation**, sans connexion Mécène, la page ne montre aucun cours (comme sur Discord, tout reste dans la Loge). **Après `/cote bandeau actif:oui`**, les cours deviennent publics sur la page ; le portefeuille, le vote et les fortunes restent réservés aux Mécènes connectés.
+- **Avant l'introduction en Bourse**, un Mécène connecté voit « La Bourse ouvre le soir de la Sélection ».
+- Comme le reste du site, la page n'est visible que des testeurs avant le 26 décembre.
+- Les achats, ventes et votes passent par `POST /api/rangs?cote=1` (seulement depuis le site lui-même, avec la session Discord).
 
 ### Saison 2
 
@@ -358,6 +370,16 @@ Section « Les écrans » de l'accueil : un moniteur et une case par streamer. �
 | --- | --- |
 | `TWITCH_CLIENT_ID` | Client ID de l'application Twitch |
 | `TWITCH_CLIENT_SECRET` | Secret de l'application Twitch (ne jamais le partager) |
+
+### La Salle de contrôle (`/salle`)
+
+Tous les directs du Programme **en même temps**, en mosaïque, comme les Mécènes qui observent l'île. Lien depuis la section « Les écrans » de l'accueil et le pied de page.
+
+- Le visiteur clique sur **Entrer** (c'est là que les lecteurs Twitch se chargent, avec leurs cookies). Les écrans en direct démarrent sans le son ; ceux qui ne sont pas en direct affichent « Hors antenne ».
+- **Un clic sur un écran** : il passe en grand avec le son, les autres se rangent sur le côté, sans le son. **Mosaïque** (ou Échap) pour revenir ; touches **1 à 9** pour choisir un écran, **F** pour le plein écran.
+- **Le bandeau de la Bourse** s'affiche en bas tout seul après `/cote bandeau actif:oui` (pas sur téléphone, où il serait illisible).
+- **Liste des streamers** : la même que l'accueil, mais écrite deux fois : `ECRANS` dans `index.html` **et** dans `salle.html`. À modifier aux deux endroits.
+- Qui est en direct : même source que l'accueil (`TWITCH_CLIENT_ID` et `TWITCH_CLIENT_SECRET`). Sans ces variables, tous les écrans chargent le lecteur Twitch, qui affiche lui-même « hors ligne ».
 
 ## Partenaires
 
