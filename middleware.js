@@ -16,8 +16,8 @@ export const config = {
 
 const OUVERTURE = Date.parse("2026-12-26T21:00:00+01:00");
 const SAISON2 = Date.parse("2027-09-01T20:00:00+02:00");
-// Les écrans pour OBS (le bandeau de la Bourse, la Sélection) restent ouverts : ils ne montrent rien tant que la régie ne les a pas lancés.
-const OUVERTS = new Set(["/legal", "/legal.html", "/bientot", "/bientot.html", "/bandeau", "/bandeau.html", "/selection", "/selection.html"]);
+// Les écrans pour OBS (le bandeau de la Bourse, la Sélection, le vote des Offrandes) restent ouverts : ils ne montrent rien tant que la régie ne les a pas lancés.
+const OUVERTS = new Set(["/legal", "/legal.html", "/bientot", "/bientot.html", "/bandeau", "/bandeau.html", "/selection", "/selection.html", "/offrande", "/offrande.html"]);
 const PAGES_SAISON2 = new Set(["/saison2", "/saison2.html"]);
 
 // Même session que le reste du site (lib/discord.js) : charge.signature, signée avec SESSION_SECRET, valable 6 heures.

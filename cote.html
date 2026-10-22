@@ -181,6 +181,38 @@ dialog .apercu{font-family:var(--mono);font-size:13px;color:var(--gold);min-heig
 dialog .apercu.non{color:var(--alarm-clair)}
 dialog .boutons{display:flex;gap:10px;justify-content:flex-end}
 
+/* Les colis */
+.colis{display:flex;flex-direction:column}
+.colis .corps{padding:18px 20px 20px;display:flex;flex-direction:column;gap:16px}
+.colis .intro{margin:0;color:var(--dim);font-size:15px;max-width:72ch}
+.cagnottes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.cagnotte{border:1px solid var(--line);background:#0b0c0f;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px}
+.cagnotte .haut{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cagnotte .haut b{font-weight:400;font-size:17px}
+.cagnotte .haut span{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+.cagnotte .pour{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim)}
+.jauge{height:8px;background:rgba(255,255,255,.05);border:1px solid var(--line);position:relative;overflow:hidden}
+.jauge i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#8E7747,var(--brass) 60%,var(--gold));transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.cagnotte .bas{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.cagnotte .bas b{font-weight:400;color:var(--bone)}
+.cagnotte.prete{border-color:var(--brass)}
+.cagnotte.prete .haut span{color:var(--gold)}
+.cagnotte.livree{opacity:.55}
+.colis .pied{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.colis .pied small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.offert{margin:0;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--dim)}
+.offert b{font-weight:400;color:var(--bone)}
+dialog select{width:100%;background:#0b0c0f;border:1px solid var(--line);color:var(--bone);font-family:var(--serif);font-size:17px;padding:10px 12px;margin-top:8px;border-radius:0}
+.sortes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.sorte{all:unset;box-sizing:border-box;cursor:pointer;border:1px solid var(--line);background:#0b0c0f;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.sorte b{font-weight:400;font-size:16px;color:var(--bone)}
+.sorte span{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.sorte small{font-size:12px;color:var(--faint);line-height:1.35}
+.sorte[aria-pressed="true"]{border-color:var(--gold);background:rgba(233,207,120,.08)}
+.sorte[aria-pressed="true"] b{color:var(--gold)}
+.sorte:focus-visible{outline:1px solid var(--bone);outline-offset:2px}
+@media (max-width:520px){.sorte{padding:9px 10px}.sorte small{font-size:11px}}
+
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:50;max-width:min(560px,calc(100vw - 32px));background:var(--bone);color:#121212;padding:12px 18px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .toast.vu{opacity:1;transform:translate(-50%,0)}
 .toast.non{background:#2a1513;color:#f3d6cf;border:1px solid var(--alarm)}
@@ -273,6 +305,16 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
     </div>
   </section>
 
+  <!-- Les colis (Mécènes) -->
+  <section class="cadre colis" id="colis" hidden aria-labelledby="t-colis">
+    <div class="titre"><h2 id="t-colis">Les colis</h2><span id="colis-etat"></span></div>
+    <div class="corps">
+      <p class="intro">Mettez vos crédits en commun : quand la cagnotte est pleine, un colis marqué de l'Œil apparaît pour le candidat, et lui seul peut l'ouvrir. Les crédits donnés sortent de ta fortune.</p>
+      <ul class="cagnottes" id="cagnottes"></ul>
+      <div class="pied"><button class="btn" type="button" id="b-colis">Envoyer un colis</button><small id="colis-offert"></small></div>
+    </div>
+  </section>
+
   <!-- Le tableau de bord -->
   <div class="bureau" id="bureau" hidden>
     <section class="cadre" aria-labelledby="t-cours">
@@ -295,6 +337,7 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
           </div>
           <ul class="lignes" id="pf-lignes"></ul>
           <p class="rien" id="pf-rien" hidden>Aucune part pour l'instant. Choisis un candidat dans les cours et mise.</p>
+          <p class="offert" id="pf-offert" hidden></p>
         </div>
       </section>
 
@@ -337,6 +380,26 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
     <div class="boutons">
       <button class="btn ghost" type="button" id="f-annuler">Annuler</button>
       <button class="btn" type="submit" id="f-ok">Confirmer</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="f-colis" aria-labelledby="fc-titre">
+  <form method="dialog" id="fc-form">
+    <span class="eyebrow">Un colis marqué de l'Œil</span>
+    <h2 id="fc-titre">Envoyer un colis</h2>
+    <label for="fc-cand">Pour qui ?</label>
+    <select id="fc-cand"></select>
+    <label>Quel colis ?</label>
+    <div class="sortes" id="fc-sortes" role="group" aria-label="Quel colis"></div>
+    <div class="info"><span id="fc-cagnotte"></span><span id="fc-dispo"></span></div>
+    <label for="fc-nombre">Crédits à donner</label>
+    <input id="fc-nombre" type="text" inputmode="numeric" autocomplete="off" required>
+    <div class="raccourcis" id="fc-raccourcis"></div>
+    <div class="apercu" id="fc-apercu" aria-live="polite"></div>
+    <div class="boutons">
+      <button class="btn ghost" type="button" id="fc-annuler">Annuler</button>
+      <button class="btn" type="submit" id="fc-ok">Donner</button>
     </div>
   </form>
 </dialog>
@@ -407,7 +470,7 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
     var mecene = d.acces === "mecene";
     // les états sans tableau
     if (!d.cours || !d.ouverte){
-      $("bureau").hidden = true; $("vote").hidden = true;
+      $("bureau").hidden = true; $("vote").hidden = true; $("colis").hidden = true;
       montrer(d.acces === "invite" ? "c-connexion" : d.acces === "hors_serveur" ? "c-serveur" : d.acces === "refuse" ? "c-refus" : "c-attente");
       return;
     }
@@ -421,8 +484,82 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
     $("colonne").hidden = !mecene && d.acces !== "invite";
     $("bureau").classList.toggle("seul", $("colonne").hidden);
     if (mecene){ rendrePortefeuille(d); rendreFortunes(d) }
+    rendreColis(d, mecene);
     $("bureau").hidden = false;
   }
+
+  // ---------- les colis ----------
+  function colisOuverts(d){ return !!(d && d.colis && d.colis.ouvert && !d.colis.erreur) }
+  function rendreColis(d, mecene){
+    var c = d.colis;
+    var montre = mecene && c && !c.erreur && (c.ouvert || c.cagnottes.length);
+    $("colis").hidden = !montre;
+    if (!montre) return;
+    $("colis-etat").textContent = c.ouvert ? "Ouverts" : "Fermés pour l'instant";
+    $("b-colis").hidden = !c.ouvert;
+    $("colis-offert").textContent = c.offert ? "Tu as offert " + cr(c.offert) + " en colis" : "";
+    $("cagnottes").innerHTML = c.cagnottes.length ? c.cagnottes.map(function(g){
+      var etiq = g.etat === "prete" ? "Prêt · en route" : g.etat === "livree" ? "Livré" : nf.format(Math.round(g.total / g.prix * 100)) + " %";
+      var bouton = g.etat === "ouverte" && c.ouvert ? '<button class="btn sm" type="button" data-colis-cand="' + esc(g.cand) + '" data-colis-type="' + esc(g.type) + '">Donner</button>' : "";
+      return '<li class="cagnotte ' + esc(g.etat) + '"><div class="haut"><b>' + esc(g.nom) + "</b><span>" + etiq + '</span></div><span class="pour">Pour ' + esc(g.candNom) + "</span>"
+        + '<div class="jauge"><i style="width:' + Math.min(100, g.total / g.prix * 100).toFixed(1) + '%"></i></div>'
+        + '<div class="bas"><span><b>' + nf.format(g.total) + "</b> / " + nf.format(g.prix) + " cr · " + g.donateurs + " Mécène" + (g.donateurs > 1 ? "s" : "") + (g.moi ? " · " + nf.format(g.moi) + " de toi" : "") + "</span>" + bouton + "</div></li>";
+    }).join("") : '<li class="cagnotte"><span class="pour">Aucune cagnotte en cours. Lance la première.</span></li>';
+  }
+
+  var fc = null;
+  function ouvrirColis(cand, type){
+    var d = etat; if (!colisOuverts(d)) return;
+    var actifs = d.cours.filter(function(x){ return x.etat === "actif" });
+    if (!actifs.length) return;
+    fc = { cand: cand || actifs[0].id, type: type || (d.colis.catalogue[0] && d.colis.catalogue[0].id) };
+    $("fc-cand").innerHTML = actifs.map(function(x){ return '<option value="' + esc(x.id) + '">' + esc(x.nom) + "</option>" }).join("");
+    $("fc-cand").value = fc.cand;
+    majColis();
+    $("f-colis").showModal();
+  }
+  function cagnotteDe(cand, type){ return (etat.colis.cagnottes.filter(function(g){ return g.cand === cand && g.type === type && g.etat === "ouverte" })[0]) || null }
+  function majColis(){
+    var d = etat, cat = d.colis.catalogue;
+    $("fc-sortes").innerHTML = cat.map(function(s){
+      var g = cagnotteDe(fc.cand, s.id);
+      return '<button class="sorte" type="button" data-sorte="' + esc(s.id) + '" aria-pressed="' + (s.id === fc.type) + '"><b>' + esc(s.nom) + "</b><span>" + nf.format(s.prix) + " cr" + (g ? " · déjà " + nf.format(g.total) : "") + "</span><small>" + esc(s.texte || "") + "</small></button>";
+    }).join("");
+    var s = cat.filter(function(x){ return x.id === fc.type })[0];
+    var g = cagnotteDe(fc.cand, fc.type), reste = s ? s.prix - (g ? g.total : 0) : 0;
+    fc.reste = reste;
+    $("fc-cagnotte").innerHTML = s ? "Cagnotte <b>" + nf.format(g ? g.total : 0) + " / " + nf.format(s.prix) + " cr</b>" : "";
+    $("fc-dispo").innerHTML = "Tu as <b>" + cr(d.portefeuille.credits) + "</b>";
+    var choix = [["Ce qui manque", reste], ["500", 500], ["1 000", 1000]];
+    $("fc-raccourcis").innerHTML = choix.map(function(c){ return '<button type="button" data-montant="' + c[1] + '">' + c[0] + "</button>" }).join("");
+    // proposé : ce qui manque s'il reste peu, sinon 500 cr (on ne pré-remplit jamais un gros don)
+    if (!$("fc-nombre").value) $("fc-nombre").value = String(Math.max(0, Math.min(reste <= 1000 ? reste : 500, d.portefeuille.credits)));
+    apercuColis();
+  }
+  function lireColis(){ return Math.floor(Number(String($("fc-nombre").value).replace(/[\s  .]/g, "").replace(",", "."))) }
+  function apercuColis(){
+    if (!fc) return;
+    var n = lireColis(), a = $("fc-apercu"), dispo = etat.portefeuille.credits, ok = true, txt = "";
+    var don = Math.min(n, fc.reste, dispo);
+    if (!(n > 0)) { ok = false }
+    else if (dispo < 1) { txt = "Tu n'as plus de crédits libres."; ok = false }
+    else if (don >= fc.reste) txt = "→ " + cr(don) + " : le colis est complet, la régie le fait livrer.";
+    else txt = "→ " + cr(don) + " · il manquera encore " + cr(fc.reste - don) + ".";
+    a.textContent = txt; a.classList.toggle("non", !ok && !!txt);
+    $("fc-ok").disabled = !ok || occupe;
+  }
+  $("fc-cand").addEventListener("change", function(){ fc.cand = this.value; $("fc-nombre").value = ""; majColis() });
+  $("fc-sortes").addEventListener("click", function(e){ var b = e.target.closest("[data-sorte]"); if (!b) return; fc.type = b.getAttribute("data-sorte"); $("fc-nombre").value = ""; majColis() });
+  $("fc-raccourcis").addEventListener("click", function(e){ var b = e.target.closest("[data-montant]"); if (!b) return; $("fc-nombre").value = b.getAttribute("data-montant"); apercuColis() });
+  $("fc-nombre").addEventListener("input", apercuColis);
+  $("fc-annuler").addEventListener("click", function(){ $("f-colis").close() });
+  $("fc-form").addEventListener("submit", function(e){
+    e.preventDefault(); if (!fc) return;
+    var n = lireColis(); if (!(n > 0)) return;
+    envoyer({ action: "colis", candidat: fc.cand, type: fc.type, nombre: n }).then(function(ok){ if (ok){ $("f-colis").close(); $("fc-nombre").value = "" } });
+  });
+  $("b-colis").addEventListener("click", function(){ $("fc-nombre").value = ""; ouvrirColis() });
+  $("cagnottes").addEventListener("click", function(e){ var b = e.target.closest("[data-colis-cand]"); if (!b) return; $("fc-nombre").value = ""; ouvrirColis(b.getAttribute("data-colis-cand"), b.getAttribute("data-colis-type")) });
 
   function rendreCours(d, mecene){
     var tenu = {};
@@ -438,6 +575,7 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
       if (mecene){
         if (actif) actions += '<button class="btn sm" type="button" data-achat="' + esc(c.id) + '">Miser</button>';
         if (l && actif) actions += '<button class="btn sm rouge" type="button" data-vente="' + esc(c.id) + '">Vendre</button>';
+        if (actif && colisOuverts(d)) actions += '<button class="btn sm ghost" type="button" data-colis="' + esc(c.id) + '" title="Envoyer un colis">Colis</button>';
       }
       return '<tr class="' + esc(c.etat) + '">'
         + '<td class="rang">' + (actif ? rang : "") + "</td>"
@@ -458,6 +596,8 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
     $("pf-parts").textContent = nf.format(Math.round(enParts));
     $("pf-rang").textContent = p.rang ? (p.rang === 1 ? "1re" : p.rang + "e") + " sur " + p.joueurs : "";
     $("pf-rien").hidden = p.lignes.length > 0;
+    $("pf-offert").hidden = !p.offert;
+    $("pf-offert").innerHTML = p.offert ? "📦 Offert en colis : <b>" + cr(p.offert) + "</b>" : "";
     $("pf-lignes").innerHTML = p.lignes.map(function(l){
       var info = l.etat === "mort" ? '<span class="var">faillite</span>' : l.etat === "sorti" ? '<span class="var stable">suspendue</span>'
         : '<span class="var ' + (l.gain > 0.05 ? "hausse" : l.gain < -0.05 ? "baisse" : "stable") + '">' + pct(l.gain) + "</span>";
@@ -557,6 +697,8 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
     envoyer({ action: fenetre.achat ? "achat" : "vente", candidat: fenetre.c.id, nombre: n }).then(function(ok){ if (ok) $("fenetre").close() });
   });
   $("lignes-cours").addEventListener("click", function(e){
+    var cb = e.target.closest("[data-colis]");
+    if (cb){ $("fc-nombre").value = ""; ouvrirColis(cb.getAttribute("data-colis")); return }
     var b = e.target.closest("[data-achat],[data-vente]"); if (!b) return;
     ouvrir(b.hasAttribute("data-achat"), b.getAttribute("data-achat") || b.getAttribute("data-vente"));
   });
@@ -581,8 +723,9 @@ footer a{color:inherit;text-decoration:none} footer a:hover{color:var(--bone)}
   if (q.get("login") === "erreur") toast("La connexion avec Discord a échoué. Réessaie.", true);
   if (q.has("login")) history.replaceState(null, "", location.pathname);
   charger();
-  setInterval(function(){ if (!document.hidden && !occupe && !$("fenetre").open) charger() }, 60000);
-  document.addEventListener("visibilitychange", function(){ if (!document.hidden && !occupe && !$("fenetre").open) charger() });
+  var libre = function(){ return !document.hidden && !occupe && !$("fenetre").open && !$("f-colis").open };
+  setInterval(function(){ if (libre()) charger() }, 30000);
+  document.addEventListener("visibilitychange", function(){ if (libre()) charger() });
 })();
 </script>
 </body>

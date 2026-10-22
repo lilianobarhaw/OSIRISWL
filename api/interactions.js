@@ -10,6 +10,7 @@
 //   /decompte : l'annonce de l'ouverture officielle, avec son compte à rebours (lib/decompte.js)
 //   /cote : la Cote et la Bourse d'Osiris, pour la régie (lib/cote.js)
 //   /selection : la cérémonie de la Sélection, avec le bouton « Nom suivant » (lib/selection.js)
+//   /colis : les colis payés en crédits par les Mécènes (lib/colis.js)
 // Et les boutons de la Cote et de la Bourse, pour les Mécènes (« Voter », panneau de #la-cote).
 //   /warn, /unwarn, /sanctions, /mute, /unmute, /kick, /ban, /unban, /clear, /slowmode (lib/moderation.js)
 
@@ -24,6 +25,7 @@ import * as canal17 from "../lib/canal17.js";
 import * as decompte from "../lib/decompte.js";
 import * as cote from "../lib/cote.js";
 import * as selection from "../lib/selection.js";
+import * as colis from "../lib/colis.js";
 import { baseConfiguree } from "../lib/redis.js";
 
 const VIEW = 1024n, SEND = 2048n, EMBED = 16384n, ATTACH = 32768n, HISTORY = 65536n;
@@ -125,8 +127,8 @@ async function command(i, user) {
   }
 
   // La Cote, la Bourse et la Sélection : une fenêtre tout de suite, ou « Osiris réfléchit… » puis le résultat.
-  if (name === "cote" || name === "selection") {
-    const r = name === "cote" ? await cote.commande(i, user) : await selection.commande(i, user);
+  if (name === "cote" || name === "selection" || name === "colis") {
+    const r = name === "cote" ? await cote.commande(i, user) : name === "colis" ? await colis.commande(i) : await selection.commande(i, user);
     if (r.reponse) return r.reponse;
     const work = r.travail.catch((e) => "Erreur : " + (e?.message || "inconnue"));
     const fast = await Promise.race([work, sleep(RAPIDE).then(() => null)]);
@@ -156,7 +158,7 @@ async function command(i, user) {
 
   if (name === "fermer") return (await closeTicket(i, user)) || reply("Ticket fermé.");
 
-  if (name === "offrande") return json(offrandeModal(opt("salon")));
+  if (name === "offrande") return json(offrandeModal(opt("salon"), opt("ecran") !== false));
 
   if (name === "casting") {
     const chRes = await bot(`/channels/${i.channel_id}`);
@@ -203,7 +205,11 @@ export async function POST(req) {
 
   try {
     // Saisie en cours d'une option (le candidat de /cote mort et /cote sortie)
-    if (i.type === 4) return i.data.name === "cote" ? await cote.autocomplete(i) : json({ type: 8, data: { choices: [] } });
+    if (i.type === 4) return i.data.name === "cote" ? await cote.autocomplete(i) : i.data.name === "colis" ? await colis.autocomplete(i) : json({ type: 8, data: { choices: [] } });
+
+    // Les colis : le bouton « Colis » du panneau de la Bourse, les menus, la fenêtre du don, et les boutons de la régie
+    if (i.type === 3 && (id === "bourse:colis" || id.startsWith("colis:"))) return await colis.composant(i, user);
+    if (i.type === 5 && id.startsWith("colis_")) return await colis.fenetre(i, user);
 
     // La Cote et la Bourse : boutons, menus et fenêtres des Mécènes (et les fenêtres de la régie)
     if (i.type === 3 && (id.startsWith("cote:") || id.startsWith("bourse:"))) {
@@ -230,10 +236,11 @@ export async function POST(req) {
     // Fenêtre de /offrande envoyée → carte Osiris + sondage dans #offrandes
     if (i.type === 5 && id.startsWith("offrande_envoi")) {
       if (!isDirection(i.member)) return reply(DIRECTION_ONLY);
-      const r = await publierOffrande(i, id.split(":")[1]);
+      const [, salonTest, ecran] = id.split(":");
+      const r = await publierOffrande(i, salonTest, ecran !== "0");
       if (r.erreur) return reply(r.erreur);
       await logEvent({ title: r.test ? "Offrande de test lancée" : "Offrande lancée", description: `<@${user.id}> a lancé **${r.titre}** dans <#${r.salon}> (${r.duree}) : ${r.offrandes.join(" · ")}`, user });
-      return reply(`Offrande publiée dans <#${r.salon}>. Le vote se ferme dans ${r.duree}.${r.ferme ? " Discord affiche 1 h sur le sondage : le journal Osiris le fermera à l'heure annoncée sur la carte (il doit tourner sur le VPS)." : ""}${r.notifies ? " Mécènes (tous les rangs) et staff notifiés." : ""}${r.test ? "\nC'est un test : ce salon ne compte pas pour les rangs. Supprime les deux messages quand tu as fini." : ""}`);
+      return reply(`Offrande publiée dans <#${r.salon}>. Le vote se ferme dans ${r.duree}.${r.ferme ? " Discord affiche 1 h sur le sondage : le journal Osiris le fermera à l'heure annoncée sur la carte (il doit tourner sur le VPS)." : ""}${r.notifies ? " Mécènes (tous les rangs) et staff notifiés." : ""}${r.enBase ? (r.ecran ? "\nÀ l'écran : le vote s'affiche sur `/offrande` (OBS) et dans la Salle de contrôle. Les Mécènes peuvent aussi voter sur le site ; le résultat réuni sera publié sous le sondage à la fin." : "\nPas à l'écran : seuls les Mécènes connectés voient le vote dans la Salle de contrôle (ils peuvent y voter).") : ""}${r.test ? "\nC'est un test : ce salon ne compte pas pour les rangs. Supprime les deux messages quand tu as fini." : ""}`);
     }
 
     // Fenêtre de /canal17-voix envoyée → message de la voix dans #canal-17 (ou le salon choisi)
@@ -401,6 +408,8 @@ export function GET() {
     salon_du_decompte: has("DISCORD_DECOMPTE_SALON_ID") ? "OK" : "désactivé : il manque DISCORD_DECOMPTE_SALON_ID",
     selection: !baseConfiguree() ? "désactivée : base Upstash non branchée" : has("DISCORD_SELECTION_CHANNEL_ID") ? "OK" : "base OK, mais il manque DISCORD_SELECTION_CHANNEL_ID (le salon #la-sélection)",
     cote_et_bourse: !baseConfiguree() ? "désactivées : base Upstash non branchée (KV_REST_API_URL, KV_REST_API_TOKEN)" : has("DISCORD_COTE_CHANNEL_ID") ? "OK" : "base OK, mais il manque DISCORD_COTE_CHANNEL_ID (le salon #la-cote)",
+    colis: !baseConfiguree() ? "désactivés : base Upstash non branchée" : has("DISCORD_COLIS_CHANNEL_ID") ? "OK" : "base OK, mais il manque DISCORD_COLIS_CHANNEL_ID (le salon de la régie qui reçoit les colis prêts)",
+    offrandes_a_l_ecran: !baseConfiguree() ? "désactivées : base Upstash non branchée (les Offrandes restent des sondages Discord)" : "OK",
     mot_du_jour: has("DISCORD_MOT_REGISTRE_ID") ? "OK" + (has("DISCORD_MOT_ANNONCE_ID") ? ", avec l'annonce du soir" : ", sans annonce du soir") : "désactivé : il manque DISCORD_MOT_REGISTRE_ID",
   });
 }

@@ -40,6 +40,8 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 - `lib/selection.js` + `selection.html` (adresse `/selection`) : la cérémonie de la Sélection et l'introduction en Bourse (voir « La Sélection »).
 - `cote.html` (adresse `/cote`) : l'onglet La Cote du site, la Bourse avec le même portefeuille que sur Discord (voir « La Bourse sur le site »).
 - `salle.html` (adresse `/salle`) : la Salle de contrôle, tous les directs en mosaïque (voir « La Salle de contrôle »).
+- `offrande.html` (adresse `/offrande`) : le vote des Offrandes en direct, pour OBS (voir « Les Offrandes à l'écran »).
+- `lib/colis.js` : les colis payés en crédits par les Mécènes (voir « Les colis »).
 - `package.json` : `"type": "module"`.
 
 ## Parcours du candidat
@@ -95,6 +97,7 @@ Site du serveur GTA RP Osiris. Page d'accueil qui présente Osiris (animation d'
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | La Cote et la Bourse : ajoutées toutes seules par Vercel quand on branche la base Upstash (Storage) |
 | `COTE_PROGRAMME` | Facultatif. Le numéro du Programme de la Cote (`01` par défaut) |
 | `DISCORD_SELECTION_CHANNEL_ID` | La Sélection : le salon public `#la-sélection` |
+| `DISCORD_COLIS_CHANNEL_ID` | Les colis : un salon **staff** de la régie, qui reçoit « Colis prêt » avec les boutons Livré et Annuler |
 
 Redéployer après chaque modification des variables. Vérification : ouvrir `https://<ton-domaine>/api/candidature` → doit afficher « toutes les variables sont configurées ».
 
@@ -175,6 +178,23 @@ L'onglet **La Cote** du site (menu de l'accueil, ou `https://osiriswl.vercel.app
 - **Avant l'introduction en Bourse**, un Mécène connecté voit « La Bourse ouvre le soir de la Sélection ».
 - Comme le reste du site, la page n'est visible que des testeurs avant le 26 décembre.
 - Les achats, ventes et votes passent par `POST /api/rangs?cote=1` (seulement depuis le site lui-même, avec la session Discord).
+
+### Les colis
+
+Les Mécènes mettent leurs crédits en commun pour envoyer un **colis marqué de l'Œil** à un candidat (comme les sponsors de Hunger Games). Les crédits donnés sortent de leur portefeuille, donc de leur fortune : sauver son favori, ou garder ses crédits pour le classement.
+
+**Mise en place (une fois)**
+1. Un salon **staff** pour la régie (par exemple `#colis-régie`), invisible des Mécènes et des candidats → son identifiant dans `DISCORD_COLIS_CHANNEL_ID`. Redéployer.
+2. Renvoyer les commandes : `/api/commands?key=<SETUP_KEY>` (pour `/colis`).
+3. **Republier le panneau de la Bourse** dans #la-cote (`/cote panneau`, puis supprimer l'ancien) : le nouveau a le bouton 📦 Colis.
+4. Le catalogue par défaut : Chaleur 1 500 cr, Vivres 1 500, Soins 2 500, Une clé 6 000. `/colis catalogue` pour le changer (une ligne par colis : `Nom | prix | contenu`).
+
+**Pendant le Programme**
+- `/colis ouvrir actif:oui` : les Mécènes peuvent donner (bouton 📦 Colis du panneau, ou onglet La Cote du site). `actif:non` arrête les nouveaux dons.
+- Une cagnotte par candidat et par sorte de colis. Quand elle est pleine : « 📦 Colis prêt » dans le salon de la régie (avec **Livré** et **Annuler et rembourser**), et « Un colis attend… » dans #la-cote.
+- La régie fait apparaître le colis en jeu (à la poste ou sur le perron, lui seul peut l'ouvrir), puis clique sur **Livré** : c'est annoncé dans #la-cote. `/colis livrer` fait la même chose.
+- Un candidat mort ou sorti avant la livraison : les donateurs sont remboursés tout seuls. `/colis annuler` rembourse une cagnotte à la main. `/colis etat` résume tout.
+- Les candidats ne voient rien : tout se passe dans la Loge et sur l'onglet La Cote (Mécènes connectés).
 
 ### Saison 2
 
@@ -343,6 +363,17 @@ Taper `/offrande` n'importe où : une fenêtre demande le titre, la durée (en m
 **Votes de moins d'une heure** : Discord n'accepte pas de sondage de moins d'une heure. Le sondage est donc créé pour l'heure entière, la carte annonce la vraie heure de fin, et le journal Osiris (programme sur le VPS) ferme le sondage à cette heure-là. Si le journal est arrêté, le sondage reste ouvert jusqu'au bout de l'heure.
 
 Pour essayer sans fausser les rangs : `/offrande salon:#un-salon-staff`. La carte et le sondage partent dans ce salon, qui n'est pas compté.
+
+### Les Offrandes à l'écran
+
+Avec la base Upstash branchée, chaque `/offrande` est aussi gardée sur le site :
+- **Les Mécènes votent aussi depuis le site**, dans la bande « Offrande en cours » en haut de la Salle de contrôle (connexion Discord). Un candidat ne peut pas voter.
+- **Le compte réunit Discord et le site**, sans doublon : si quelqu'un a voté aux deux endroits, c'est son vote Discord qui compte.
+- **À l'heure de fin**, le bot publie le résultat réuni en réponse au sondage (« L'OFFRANDE EST CHOISIE · … »). Discord affiche aussi son propre résultat, qui ne compte que les votes Discord : c'est celui du bot qui fait foi.
+- **Les votes du site comptent pour les rangs**, comme un vote au sondage.
+- **Option `ecran`** de `/offrande` (oui par défaut) : le vote s'affiche en direct sur l'écran OBS et, pour tout le monde, dans la Salle de contrôle. Avec `ecran:non`, seuls les Mécènes connectés le voient (et votent) dans la Salle ; l'écran OBS reste vide.
+- **L'écran OBS** : source Navigateur `https://osiriswl.vercel.app/offrande`, 1920 × 1080, fond transparent. Le panneau apparaît au lancement, montre les barres et le compte à rebours, puis le résultat pendant 60 secondes. `?position=gauche` ou `centre`, `?resultat=90` (secondes), `?demo=1` pour régler la scène.
+- Après l'ajout de l'option `ecran`, renvoyer les commandes : `/api/commands?key=<SETUP_KEY>`.
 
 Permissions du bot dans #offrandes : Voir le salon, Envoyer des messages, Intégrer des liens, **Créer des sondages**, **Mentionner @everyone, @here et tous les rôles** (sinon les rôles s'affichent mais personne n'est notifié). La bannière et l'icône viennent du site : `SITE_URL` doit être rempli.
 

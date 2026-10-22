@@ -21,6 +21,8 @@
   - Un clic sur un écran : il passe en grand, avec le son ; les autres restent sur le côté, sans le son.
   - Touches : 1 à 9 pour choisir un écran, M ou Échap pour revenir à la mosaïque, F pour le plein écran.
   - En bas, le bandeau de la Bourse (/bandeau), seulement quand la régie l'a activé (/cote bandeau actif:oui).
+  - En haut, pendant une Offrande, la bande du vote (barres, compte à rebours) : les Mécènes connectés votent d'un clic
+    (lib/offrande.js ; votes Discord et site réunis, sans doublon).
   - La liste des streamers est la même que celle de la page d'accueil (bloc ECRANS) : à modifier aux deux endroits.
   - Les lecteurs Twitch ne se chargent qu'après le bouton « Entrer » (Twitch peut alors utiliser ses propres cookies).
 -->
@@ -30,7 +32,7 @@
   --ground:#0A0B0D; --panel:#111317; --panel-2:#16191E; --line:#23262C; --bone:#E6E0D3; --dim:#8B877D; --faint:#55534D;
   --brass:#C4A265; --brass-soft:#8E7747; --gold:#E9CF78; --alarm:#B5564A; --alarm-clair:#D27A6D;
   --display:"Marcellus", Georgia, serif; --serif:"Source Serif 4", Georgia, serif; --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
-  --haut:58px; --bas:0px; --marge:14px;
+  --haut:58px; --bas:0px; --bande:0px; --marge:14px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#050506;color:var(--bone);font-family:var(--serif);-webkit-font-smoothing:antialiased}
@@ -60,7 +62,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;background:rep
 @media (max-width:560px){.barre .titre b{font-size:13px;letter-spacing:.2em}.barre .milieu{display:none}.barre{gap:10px}}
 
 /* Le mur d'écrans : chaque écran est placé par le script (positions absolues, sans jamais déplacer les lecteurs) */
-.mur{position:absolute;left:0;right:0;top:var(--haut);bottom:var(--bas)}
+.mur{position:absolute;left:0;right:0;top:calc(var(--haut) + var(--bande));bottom:var(--bas)}
 body.defile .mur{bottom:auto}
 .ecran{position:absolute;background:#000;border:1px solid #1b1d22;overflow:hidden;transition:left .45s cubic-bezier(.2,.8,.2,1),top .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1),height .45s cubic-bezier(.2,.8,.2,1),border-color .3s}
 .ecran.sans-anim{transition:none}
@@ -108,6 +110,37 @@ body.defile .mur{bottom:auto}
 .annonce{position:fixed;left:50%;bottom:calc(var(--bas) + 18px);transform:translateX(-50%);z-index:15;background:rgba(10,11,13,.92);border:1px solid var(--line);padding:10px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis}
 body.defile .annonce{position:static;transform:none;margin:12px auto 24px;display:block;width:max-content;white-space:normal;text-align:center}
 
+/* La bande de l'Offrande en cours (sous la barre du haut) */
+.offrande{position:fixed;top:var(--haut);left:0;right:0;z-index:19;display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr) minmax(190px,250px);gap:14px;align-items:center;padding:10px var(--marge);background:linear-gradient(180deg,#121317,#0c0d10);border-bottom:1px solid var(--brass-soft);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+body.defile .offrande{position:absolute;grid-template-columns:1fr;gap:10px}
+.o-tete{display:flex;flex-direction:column;gap:3px;min-width:0}
+.o-etiq{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);display:inline-flex;align-items:center;gap:8px}
+.o-etiq::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--alarm);box-shadow:0 0 8px rgba(181,86,74,.9);animation:clignote 1.6s steps(2,start) infinite}
+.offrande.fini .o-etiq::before{background:var(--gold);box-shadow:none;animation:none}
+.o-titre{font-family:var(--display);font-weight:400;font-size:19px;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.o-chrono{font-family:var(--mono);font-size:22px;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1}
+.o-chrono.urgent{color:#E6806F}
+.o-choix{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+body.defile .o-choix{grid-auto-flow:row}
+.o-opt{all:unset;box-sizing:border-box;position:relative;overflow:hidden;border:1px solid var(--line);background:#0b0c0f;padding:9px 12px;min-height:54px;display:flex;flex-direction:column;justify-content:center;gap:2px;cursor:pointer}
+.o-opt:disabled{cursor:default}
+.o-opt:not(:disabled):hover{border-color:var(--brass)}
+.o-opt:focus-visible{outline:1px solid var(--bone);outline-offset:2px}
+.o-fond{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(142,119,71,.32),rgba(196,162,101,.22));transition:width 1s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.o-l1,.o-l2{position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.o-l1{font-size:15px;color:var(--bone)}
+.o-l2{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--dim)}
+.o-opt[aria-pressed="true"]{border-color:var(--gold)}
+.o-opt[aria-pressed="true"] .o-l2{color:var(--gold)}
+.offrande.fini .o-opt{opacity:.45}
+.offrande.fini .o-opt.gagnant{opacity:1;border-color:var(--gold)}
+.offrande.fini .o-opt.gagnant .o-fond{background:linear-gradient(90deg,rgba(233,207,120,.4),rgba(233,207,120,.2))}
+.offrande.fini .o-opt.gagnant .o-l1{color:var(--gold)}
+.o-moi{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);line-height:1.5}
+.o-moi b{font-weight:400;color:var(--gold)}
+.o-moi a{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--brass-soft)}
+.o-moi .err{color:#E6806F}
+
 /* Le bandeau de la Bourse */
 .bandeau{position:fixed;left:0;right:0;bottom:0;height:92px;z-index:18;border:0;width:100%;background:transparent}
 
@@ -145,6 +178,11 @@ body.defile .annonce{position:static;transform:none;margin:12px auto 24px;displa
 </header>
 
 <main class="mur" id="mur" aria-label="Les écrans du Programme"></main>
+<section class="offrande" id="offrande" hidden aria-label="L'Offrande en cours" aria-live="polite">
+  <div class="o-tete"><span class="o-etiq" id="o-etiq">Offrande en cours</span><b class="o-titre" id="o-titre"></b><span class="o-chrono" id="o-chrono"></span></div>
+  <div class="o-choix" id="o-choix" role="group" aria-label="Les Offrandes"></div>
+  <div class="o-moi" id="o-moi"></div>
+</section>
 <div class="annonce" id="annonce" hidden></div>
 <iframe class="bandeau" id="bandeau" title="Bandeau de la Bourse d'Osiris" hidden></iframe>
 
@@ -287,9 +325,11 @@ body.defile .annonce{position:static;transform:none;margin:12px auto 24px;displa
   var G = 8;
   function placer(){
     var W = window.innerWidth, haut = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--haut")) || 58;
-    var H = window.innerHeight - haut - (bandeauActif ? 92 : 0);
     var mobile = W < 720;
     document.body.classList.toggle("defile", mobile);
+    var bande = $("offrande").hidden ? 0 : Math.ceil($("offrande").getBoundingClientRect().height);
+    document.documentElement.style.setProperty("--bande", bande + "px");
+    var H = window.innerHeight - haut - bande - (bandeauActif ? 92 : 0);
     var liste = ordre(), pos = {};
     var M = mobile ? 8 : 14, w0 = W - 2 * M, h0 = H - 2 * M;
     if (grand && !tuiles[grand].classList.contains("eteint")){
@@ -401,12 +441,71 @@ body.defile .annonce{position:static;transform:none;margin:12px auto 24px;displa
       .catch(function(){});
   }
 
+  // ---------- l'Offrande en cours : les barres, le compte à rebours, le vote des Mécènes ----------
+  var offr = null, ecartO = 0, cleO = "", envoi = false, noteO = null;
+  var heureO = function(t){ var s = Math.max(0, Math.ceil((t - (Date.now() + ecartO)) / 1000)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0") };
+  function rendreOffrande(){
+    var o = offr, bande = $("offrande");
+    var montre = !!(o && o.actif && (!o.ferme || Date.now() + ecartO < o.fin + 120000));
+    if (bande.hidden === montre){ bande.hidden = !montre; placer() }
+    if (!montre) return;
+    var mecene = o.moi && o.moi.acces === "mecene";
+    var peutVoter = mecene && !o.ferme && o.moi.discord === null && !envoi;
+    if (cleO !== o.id + ":" + o.options.length){
+      cleO = o.id + ":" + o.options.length;
+      $("o-choix").innerHTML = o.options.map(function(x, k){ return '<button class="o-opt" type="button" data-k="' + k + '" aria-pressed="false"><span class="o-fond"></span><span class="o-l1"></span><span class="o-l2"></span></button>' }).join("");
+      placer();
+    }
+    bande.classList.toggle("fini", !!o.ferme);
+    $("o-etiq").textContent = o.ferme ? (o.gagnant !== null ? "L'Offrande est choisie" : "Vote clos") : "Offrande en cours";
+    $("o-titre").textContent = o.titre;
+    $("o-chrono").textContent = o.ferme ? (o.gagnant !== null ? o.options[o.gagnant].nom : o.total ? "Égalité · la régie tranche" : "Aucun vote") : heureO(o.fin);
+    $("o-chrono").classList.toggle("urgent", !o.ferme && o.fin - (Date.now() + ecartO) <= 30000);
+    [].forEach.call($("o-choix").children, function(b, k){
+      var x = o.options[k]; if (!x) return;
+      b.querySelector(".o-fond").style.width = x.pct + "%";
+      b.querySelector(".o-l1").textContent = x.emoji + " " + x.chiffre + " · " + x.nom;
+      var mien = mecene && (o.moi.discord === k || (o.moi.discord === null && o.moi.choix === k));
+      b.querySelector(".o-l2").textContent = Math.round(x.pct) + " % · " + nf.format(x.votes) + " vote" + (x.votes > 1 ? "s" : "") + (mien ? " · ton vote" : "");
+      b.setAttribute("aria-pressed", String(!!mien));
+      b.title = x.texte || "";
+      b.disabled = !peutVoter;
+      b.classList.toggle("gagnant", !!o.ferme && (o.gagnant === k || (o.egalite || []).indexOf(k) >= 0));
+    });
+    var m = $("o-moi");
+    if (noteO && Date.now() < noteO.jusqu) m.innerHTML = '<span class="' + (noteO.erreur ? "err" : "") + '">' + esc(noteO.texte) + "</span>";
+    else if (o.ferme) m.innerHTML = "Vote clos · <b>" + nf.format(o.total) + "</b> Mécène" + (o.total > 1 ? "s" : "") + "<br>Discord et site réunis";
+    else if (!o.moi || !o.moi.connecte) m.innerHTML = 'Mécène ? <a href="/api/auth/login?retour=salle">Connecte-toi pour voter</a>';
+    else if (!mecene) m.textContent = "Les Offrandes sont votées par les Mécènes.";
+    else if (o.moi.discord !== null && o.moi.discord !== undefined) m.innerHTML = "Tu as voté sur Discord :<br><b>" + esc(o.options[o.moi.discord].nom) + "</b>";
+    else if (o.moi.choix !== null && o.moi.choix !== undefined) m.innerHTML = "Ton vote : <b>" + esc(o.options[o.moi.choix].nom) + "</b><br>Tu peux changer jusqu'à la fin";
+    else m.innerHTML = "Choisis ton Offrande<br>" + nf.format(o.total) + " Mécène" + (o.total > 1 ? "s ont" : " a") + " voté";
+  }
+  function lireOffrande(){
+    if (envoi) return Promise.resolve();
+    return fetch("/api/rangs?offrande=1", { cache: "no-store", credentials: "same-origin" })
+      .then(function(r){ return r.json() })
+      .then(function(d){ if (d.maintenant) ecartO = d.maintenant - Date.now(); offr = d; rendreOffrande() })
+      .catch(function(){});
+  }
+  $("o-choix").addEventListener("click", function(e){
+    var b = e.target.closest("[data-k]"); if (!b || b.disabled || !offr) return;
+    envoi = true; rendreOffrande();
+    fetch("/api/rangs?offrande=1", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: offr.id, choix: Number(b.getAttribute("data-k")) }) })
+      .then(function(r){ return r.json() })
+      .then(function(d){ envoi = false; if (d.etat) offr = d.etat; noteO = { texte: d.erreur || d.message || "", erreur: !!d.erreur || !d.ok, jusqu: Date.now() + 3500 }; rendreOffrande() })
+      .catch(function(){ envoi = false; noteO = { texte: "Le vote n'est pas passé, réessaie.", erreur: true, jusqu: Date.now() + 3500 }; rendreOffrande() });
+  });
+  setInterval(function(){ if (offr && offr.actif && !offr.ferme) rendreOffrande() }, 500);
+
   // ---------- l'entrée ----------
   construire();
   lireDirects().then(function(){ ECRANS.forEach(function(e){ requestAnimationFrame(function(){ tuiles[e.twitch].classList.remove("sans-anim") }) }) });
   lireBandeau();
   setInterval(lireDirects, 60000);
   setInterval(lireBandeau, 60000);
+  lireOffrande();
+  setInterval(function(){ if (!document.hidden) lireOffrande() }, 3000);
 
   $("b-entrer").addEventListener("click", function(){
     entre = true;

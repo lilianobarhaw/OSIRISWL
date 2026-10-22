@@ -7,6 +7,7 @@ function back(query, retour) {
     : retour === "canal17" ? "/?canal17=1" + query.replace("?", "&")
     : retour === "mot" ? "/mot" + query
     : retour === "cote" ? "/cote" + query
+    : retour === "salle" ? "/salle" + query
     : "/casting" + query + "#candidature";
   const headers = new Headers({ Location: env("SITE_URL") + page });
   headers.append("Set-Cookie", cookie("osiris_retour", "", 0));
